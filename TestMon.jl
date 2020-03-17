@@ -1,5 +1,4 @@
-#include("FunctionsTRQGroup.jl")
-#cd("TestMonData")
+include("Auxiliary.jl")
 
 function GetQVals(g, bidstep)
     steps = rand([1:1:20;], 1)[1]
@@ -160,17 +159,4 @@ function TestIncreasingDiffBidder(auction, bidder, Bounds, W, R, rho)
     end
     #end
     return ([test, stepviol])
-end
-
-function TestData(auction, R, rhoindex)
-    eval(Meta.parse(string(
-        "@load \"TestMonA",
-        auction,
-        "R",
-        R,
-        "rho",
-        rhoindex,
-        ".dat\" T",
-    )))
-    return T
 end

@@ -1,3 +1,5 @@
+include("Grouping.jl")
+
 ###########################################################################
 ## Plot bounds bds obtained from Algorithm (TighterBounds())
 ###########################################################################
@@ -230,7 +232,7 @@ function ComputeBounds(auctiongroup, Bounds)
         push!(AvgPratioU1, Ratio1[2])
         push!(AvgPratioU2, Ratio2[2])
     end
-    return (DataFrame([
+    return DataFrame([
         AvgPpreL0,
         AvgPpreL1,
         AvgPpreL2,
@@ -249,7 +251,7 @@ function ComputeBounds(auctiongroup, Bounds)
         AvgPratioU0,
         AvgPratioU1,
         AvgPratioU2,
-    ]))
+    ])
 end
 
 
@@ -273,3 +275,26 @@ function ComputeBoundsMeanStd(Runs)
     end
     return ([DataFrame(Means), DataFrame(Std)])
 end
+
+Bds = ComputeBoundsMeanStd(10)
+
+# table with means
+latexify(
+    Bds[1],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+# table with se
+latexify(
+    Bds[2],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+# table with estimate overview
+latexify(
+    describe(Bds[1])[:,1:5],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
