@@ -5,33 +5,29 @@ This files contains information about the Julia scripts and functions used in:
 Author: Samuel Häfner, University of St. Gallen, [samuel.haefner@unisg.ch](mailto:samuel.haefner@unisg.ch) 
 
 ------
+------
 
-The julia files contain both the functions for estimation as well as the scripts to read and process the obtained estimates.
+The scripts and functions come in several files:
 
-The main files are the following:
-
-- **Auxiliary.jl** --- reads in the required packages, the data set and defines the required auxiliary functions and  global variables.
-- **Grouping.jl** --- determines the bidder groups and auction groups used for the estimation.
-- **Estimation.jl** --- contains the main functions for the estimation of W and the bounds.
-- **TestMon.jl** --- contains the main functions to test for the monotonicity of F in v.
-
-The following files contain the scripts used for estimation:
-
-- **EstimateWandTGeneric.jl** --- generic script to compute and save estimates of W and Theta.
-- **EstimateTighterBoundsGeneric.jl** --- generic script to compute standard and tighter bounds, using W from EstimateWandTGeneric.jl. 
-- **TestMonGeneric.jl** --- generic script to test for monotonicity of F, determining W and the bounds for one bootstrap round, computing violations of monotonicity.
-
-The following files contain the scripts to read in and process the obtained estimates:
-
-- **ReadEstimates.jl** --- contains the functions to read in the estimates.
-- **ReadT.jl** --- script to read in estimates of T and produce the plots. 
-- **ReadTestMon.jl** --- script to read in the monotonicity violations obtained and saved in TestMonGeneric.jl.
-
-The last file contains scripts used for the plots:
-
-- **ResamplingPlots.jl** --- scripts to generate the group plots and the resampling plots. 
+- Main functions:
+  - **Auxiliary.jl** --- reads in the required packages, the data set and defines the required auxiliary functions and  global variables.
+  - **Grouping.jl** --- determines the bidder groups and auction groups used for the estimation.
+  - **Estimation.jl** --- contains the main functions for the estimation.
+  - **TestMon.jl** --- contains the main functions to test for the monotonicity of F in v.
+- Generic scripts to compute the estimates:
+  - **EstimateWandTGeneric.jl** --- generic script to compute and save estimates of W and Theta.
+  - **EstimateTighterBoundsGeneric.jl** --- generic script to compute standard and tighter bounds, using W from EstimateWandTGeneric.jl.
+  - **TestMonGeneric.jl** --- generic script to test for monotonicity of F, determining W and the bounds for one bootstrap round, computing violations of monotonicity. 
+- Scripts to read and process the estimates
+  - **ReadEstimates.jl** --- contains the functions to read in the estimates.
+  - **ReadT.jl** --- script to read in estimates of T and produce the plots. 
+  - **ReadTestMon.jl** --- script to read in the monotonicity violations obtained and saved in TestMonGeneric.jl.
+- Other scripts:
+  - **ResamplingPlots.jl** --- scripts to generate the group plots and the resampling plots. 
 
 ------
+------
+
 
 **Auxiliary.jl** --- reads in the required packages, the data set and defines a few important global variables.
 
@@ -71,6 +67,7 @@ The last file contains scripts used for the plots:
 - FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
 - VarPhiU(q, v, vl)
 - VarPhiL(q, v, vu)
+
 
 
 ------
