@@ -29,7 +29,7 @@ The following files contain the scripts to produce the .jl and .sh files to run 
 - **EstimateBoundsSLURM.jl**
 - **TestMonSLURM.jl**
 
-The following files contain the scripts used to read in and process the estimates produced with above *Slurm.jl scripts:
+The following files contain the scripts used to read in and process the estimates produced with above *SLURM.jl scripts:
 
 - **ReadEstimates.jl** --- contains the functions to read in the estimates and to produce the plot of the bounds.
 - **ReadT.jl** --- script to read in estimates of T and produce the plots. 
