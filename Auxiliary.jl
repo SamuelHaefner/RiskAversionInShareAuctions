@@ -1,5 +1,6 @@
-# change working directory
-#cd("Dropbox/Working Papers/Share Auctions/Risk Aversion/Replication/JuliaScripts")
+# this file contains the auxiliary functions 
+# and global variable use throughout the estimation
+# cf. Readme.md for more information.
 
 # packages required
 using CSV
@@ -8,6 +9,7 @@ using Distributions
 using BSON: @save, @load  ## @save and @load
 using Roots
 
+### determine the global variables
 
 # read in data
 bids = CSV.read(
@@ -34,11 +36,11 @@ K = 5
 # unit of account: 100 corresponds to CHF
 un = 100
 
-# upper bound on type space (in CHF)
-vupperbar = 23
+# upper bound on type space (number in cents, as are the bids)
+vupperbar = 2300/un
 
 # retreive the auction indeces of all auctions
-# just use the frist 39 auctions (the last auction has only one participant)
+# only use the first 39 auctions (the last auction has only one participant)
 auctionindeces = unique(bids[!, :auction])[1:39]
 
 # retreive the bidder indeces of all registered bidders
@@ -51,30 +53,27 @@ clearingprices = []
 activebidders = []
 activebidderindeces = []
 for i in [1:1:length(auctionindeces);]
-    push!(quotas, bids[bids.auction.==auctionindeces[i], :quotatot][1])
+    push!(quotas, bids[bids.auction .== auctionindeces[i], :quotatot][1])
     push!(
         clearingprices,
-        minimum(bids[(bids.auction.==auctionindeces[i]).&(bids.qr.>0), :pb]),
+        minimum(bids[(bids.auction .== auctionindeces[i]) .& (bids.qr .> 0), :pb]),
     )
     push!(
         activebidders,
-        length(unique(bids[bids.auction.==auctionindeces[i], :bidder])),
+        length(unique(bids[bids.auction .== auctionindeces[i], :bidder])),
     )
     push!(
         activebidderindeces,
-        unique(bids[bids.auction.==auctionindeces[i], :bidder]),
+        unique(bids[bids.auction .== auctionindeces[i], :bidder]),
     )
 end
 
+### determine the auxiliary functions
 
-#############################################################################
-# function that returns bid of [bidder] in [auction]
-# in a dataframe with columns [qb,pb,cumqb]
-#############################################################################
 function qpBid(bidder, auction)
     # retreive price-quantity pairs
     bid = bids[
-        (bids.bidder.==bidder).&(bids.auction.==auctionindeces[auction]),
+        (bids.bidder .== bidder) .& (bids.auction .== auctionindeces[auction]),
         [:qb, :pb],
     ]
 
@@ -96,9 +95,6 @@ function qpBid(bidder, auction)
     rename!(bid, (:x1 => :cumqb))
 end
 
-#############################################################################
-## returns average number of bidders in each cluster
-#############################################################################
 function AvgNoBidders(bidderassignment)
     avgno = []
     for g in sort(unique(bidderassignment))
@@ -106,10 +102,8 @@ function AvgNoBidders(bidderassignment)
         for auction in [1:1:39;]
             push!(
                 n,
-                length(findall(in.(
-                    activebidderindeces[auction],
-                    (findall(in.(bidderassignment, g)),),
-                ))),
+                length(findall(in.(activebidderindeces[auction],
+                    (findall(in.(bidderassignment, g)),),))),
             )
         end
         push!(avgno, ceil(mean(n)))
@@ -117,9 +111,6 @@ function AvgNoBidders(bidderassignment)
     return convert(Array{Int64,1}, avgno)
 end
 
-#############################################################################
-# returns the bid-to-cover ration in an auction
-#############################################################################
 function BidToCover(auction)
     q = 0
     for bidder in activebidderindeces[auction]
@@ -127,40 +118,25 @@ function BidToCover(auction)
     end
     return q / quotas[auction]
 end
-# describe([BidToCover(x) for x in [1:1:39;]])
 
-#############################################################################
-# returns the revenue in an auction
-#############################################################################
 function Revenue(auction)
-    revenue = sum(bids[(bids.auction.==auctionindeces[auction]), :qr])
+    revenue = sum(bids[(bids.auction .== auctionindeces[auction]), :pr])
 end
-# describe([Revenue(x) for x in [1:1:39;]])
 
-##############################################################################
-# returns the received quantity of a bidder in a given auction
-##############################################################################
 function qRec(bidder, auction)
     return sum(bids[
-        (bids.bidder.==bidder).&(bids.auction.==auctionindeces[auction]),
+        (bids.bidder .== bidder) .& (bids.auction .== auctionindeces[auction]),
         :qr,
     ])
 end
 
-##############################################################################
-# returns the received quantity share of a bidder in a given auction
-##############################################################################
 function qShareRec(bidder, auction)
     return sum(bids[
-        (bids.bidder.==bidder).&(bids.auction.==auctionindeces[auction]),
+        (bids.bidder .== bidder) .& (bids.auction .== auctionindeces[auction]),
         :qperc,
     ])
 end
 
-
-##############################################################################
-# returns the indeces in which a bidder is active
-###############################################################################
 function ActiveAuctions(bidder)
     activeauctions = []
     for i in [1:1:39;]
@@ -170,13 +146,7 @@ function ActiveAuctions(bidder)
     end
     return activeauctions
 end
-# describe([length(ActiveAuctions(x)) for x in [1:1:123;]])
-# findall([length(ActiveAuctions(x)) for x in [1:1:123;]].>=35)
 
-
-##############################################################################
-# return the average bid of a bidder
-##############################################################################
 function AvgBid(bidder)
     qbid = []
     for i in ActiveAuctions(bidder)
@@ -184,11 +154,7 @@ function AvgBid(bidder)
     end
     return mean(qbid)
 end
-# describe([AvgBid(x) for x in [1:1:123;]])
 
-########################################################################
-# return share of succesfull bidders in an auction
-#########################################################################
 function ShareSuccBidders(auction)
     succ = 0
     for i in activebidderindeces[auction]
@@ -198,11 +164,7 @@ function ShareSuccBidders(auction)
     end
     return succ / activebidders[auction]
 end
-# describe([ShareSuccBidders(x) for x in [1:1:123;]])
 
-#########################################################################
-# return the success rate of a bidder
-#########################################################################
 function SuccessRate(bidder)
     succ = 0
     for i in ActiveAuctions(bidder)
@@ -212,11 +174,7 @@ function SuccessRate(bidder)
     end
     return succ / length(ActiveAuctions(bidder))
 end
-# describe([SuccessRate(x) for x in [1:1:123;]])
 
-#########################################################################
-## return value of \beta_bid(q)
-#########################################################################
 function StepBid(q, bid)
     if q <= minimum(bid[!, :cumqb])
         return bid[1, :pb]
@@ -224,13 +182,9 @@ function StepBid(q, bid)
     if q > maximum(bid[!, :cumqb])
         return 0
     end
-    return bid[length(bid[bid.cumqb.<q, :cumqb])+1, :pb]
+    return bid[length(bid[bid.cumqb .< q, :cumqb]) + 1, :pb]
 end
 
-
-#########################################################################
-## return number of step in \beta_bid at q
-#########################################################################
 function NoStepBid(q, bid)
     if q <= minimum(bid[!, :cumqb])
         return 1
@@ -238,12 +192,9 @@ function NoStepBid(q, bid)
     if q > maximum(bid[!, :cumqb])
         return length(bid.cumqb)
     end
-    return length(bid[bid.cumqb.<q, :cumqb]) + 1
+    return length(bid[bid.cumqb .< q, :cumqb]) + 1
 end
 
-#########################################################################
-## return value of v(q)
-#########################################################################
 function StepV(q, v)
     if q <= minimum(v[!, :qval])
         return v[1, :vval]
@@ -251,39 +202,29 @@ function StepV(q, v)
     if q > maximum(v[!, :qval])
         return 0
     end
-    return v[length(v[v.qval.<q, :qval])+1, :vval]
+    return v[length(v[v.qval .< q, :qval]) + 1, :vval]
 end
 
-#########################################################################
-## return value of \int_a^b\beta_bid(q)dq
-#########################################################################
 function IntBid(a, b, bid)
-    x = bid[(bid.cumqb.>a).&(bid.cumqb.<b), :cumqb]
+    x = bid[(bid.cumqb .> a) .& (bid.cumqb .< b), :cumqb]
     push!(x, b)
     pushfirst!(x, a)
     y = []
     y = [StepBid(z, bid) for z in x[2:end]]
-    x = x[2:end] - x[1:end-1]
+    x = x[2:end] - x[1:end - 1]
     return round(x' * y; digits = 4)
 end
 
-#########################################################################
-## return value of \int_a^b v(q)dq
-#########################################################################
 function IntV(a, b, v)
-    x = v[(v.qval.>a).&(v.qval.<b), :qval]
+    x = v[(v.qval .> a) .& (v.qval .< b), :qval]
     push!(x, b)
     pushfirst!(x, a)
     y = []
     y = [StepV(z, v) for z in x[2:end]]
-    x = x[2:end] - x[1:end-1]
+    x = x[2:end] - x[1:end - 1]
     return round(x' * y; digits = 4)
 end
 
-#########################################################################
-## return value of \overline{\Pi}^j_i(bid,v) when the quota is Q
-## WPar is an array, containing the estimated parameters for steps j=1,...,k
-#########################################################################
 function PiOverline(bidstep, bid, v, WPar, rho, Q, n)
     if rho == 0
         return 0
@@ -305,12 +246,12 @@ function PiOverline(bidstep, bid, v, WPar, rho, Q, n)
 
     ### integrate f from bid.cumqb[j] to bid.cumqb[end]
     ### use intervals given with intpts
-    intpts = v[v.qval.>bid.cumqb[bidstep], :qval]
+    intpts = v[v.qval .> bid.cumqb[bidstep], :qval]
     pushfirst!(intpts, bid.cumqb[bidstep])
     val = []
-    for i in [1:1:length(intpts)-1;]
-        d = (intpts[i+1] - intpts[i]) / n
-        push!(val, d * sum([f(x) for x in [intpts[i]+d:d:intpts[i+1];]]))
+    for i in [1:1:length(intpts) - 1;]
+        d = (intpts[i + 1] - intpts[i]) / n
+        push!(val, d * sum([f(x) for x in [intpts[i] + d:d:intpts[i + 1];]]))
     end
 
     return try
@@ -320,20 +261,13 @@ function PiOverline(bidstep, bid, v, WPar, rho, Q, n)
     end
 end
 
-
-############################################################################
-## returns w(p,q) where WPar contains the parameters of W(p+dp,q) and W(p,q)
-############################################################################
 function w(q, WPar, dp)
     return (cdf(WPar[1], q) - cdf(WPar[2], q)) / dp
 end
 
-############################################################################
-## returns all submitted prices in [auctionset] in ascending order
-############################################################################
 function PriceBids(auctionset)
     pricebidsarr =
-        [bids[(bids.auction.==auctionindeces[x]), :pb] for x in auctionset]
+        [bids[(bids.auction .== auctionindeces[x]), :pb] for x in auctionset]
     pricebids = []
     for i in [1:1:length(pricebidsarr);]
         append!(pricebids, pricebidsarr[i])
@@ -341,12 +275,9 @@ function PriceBids(auctionset)
     return sort!(unique(pricebids / un))
 end
 
-
-
-##########################################################################
-## returns the value of the FOC
-##########################################################################
 function FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
+    # retrive estimates for W(p,q) at price points p (WPar) and at the respective 
+    # next higher prices among the submitted bids (WParPlus)
     WPar = W[group][bootstraprun][sort(
         findall(in.(prices, (bid.pb,))),
         rev = true,
@@ -364,16 +295,22 @@ function FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
         pushfirst!(WParPlus, missing)
     end
 
+    # dp is difference between price bid and next higher price bid among submitted bids 
+    # for the current bidstep
     dp = try
-        prices[findall(in.(prices, (bid.pb,))).+1][bidstep] -
+        prices[findall(in.(prices, (bid.pb,))) .+ 1][bidstep] -
         prices[findall(in.(prices, (bid.pb,)))][bidstep]
     catch
         return 0
     end
 
+    # make sure WPar and WParPlus is well defined
     if ismissing(WParPlus[bidstep]) || ismissing(WPar[bidstep])
         return 0
     end
+
+    # need to distinguish between first and other steps (as in first step, 
+    # integration starts at 0)
     if bidstep >= 2
         f(x) =
             exp(
@@ -385,27 +322,29 @@ function FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
                 (StepV(x, v) - StepBid(x, bid)) * (
                     w(Q - x, [WParPlus[bidstep], WPar[bidstep]], dp) +
                     rho *
-                    (x - bid.cumqb[bidstep-1]) *
+                    (x - bid.cumqb[bidstep - 1]) *
                     cdf(WPar[NoStepBid(x, bid)], Q - x)
                 ) - cdf(WPar[NoStepBid(x, bid)], Q - x)
             )
 
-        ### integrate f from bid.cumqb[j] to bid.cumqb[end]
+        ### integrate f from bid.cumqb[bidstep-1] to bid.cumqb[bidstep]
         ### use intervals given with intpts
         intpts = v[
-            (v.qval.>bid.cumqb[bidstep-1]).&(v.qval.<bid.cumqb[bidstep]),
+            (v.qval .> bid.cumqb[bidstep - 1]) .& (v.qval .< bid.cumqb[bidstep]),
             :qval,
         ]
-        pushfirst!(intpts, bid.cumqb[bidstep-1])
+        pushfirst!(intpts, bid.cumqb[bidstep - 1])
         push!(intpts, bid.cumqb[bidstep])
         val = []
-        for i in [1:1:length(intpts)-1;]
-            d = (intpts[i+1] - intpts[i]) / n
-            push!(val, d * sum([f(x) for x in [intpts[i]+d:d:intpts[i+1];]]))
+        for i in [1:1:length(intpts) - 1;]
+            d = (intpts[i + 1] - intpts[i]) / n
+            push!(val, d * sum([f(x) for x in [intpts[i] + d:d:intpts[i + 1];]]))
         end
+
+        ## return integral plus value of normalized interim utility beyond bidstep
         return sum(val) +
                rho *
-        (bid.cumqb[bidstep] - bid.cumqb[bidstep-1]) *
+        (bid.cumqb[bidstep] - bid.cumqb[bidstep - 1]) *
         PiOverline(bidstep, bid, v, WPar, rho, Q, n)
     else
         g(x) =
@@ -421,16 +360,18 @@ function FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
                 ) - cdf(WPar[NoStepBid(x, bid)], Q - x)
             )
 
-        ### integrate f from bid.cumqb[j] to bid.cumqb[end]
+        ### integrate g from 0 to bid.cumqb[bidstep-1]
         ### use intervals given with intpts
-        intpts = v[(v.qval.>0).&(v.qval.<bid.cumqb[bidstep]), :qval]
+        intpts = v[(v.qval .> 0) .& (v.qval .< bid.cumqb[bidstep]), :qval]
         pushfirst!(intpts, 0)
         push!(intpts, bid.cumqb[bidstep])
         val = []
-        for i in [1:1:length(intpts)-1;]
-            d = (intpts[i+1] - intpts[i]) / n
-            push!(val, d * sum([g(x) for x in [intpts[i]+d:d:intpts[i+1];]]))
+        for i in [1:1:length(intpts) - 1;]
+            d = (intpts[i + 1] - intpts[i]) / n
+            push!(val, d * sum([g(x) for x in [intpts[i] + d:d:intpts[i + 1];]]))
         end
+
+        ## return integral plus value of normalized interim utility beyond bidstep
         return sum(val) +
                rho *
         bid.cumqb[bidstep] *
@@ -438,37 +379,27 @@ function FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
     end
 end
 
-
-
-###########################################################################
-## functions to estimate tighter bounds
-###########################################################################
-
 function VarPhiU(q, v, vl)
     vnew = DataFrame(
-        vval = max.(
-            fill(convert(Float64, v), length(vl[vl.qval.<=q, :qval])),
-            vl[vl.qval.<=q, :vval],
-        ),
-        qval = vl[vl.qval.<=q, :qval],
+        vval = max.(fill(convert(Float64, v), length(vl[vl.qval .<= q, :qval])),
+            vl[vl.qval .<= q, :vval],),
+        qval = vl[vl.qval .<= q, :qval],
     )
     if !in(q, vl[:, :qval])
-        push!(vnew, [max.(v, vl[vl.qval.>q, :vval][1]), q])
+        push!(vnew, [max.(v, vl[vl.qval .> q, :vval][1]), q])
     end
-    append!(vnew, vl[vl.qval.>q, :])
+    append!(vnew, vl[vl.qval .> q, :])
 end
 
 function VarPhiL(q, v, vu)
     vnew = DataFrame(
-        vval = min.(
-            fill(convert(Float64, v), length(vu[vu.qval.>=q, :qval])),
-            vu[vu.qval.>=q, :vval],
-        ),
-        qval = vu[vu.qval.>=q, :qval],
+        vval = min.(fill(convert(Float64, v), length(vu[vu.qval .>= q, :qval])),
+            vu[vu.qval .>= q, :vval],),
+        qval = vu[vu.qval .>= q, :qval],
     )
     if !in(q, vu[:, :qval])
-        push!(vnew, [vu[vu.qval.<q, :vval][end], q])
+        push!(vnew, [vu[vu.qval .< q, :vval][end], q])
     end
-    append!(vnew, vu[vu.qval.<q, :])
+    append!(vnew, vu[vu.qval .< q, :])
     sort!(vnew, :qval)
 end

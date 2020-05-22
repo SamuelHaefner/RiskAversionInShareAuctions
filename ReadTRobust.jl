@@ -18,7 +18,7 @@ m = 5
 rhovec = sort!(append!([exp(x) for x in [-10:0.5:0;]], 0))
 
 for runno in [1:1:runs;]
-    eval(Meta.parse(string("@load \"Theta", runno, ".dat\" Theta", runno)))
+    eval(Meta.parse(string("@load \"ThetaRobust", runno, ".dat\" Theta", runno)))
 end
 
 Tested = []
@@ -122,13 +122,9 @@ plot!(
 )
 plot!(xlabel = L"\ln(\rho)")
 plot(toplot)
-savefig("ThetaEst.pdf")
+savefig("ThetaEstRobust.pdf")
 
-latexify(
-    TData[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
+
 
 #### Thetas by Bidder Assignment
 
@@ -173,6 +169,22 @@ TDataAdd = DataFrame([
 TDataG3 = hcat(TDataG3, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataG3, (:x1 => :std))
 TDataG3 = hcat(TDataG3, TDataAdd)
+
+latexify(
+    TDataG1[:, [:rho, :meanest, :std]],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+)
+latexify(
+    TDataG2[:, [:rho, :meanest, :std]],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+)
+latexify(
+    TDataG3[:, [:rho, :meanest, :std]],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+)
 
 default(lab = "")
 ticks = pushfirst!(log.(TDataG1.rho[2:end]), -11)
@@ -237,23 +249,8 @@ plot!(
 
 plot!(xlabel = L"\ln(\rho)")
 plot(toplot)
-savefig("ThetaEstBidderGroups.pdf")
+savefig("ThetaEstBidderGroupsRobust.pdf")
 
-latexify(
-    TDataG1[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
-latexify(
-    TDataG2[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
-latexify(
-    TDataG3[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
 
 ## By Auction Group
 Tested = []
@@ -457,6 +454,22 @@ TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TData, (:x1 => :std))
 TDataG3 = hcat(TData, TDataAdd)
 
+latexify(
+    TDataG1[:, [:rho, :meanest, :std]],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+)
+latexify(
+    TDataG2[:, [:rho, :meanest, :std]],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+)
+latexify(
+    TDataG3[:, [:rho, :meanest, :std]],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+)
+
 default(lab = "")
 ticks = pushfirst!(log.(TDataG1.rho[2:end]), -11)
 ticklabels = string.(pushfirst!(log.(TDataG1.rho[2:end]), -Inf))
@@ -520,23 +533,9 @@ plot!(
 
 plot!(xlabel = L"\ln(\rho)")
 plot(toplot)
-savefig("ThetaEstAuctionGroups.pdf")
+savefig("ThetaEstAuctionGroupsRobust.pdf")
 
-latexify(
-    TDataG1[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
-latexify(
-    TDataG2[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
-latexify(
-    TDataG3[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
+
 
 
 ## CE-Computation

@@ -1,6 +1,34 @@
-include("Auxiliary.jl")
+# this file  contains the main functions to test for the monotonicity of F in v.
+# cf. Readme.md for more information
+
+function TestIncreasingDiff(auction, bidderset, BoundsAuction, W, R, rhoindexset, rhovec)
+    T = []
+    for rhoindex in rhoindexset
+        Trho = []
+        for bidder in bidderset
+            try
+                push!(
+                    Trho,
+                    TestIncreasingDiffBidder(
+                        auction,
+                        bidder,
+                        BoundsAuction[rhoindex],
+                        W,
+                        R,
+                        rhovec[rhoindex],
+                    ),
+                )
+            catch
+                push!(Trho, [-1, -1])
+            end
+        end
+        push!(T, Trho)
+    end
+    return T
+end
 
 function GetQVals(g, bidstep)
+    # random number of steps
     steps = rand([1:1:20;], 1)[1]
     # random q values between steps
     if bidstep == 1
@@ -29,7 +57,7 @@ function GetHigherF(g, h, qval)
     rename!(f1, (:x2 => :qval))
 end
 
-# check whether F is monotone in v between vlb and vub, on bidstep
+
 function CheckFOCMonotone(
     bidstep,
     bid,
@@ -42,7 +70,8 @@ function CheckFOCMonotone(
     Q,
     bootstraprun,
     R,
-)
+    )
+    
     FOCdiff = []
     for i in [1:1:R;]
         qval = GetQVals(vlb, bidstep)
@@ -61,81 +90,33 @@ function CheckFOCMonotone(
     return FOCdiff
 end
 
-
-##############################################################################
-## MAIN FUNCION
-##############################################################################
-function TestIncreasingDiff(auction, bidderset, R, rhoindexset, rhovec)
-    WB = LoadWandBounds(auction)
-    T = []
-    for rhoindex in rhoindexset
-        Trho = []
-        for bidder in bidderset
-            try
-                push!(
-                    Trho,
-                    TestIncreasingDiffBidder(
-                        auction,
-                        bidder,
-                        WB[1][rhoindex],
-                        WB[2],
-                        R,
-                        rhovec[rhoindex],
-                    ),
-                )
-            catch
-                push!(Trho, [-1, -1])
-            end
-        end
-        push!(T, Trho)
-    end
-    return T
-end
-
-
-
 function LoadWandBounds(auction)
     eval(Meta.parse(string(
         "@load \"BoundsTestMon",
         auction,
         ".dat\" BoundsAuction",
     )))
-    #g = findall([in(auction,group[x]) for x in [1:1:length(group);]])[1]
-    #auctionindexingroup = findall(x->x==auction,group[g])[1]
-    #eval(Meta.parse(string("t1 = Bounds",Run,"[g][auctionindexingroup][2][1]")))
     @load "WValuesTestMon.dat" W
     return [BoundsAuction, W]
 end
 
 function TestIncreasingDiffBidder(auction, bidder, Bounds, W, R, rho)
-    #rhovec = [exp(x) for x in [-10:0.5:0;]]
-    #eval(Meta.parse(string("@load \"Bounds",Run,".dat\" Bounds",Run)))
+
     g = findall([in(auction, group[x]) for x in [1:1:length(group);]])[1]
-    #auctionindexingroup = findall(x->x==auction,group[g])[1]
-    #rho=rhovec[rhoindex]
-    #t1 = Bounds[g][auctionindexingroup][2][1]
-
-    #eval(Meta.parse(string("t1 = Bounds",Run,"[g][auctionindexingroup][2][1]")))
-
-    #eval(Meta.parse(string("@load \"WValues",Run,".dat\" W",Run)))
-    #eval(Meta.parse(string("W=W",Run)))
-
+    
     auctionset = group[g]
     prices = PriceBids(auctionset)
 
     test = 0
     stepviol = 0
-    #    bidder=3
-    #for bidder in [1:1:activebidders[auction];]
-    bid = qpbid(activebidderindeces[auction][bidder], auction)
-    #print(bid)
+    
+    bid = qpBid(activebidderindeces[auction][bidder], auction)
+    
     biddergroup = bidderassignment[activebidderindeces[auction][bidder]]
     vubr = Bounds[bidder][1][2]
     vlbr = Bounds[bidder][1][1]
-    #print(vubr)
-    #print(vlbr)
+   
     for bidstep in [1:1:length(bid.pb);]
-        #print(bidstep)
         teststep = copy(test)
         test +=
             length(findall(
@@ -157,6 +138,6 @@ function TestIncreasingDiffBidder(auction, bidder, Bounds, W, R, rho)
             stepviol += 1
         end
     end
-    #end
     return ([test, stepviol])
 end
+

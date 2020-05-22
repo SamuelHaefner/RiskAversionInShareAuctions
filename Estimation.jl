@@ -1,12 +1,7 @@
-#########################################################################
-# function returning [m] bootstrap estimates of the parameters [.,.]
-# of the gamma distribution of opponent demand, Q-S(p),
-# when [n] opponent bidders are in the auction,
-# for all price points in [prices].
-#
-# the resampling algorithm redraws from the set of bids in [auctionset]
-# [P] times.
-#########################################################################
+# this file contains the main functions for 
+# the estimation of W, $\Theta$, and the bounds.  
+# cf. Readme.md for more information.
+
 function Wgamma(prices, auctionset, bidderassignment, n, m, P)
 
     # construct array of relevant bids, one array for every bidder group
@@ -36,8 +31,8 @@ function Wgamma(prices, auctionset, bidderassignment, n, m, P)
         )
     end
 
-    #construct P resampling indeces, drawing [n(1),...,n(g)] bids, to be used on every
-    #bootstrap sample
+    #construct P resampling indeces, drawing [n(1),...,n(g)] bids, to be 
+    #used on every bootstrap sample
     resampling = []
     for g in sort(unique(bidderassignment))
         resamplinggroup = []
@@ -62,13 +57,13 @@ function Wgamma(prices, auctionset, bidderassignment, n, m, P)
     end
 
 
-    #for every group g, every bootstrap round, for every price,  retrive P opponent demand and
-    #fit gamma distribution to it
+    #for every group g, every bootstrap round, for every price, retrieve 
+    #opponent demand P times and fit gamma distribution to it
     W = []
     for g in sort(unique(bidderassignment))
         dist = []
         for b in [1:1:m;]
-            #retrieve bids
+            #retrieve relevant bids
             relbids = []
             for r in [1:1:P;]
                 samplebid = []
@@ -80,7 +75,7 @@ function Wgamma(prices, auctionset, bidderassignment, n, m, P)
                 end
                 push!(relbids, samplebid)
             end
-            #for every price, return estimate of demand
+            #for every price, return estimate of demand distribution
             z = []
             for p in prices
                 y = []
@@ -106,15 +101,6 @@ function Wgamma(prices, auctionset, bidderassignment, n, m, P)
     return (W)
 end
 
-#########################################################################
-# function returning [m] bootstrap estimates of the parameters [.,.]
-# of the log normal distribution of opponent demand, Q-S(p),
-# when [n] opponent bidders are in the auction, f
-# or all price points in [prices].
-#
-# the resampling algorithm redraws from the set of bids in [auctionset]
-# [P] times.
-#########################################################################
 function Wlnorm(prices, auctionset, bidderassignment, n, m, P)
     # construct array of relevant bids, one array for every bidder group
     bidset = []
@@ -143,8 +129,8 @@ function Wlnorm(prices, auctionset, bidderassignment, n, m, P)
         )
     end
 
-    #construct P resampling indeces, drawing [n(1),...,n(g)] bids, to be used on every
-    #bootstrap sample
+    #construct P resampling indeces, drawing [n(1),...,n(g)] bids, to be 
+    #used on every bootstrap sample
     resampling = []
     for g in sort(unique(bidderassignment))
         resamplinggroup = []
@@ -169,8 +155,8 @@ function Wlnorm(prices, auctionset, bidderassignment, n, m, P)
     end
 
 
-    #for every group g, every bootstrap round, for every price,  retrive P opponent demand and
-    #fit gamma distribution to it
+    #for every group g, every bootstrap round, for every price, retrive 
+    #opponent demand P times and fit lognormal distribution to it
     W = []
     for g in sort(unique(bidderassignment))
         dist = []
@@ -213,21 +199,15 @@ function Wlnorm(prices, auctionset, bidderassignment, n, m, P)
     return (W)
 end
 
-
-##########################################################################
-## returns dataframe with simple bounds, v=[vub,vlb,q]
-## WPar is an array, containing the estimated parameters for steps j=1,...,k
-##########################################################################
 function SimpleBound(bid, WPar, rho, Q)
-    ## start with last step
+    
+    ## start with last quantity point
     vlb = DataFrame(vval = bid.pb[end], qval = bid.cumqb[end])
-
-    ## no information in case of just one step
+    ## no information in case of just one (p,q)-pair
     if length(bid.pb) == 1
         return [vlb, DataFrame(vval = vupperbar, qval = bid.cumqb[end])]
     end
-
-    ## using vlb on last step gives \PiOverline_i^j = 0
+    ## abort if WPar is not properly defined
     if (ismissing(WPar[length(bid.pb)-1]) || ismissing(WPar[length(bid.pb)]))
         return [
             DataFrame(vval = bid.pb, qval = bid.cumqb),
@@ -236,7 +216,8 @@ function SimpleBound(bid, WPar, rho, Q)
                 qval = bid.cumqb,
             ),
         ]
-    else
+    else  
+        ##using vlb on last step gives \PiOverline_i^j = 0
         vub = DataFrame(
             vval = max(
                 bid.pb[length(bid.pb)-1],
@@ -259,22 +240,19 @@ function SimpleBound(bid, WPar, rho, Q)
         )
     end
 
-    ## move backwards through steps, if more than two steps
+    ## move backwards through quantity points, if more than two in bid
     if length(bid.pb) >= 3
         for i in [length(bid.pb)-1:-1:2;]
-            # check whether distribution estimate produced missing,
-            # if so return early
+            # abort early if WPar is not properly defined
             if (ismissing(WPar[i]) || ismissing(WPar[i+1]))
                 vlbnew = bid.pb[1:i]
                 qvalnew = bid.cumqb[1:i]
-                # DataFrame(vval=fill(vupperbar,2), qval=[100, 200])
                 append!(vlb, DataFrame(vval = vlbnew, qval = qvalnew))
                 sort!(vlb, :qval)
                 vubnew = fill(vupperbar, i)
                 append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
                 sort!(vub, :qval)
                 # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-                # take most conservative bound from estimated vub and vul
                 if length(vlb.qval) >= 2
                     for i in [1:1:length(vlb.qval);]
                         vub[i, :vval] = maximum(vub[i:end, :vval])
@@ -300,15 +278,13 @@ function SimpleBound(bid, WPar, rho, Q)
             end
             push!(vlb, [vlbnew bid.cumqb[i]])
             sort!(vlb, :qval)
-            # check whether distribution estimate produced missing,
-            # if so, return early
+            # abort early if WPar is not properly defined
             if (ismissing(WPar[i-1]) || ismissing(WPar[i]))
                 qvalnew = bid.cumqb[1:i]
                 vubnew = fill(vupperbar, i)
                 append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
                 sort!(vub, :qval)
                 # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-                # take most conservative bound from estimated vub and vul
                 if length(vlb.qval) >= 2
                     for i in [1:1:length(vlb.qval);]
                         vub[i, :vval] = maximum(vub[i:end, :vval])
@@ -338,7 +314,7 @@ function SimpleBound(bid, WPar, rho, Q)
         end
     end
 
-    ## first step
+    ## lower bound at first quantity point
     if (ismissing(WPar[1]) || ismissing(WPar[2]))
         vlbnew = bid.pb[1]
     else
@@ -359,11 +335,11 @@ function SimpleBound(bid, WPar, rho, Q)
     end
     push!(vlb, [vlbnew bid.cumqb[1]])
     sort!(vlb, :qval)
+    ## upper bound at first quantity point is vupperbar
     push!(vub, [vupperbar bid.cumqb[1]])
     sort!(vub, :qval)
 
     # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-    # take most conservative bound from estimated vub and vul
     if length(vlb.qval) >= 2
         for i in [1:1:length(vlb.qval);]
             vub[i, :vval] = maximum(vub[i:end, :vval])
@@ -374,15 +350,7 @@ function SimpleBound(bid, WPar, rho, Q)
     return [vlb, vub]
 end
 
-
-###########################################################################
-## Estimates simple bounds for all bidders in [auction] using bids from
-## [auctionset] assuming a risk preference rho. The resampling algorithm
-## uses [P] redraws on [m] bootstrap estimates. The function returns the
-## price bids, the corresponding W, as well as the bounds for every bidder
-## every bootstrap run.
-###########################################################################
-function EstimateSimpleBounds(auction, W, bidderassignments, prices, rho, m)
+function EstimateSimpleBounds(auction, W, bidderassignment, prices, rho, m)
     bounds = []
     for bidder in activebidderindeces[auction]
         boundsbidder = []
@@ -402,18 +370,18 @@ function EstimateSimpleBounds(auction, W, bidderassignments, prices, rho, m)
     return bounds
 end
 
-##########################################################################
-## estimates share of violations
-##########################################################################
-
 function EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
-    tested = zeros(length(unique(bidderassignment)), m)  #define matrix, one colum for every bootrap round, one row for every bidder group
-    violated = zeros(length(unique(bidderassignment)), m) #define matrix, one column for every bootrap round, one row for every bidder group
+    #define matrices, one colum for every bootrap round, one row for every bidder group
+    tested = zeros(length(unique(bidderassignment)), m)  
+    violated = zeros(length(unique(bidderassignment)), m) 
+
+
     for bidder in [1:1:activebidders[auction];]
         g = bidderassignment[bidder]
         bid = qpBid(activebidderindeces[auction][bidder], auction)
         for bootstraprun in [1:1:m;]
             for bidstep in [length(bid.pb):-1:1;]
+                ## compute values of F^j for upper and lower bounds
                 uc = FOC(
                     bidstep,
                     bid,
@@ -438,6 +406,7 @@ function EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
                     bootstraprun,
                     100,
                 )
+                ## test for violation
                 if (uc > 0 || lc < 0)
                     violated[g, bootstraprun] += 1
                 end
@@ -447,11 +416,6 @@ function EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
     end
     return [tested, violated]
 end
-
-
-#############################################################################
-## Runs Algorithm 2, finding tighter bounds
-#############################################################################
 
 function TighterBounds(
     bid,
@@ -465,8 +429,9 @@ function TighterBounds(
     bootstraprun,
     maxiter,
     tolerance,
-)
+    )
 
+    # initial conditions, convert initvl and initvu
     vl = copy(initvl)
     vu = copy(initvu)
     vl[!, :vval] = convert(Array{Float64,1}, vl[!, :vval])
@@ -475,13 +440,13 @@ function TighterBounds(
     vu[!, :qval] = convert(Array{Float64,1}, vu[!, :qval])
 
 
-    # partition step into 10 subintervals
+    ## go through steps in bid function in reversing order
     for bidstep in [length(bid.pb):-1:1;]
-        print(string("b", bidstep))
+        # initialize bounds to be iterated 
         vuint = []
         vlint = []
-        d = bid.qb[bidstep] / 10
-        # obtain q values
+        # partition step into 5 subintervals
+        d = bid.qb[bidstep] / 5
         if bidstep == 1
             qvals = [d:d:bid.cumqb[1];]
             push!(vuint, IntV(0, bid.cumqb[1], vu))
@@ -492,8 +457,8 @@ function TighterBounds(
             push!(vlint, IntV(bid.cumqb[bidstep-1], bid.cumqb[bidstep], vl))
         end
 
+        # iteration of bounds, at most [maxiter] iterations
         for repetition in [2:1:maxiter;]
-            print(string("r", repetition))
             # obtain new values for vu
             vvals = Array{Float64}(undef, 0)
             if repetition == 2
@@ -502,6 +467,7 @@ function TighterBounds(
                 n = 10
             end
             for q in qvals
+                # function for which root is to be determined
                 fu(x) = FOC(
                     bidstep,
                     bid,
@@ -514,6 +480,8 @@ function TighterBounds(
                     bootstraprun,
                     n,
                 )
+                # check if we are looking at the last step 
+                # (range when calling fzero differs)
                 if bidstep == length(bid.pb)
                     ## check values at upper and lower end of interval
                     if fu(StepV(q, initvu)) < 0
@@ -613,7 +581,7 @@ function TighterBounds(
                        fl(maximum([
                         StepV(bid.cumqb[bidstep], vl),
                         StepV(bid.cumqb[bidstep] + 1, vl),
-                    ])) > 0
+                        ])) > 0
                         push!(
                             vvals,
                             maximum([
@@ -680,7 +648,7 @@ function EstTighterBounds(
     m,
     maxiter,
     tolerance,
-)
+    )
     tighterbounds = []
     for bidder in [1:1:activebidders[auction];]
         #for bidder in [1:1:2;]

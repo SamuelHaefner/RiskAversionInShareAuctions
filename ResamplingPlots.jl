@@ -1,4 +1,6 @@
-include("FunctionsTRQGroup.jl")
+include("Auxiliary.jl")
+include("Grouping.jl")
+
 using Plots
 using LaTeXStrings
 using Latexify

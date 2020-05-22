@@ -34,15 +34,24 @@ The following files contain the generic scripts used to produce the scripts for 
 - ```EstimateWandTGeneric.jl``` --- generic script to compute and save estimates of W and Theta.  
 - ```EstimateWandTRobustGeneric.jl``` --- generic script to compute and save robustness checks for W and Theta, using a log-normal distribution rather than a gamma distribution when estimating W.  
 - ```EstimateBoundsGeneric.jl``` --- generic script to compute standard and tighter bounds, using W from EstimateWandTGeneric.jl.   
-- ```TestMonGeneric.jl``` --- generic script to test for monotonicity of F, determining W and the bounds for one bootstrap round, computing violations of monotonicity.
+- ```TestMonGeneric.jl``` --- generic script to test for monotonicity of F, determining W and the bounds for one bootstrap round, computing violations of monotonicity.  
 
 ## Scripts for SLURM
-The following files contain the scripts to produce the .jl and .sh files that are needed reto run the estimates on a SLURM workload manager. For each *Generic.jl-File above, they split up the jobs into a manageable number of bootstrap rounds.  
+The following files contain the scripts to produce the .jl and .sh files that are needed to run the estimates on a SLURM workload manager. For each *Generic.jl-File above, they split up the jobs into a manageable number of bootstrap rounds.  
 
 - ```EstimateWandTSLURM.jl```  
 - ```EstimateWandTRobustSLURM.jl```  
 - ```EstimateBoundsSLURM.jl```  
 - ```TestMonSLURM.jl```  
+
+In order to produce the *.sh bash scripts required by SLURM, these scripts use the following generic templates.
+
+- ```EstimateWandTGeneric.sh```  
+- ```EstimateWandTRobustGeneric.sh```
+- ```EstimateBoundsGeneric.sh```
+- ```TestMonGeneric.sh```
+
+*Comment:* The script ```TestMonWandBounds.jl``` produces the required estimates of W(p,q) and the bounds for the monotonicity check ad needs to be run before the TestMon*.jl scripts, using the bash script ```TestMonWandBounds.sh```.
 
 ## Scripts to Process the Estimates
 The following files contain the scripts used to read in and process the estimates produced with above *Slurm.jl scripts:
@@ -694,4 +703,4 @@ Real number.
 
 
 # Estimates
-The estimates that I have obtained and reported in the manuscript can be read in with the ```Read*.jl``` scripts. The estimates are saved in ```*.dat``` files that can be downloaded here.
+The estimates that I have obtained and reported in the manuscript can be read in with the ```Read*.jl``` scripts. The estimates are saved in ```*.dat``` files. A zip archive of all files can be downloaded [here](https://drive.google.com/open?id=1ZUfHe6ZNgGtjs_Bk5m7qtUc5bXY7B07Y).

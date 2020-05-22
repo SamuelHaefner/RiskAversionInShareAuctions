@@ -1,5 +1,10 @@
 using LaTeXStrings
 using Latexify
+using BSON: @save, @load  ## @save and @load
+
+include("Auxiliary.jl")
+
+rhovec = [exp(x) for x in [-10:0.5:0;]]
 
 function TestData(auction, R, rhoindex)
     eval(Meta.parse(string(
@@ -30,7 +35,6 @@ function MonTestRead()
     return MonTest
 end
 
-cd("Data")
 T = MonTestRead()
 T50 = DataFrame(
     rho = rhovec[1:20],
