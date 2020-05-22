@@ -4,10 +4,21 @@ This file contains information about the Julia code used in:
 
 Author: [Samuel Häfner](https://samuelhaefner.github.io), University of St. Gallen, [samuel.haefner@unisg.ch](mailto:samuel.haefner@unisg.ch) 
 
+# Table of Content
+
+1. [Overview](#Overview)  
+2. [Data](#Data)
+3. [Example](#Example)  
+4. [Scripts](#Scripts)  
+  a. [Estimation.jl](##Estimation.jl)  
+  b. [Testmon.jl](##Testmon.jl)  
+  c. [Grouping.jl](##Grouping.jl)  
+  d. [Auxiliary.jl](##Auxiliary.jl) 
+5. [Estimates](#Estimates) 
 
 # Overview
 
-The replication files contain both the functions for estimation as well as the scripts to read and further process the estimates. 
+The replication files in this repository contain both the functions for estimation as well as the scripts to read and further process the estimates. 
 
 ## Main Files
 The following main files contain all relevant functions and global variables (for more detailed information on the functions and variables in these files see the sections below):
@@ -46,7 +57,7 @@ The last file contains scripts used for the plots:
 
 - ```ResamplingPlots.jl``` --- scripts to generate the group plots and the resampling plots. 
 
-# The Data  
+# Data  
 The data are contained in the file ```setofbids.csv```. Each of the 12401 rows corresponds to a submitted price-quantity pair. The columns are the following:
 
 | Variable | Description |
@@ -55,15 +66,14 @@ The data are contained in the file ```setofbids.csv```. Each of the 12401 rows c
 |```quotatot``` | quota (in kg) | 
 |```bid_id``` | bid id |  
 |```bidder``` | bidder id | 
-|```qb```| quantity point (in kg) |  
+|```qb```| quantity point (not cumulative, in kg) |  
 |```pb```| price point (in Swiss cents) | 
 |```qr```| resulting quantity |  
 |```pr```| resulting payment | 
-|```qperc```| percentage of total quota |  
-|
+|```qperc```| percentage of total quota |   
 
 
-# An Example
+# Example
 
 The following code goes through the basic computations. Doing one bootstrap round, the code first estimates W(p,q), then computes $\Theta(\rho)$, and last determines the bounds for $\rho=0$ and $\rho=\rho^*$. 
 
@@ -185,7 +195,11 @@ for i in [1:1:length(rhovec);]
 end
 ```
 
-# Estimation.jl
+# Scripts
+The following sections provide details about the four main files.
+
+
+## Estimation.jl
 
 
 ```
@@ -224,7 +238,7 @@ Computes upper and lower bounds on the rationalizable profit functions as descri
 ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
 ```Q``` -- positive real number, corresponding to the quota $Q$
 #### Return value
-A list of dataframes, [vlb,vub], where vub is the upper bound and vlb is the lower bound.
+A list of data frames, [vlb,vub], where vub is the upper bound and vlb is the lower bound.
 
 -----
 ```
@@ -302,7 +316,7 @@ Runs ```TighterBounds()``` for all bidders in an ```auction``` and for ```m``` b
 List containing for each biddera and each bootstrapround a two dimensional list [```bounds```,tighterbounds], where tighterbounds is the object returned by ```TighterBounds()```.
 
 
-# TestMon.jl
+## TestMon.jl
 
 ```
 TestIncreasingDiff(auction, bidderset, BoundsAuction, W, R, rhoindexset, rhovec)
@@ -325,7 +339,7 @@ A list of length of the ```rhoindexset```, each entry is again a list of length 
 GetQVals(g, bidstep)
 ```  
 #### Description
-Draws a random number (uniformly between 1 and 20) of equidistant x-values between the x-values of the ```bidstep```-th price-quantity pair in ```g``` and the (```bidstep```-1)-th price-quantity pair
+Draws a random number (uniformly between 1 and 20) of equidistant x-values that lie between the x-values of the ```bidstep```-th price-quantity pair and the (```bidstep```-1)-th price-quantity pair in ```g```.
 #### Arguments
   ```g``` -- decreasing step function function with a number of steps of at least *bidstep*  
   ```bidstep``` -- natural number, indicating the number of the step in the bid function  
@@ -394,9 +408,14 @@ Determines for a bidder in a given auction whether monotonicity of $F^j$ is viol
 #### Return value
 Two-dimensional list, [number of tests performed (corresponds to the number of bid steps), number of violations]
 
+## Grouping.jl
 
+This script defines the following global variables used for the estimation of W:
 
-# Auxiliary.jl
+```group```: list containing, for each auction group, a vector of the respective auction indeces  
+```bidderassignment```: a vector determining for every bidder the bidder group assignment {1,2,3}
+
+## Auxiliary.jl
 
 #### Global variables:
 The script defines the following global variables that are used throughout.
@@ -418,180 +437,180 @@ The script defines the following global variables that are used throughout.
 qpBid(bidder, auction)
 ```
 #### Description
-```qpBid(bidder, auction)``` returns the bid function of a bidder in an auction, which is a dataframe [qb (quantity points), pb (price points), cumqb (cumulated quantity points)]
+Retrieve the bid function of a bidder in an auction.
 #### Arguments
   ```bidder``` -- bidderindex  
   ```auction``` -- auctionindex  
 #### Return value
-```qpBid(bidder, auction)``` returns the bid function of a bidder in an auction, which is a dataframe [qb (quantity points), pb (price points), cumqb (cumulated quantity points)]
+A data frame: [qb (quantity points), pb (price points), cumqb (cumulated quantity points)].
 
 -----
 ```
 AvgNoBidders(bidderassignment)
 ```
 #### Description
-```AvgNoBidders()``` returns the average number of bidders in each bidder cluster
+Determine the average number of bidders in each bidder cluster
 #### Arguments
   ```bidderassignment``` -- vector, each element corresponding to a bidder, denoting the cluster number of the respective bidder  
 #### Return value
-```AvgNoBidders()``` returns the average number of bidders in each bidder cluster
+A list of real numbers.
 
 -----
 ```
 BidToCover(auction)
 ```
 #### Description
-```BidToCover()``` returns the bid-to-cover ratio in an auction
+Determines the bid-to-cover ratio in an auction.
 #### Arguments
   ```auction``` -- auctionindex
 #### Return value
-```BidToCover()``` returns the bid-to-cover ratio in an auction
+Real number.
 
 -----
 ```
 Revenue(auction)
 ```
 #### Description
-```Revenue()``` returns the revenue in an auction
+Determines the revenue from an auction.
 #### Arguments
   ```auction``` -- auctionindex
 #### Return value
-```Revenue()``` returns the revenue in an auction
+Real number.
 
 -----
 ```
 qRec(bidder, auction)
 ```
 #### Description
-```qRec()``` returns the received quantity of a bidder in a given auction
+Determines the allocated quantity of a bidder in a given auction.
 #### Arguments
   ```bidder``` -- bidderindex   
   ```auction``` -- auctionindex
 #### Return value
-```qRec()``` returns the received quantity of a bidder in a given auction
+Real number.
 
 ----
 ```
 qShareRec(bidder, auction)
 ```
 #### Description
-```qShareRec()```  returns the received quantity share of a bidder in a given auction
+Determines the share of quota that is allocated to a bidder in a given auction.
 #### Arguments
   ```bidder``` -- bidderindex  
   ```auction``` -- auctionindex
 #### Return value
-```qShareRec()```  returns the received quantity share of a bidder in a given auction
+Real number.
 
 ----
 ```
 ActiveAuctions(bidder)
 ```
 #### Description
-```ActiveAuctions()``` returns the indeces in which a bidder is active
+Determines the indeces of the auctions in which a bidder is active
 #### Arguments
   ```bidder``` -- bidderindex 
 #### Return value
-```ActiveAuctions()``` returns the indeces in which a bidder is active
+A list of integers.
 
 -----
 ```
 AvgBid(bidder)
 ```
 #### Description
-```AvgBid()``` returns the average bid of a bidder
+Determines the average bid of a bidder across the auctions in which that bidder was active.
 #### Arguments
   ```bidder``` -- bidderindex
 #### Return value
-```AvgBid()``` returns the average bid of a bidder
+Real number.
 
 -----
 ```
 ShareSuccBidders(auction)
 ```
 #### Description
-```ShareSuccBidders()```  returns the  share of succesfull bidders in an auction
+Determines the  share of succesfull bidders (with non-zero allocated quantity) in an auction.
 #### Arguments
   ```auction``` -- auctionindex
 #### Return value
-```ShareSuccBidders()```  returns the  share of succesfull bidders in an auction
+Real number.
 
 ----
 ```
 SuccessRate(bidder)
 ```
 #### Description
-```SuccessRate()``` returns the success rate of a bidder
+Returns the success rate of a bidder (succesfull participation/total participation).
 #### Arguments
   ```bidder``` -- bidderindex
 #### Return value
-```SuccessRate()``` returns the success rate of a bidder
+Real number.
 
 ----
 ```
 StepBid(q, bid)
 ```
 #### Description
-```StepBid()``` returns the value of $\beta_b(q)$ (cf. the manuscript for a definition)
+Determines the value of $\beta_b(q)$ (cf. the manuscript for a definition).
 #### Arguments
   ```q``` -- positive real number
   ```bid``` -- bid function as returned from qpBid(bidder, auction)
 #### Return value
-```StepBid()``` returns the value of $\beta_b(q)$ (cf. the manuscript for a definition)
+Real number.
 
 ----
 ```
 NoStepBid(q, bid)
 ```
 #### Description
-```NoStepBid()```  returns the step number at ```q``` of the step function $\beta_b$
+Determines the step of the step function $\beta_b$ at ```q```. That is, returns the number of downward jumps that have occured strictly before ```q```, plus one.
 #### Arguments
   ```q``` positive real number
   ```bid``` bid function as returned from qpBid(bidder, auction)
 #### Return value
-```NoStepBid()```  returns the step number at ```q``` of the step function $\beta_b$
+Integer.
 
 -----
 ```
 StepV(q, v)
 ```
 #### Description
-```StepV()``` returns the value of v(q)
+Returns the value of the profit function v(q).
 #### Arguments
-  ```q``` -- positive real number
+  ```q``` -- positive real number  
   ```v``` -- marginal profit function, which is a data frame with columns ```qval``` (quantities, need to be increasing) and ```vval``` (the values of v)
 #### Return value
-```StepV()``` returns the value of v(q)
+Real number.
 
 -----
  ```
  IntBid(a, b, bid)
  ```
  #### Description
- ```IntBid()``` returns the value of $\int_a^b\beta_b(q)dq$
+ Returns the value of $\int_a^b\beta_b(q)dq$
  #### Arguments
   ```a```, ```b``` -- positive real numbers
   ```bid``` -- bid function as returned from qpBid(bidder, auction)
 #### Return value
-```IntBid()``` returns the value of $\int_a^b\beta_b(q)dq$
+Real number.
 
 ----
 ```
 IntV(a, b, v)
 ```
 #### Description
-```IntV()``` returns the value of $\int_a^b v(q)dq$
+Returns the value of $\int_a^b v(q)dq$.
 #### Arguments
   ```a```, ```b``` -- positive real numbers
   ```v``` -- marginal profit function
 #### Return value
-```IntV()``` returns the value of $\int_a^b v(q)dq$
+Real number.
 
 ----
 ```
 PiOverline(bidstep, bid, v, WPar, rho, Q, n)
 ```
 #### Description
-```PiOverline()``` returns the value of $\overline{\Pi}_i^j(b,v)$
+Returns the value of $\overline{\Pi}_i^j(b,v)$ (cf. the manuscript for a definition).
 #### Arguments
   ```bidstep``` -- positive natural number, corresponding to the number of the step under consideration, j  
   ```bid``` -- bid function  
@@ -601,38 +620,38 @@ PiOverline(bidstep, bid, v, WPar, rho, Q, n)
   ```Q``` -- positive real number, corresponding to the quota $Q$  
   ```n``` -- positive natural number, indicating the number of support points used for integration  
 #### Return value
-```PiOverline()``` returns the value of $\overline{\Pi}_i^j(b,v)$
+Real number.
 
 -----
 ```
 w(q, WPar, dp)
 ```
 #### Description
-```w()``` returns w(p,q)
+Computes $w_i(p,q)$.
 #### Arguments
   ```q``` -- positive real number  
-  ```WPar``` -- array, containing the estimated parameters of the distribution of D(p) both for p_i^j and p_i^j + dp, j=1,...,k   
+  ```WPar``` -- array, containing two sets of estimated parameters of the distribution of D(p); one for p_i^j and one for p_i^j + dp.   
   ```dp``` -- positive real number  
 #### Return value
-```w()``` returns w(p,q)
+Real number.
 
 ------
 ```
 PriceBids()
 ```
 #### Description
-```PriceBids(auctionset)``` returns all submitted prices in ```auctionset``` in ascending order
+Returns all submitted prices in ```auctionset``` in ascending order.
 #### Arguments
   ```auctionset``` -- vector, containing auction indeces
 #### Return value
-```PriceBids(auctionset)``` returns all submitted prices in ```auctionset``` in ascending order
+List of real numbers.
 
 -----
 ```
 FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
 ```
 #### Description
-```FOC()``` returns the value of the FOC, called $F^j$ in the text
+```FOC()``` returns the value of $F^j$ (cf. the manuscript).
 #### Arguments
   ```bidstep``` -- positive natural number, corresponding to the number of the step under consideration, j  
   ```bid``` -- bid function  
@@ -645,38 +664,34 @@ FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
   ```bootstraprun``` -- natural number, indicating the boostrap run number   
   ```n``` -- positive natural number, indicating the number of support points used for integration  
 #### Return value
-```FOC()``` returns the value of the FOC, called $F^j$ in the text
+Real number.
 
 -----
 ```
 VarPhiU(q, v, vl)
 ```
 #### Description
-```VarPhiU()``` returns $\varphi_u(q,v,v_l)$ (in the text)
+Determines $\varphi_u(q,v,v_l)$ (cf. the manuscript).
 #### Arguments
   ```q``` -- positive real number  
   ```v``` -- marginal profit function  
   ```vl``` -- positive real number, corresponding to $v_l$  
 #### Return value
-```VarPhiU()``` returns $\varphi_u(q,v,v_l)$ (in the text)
+Real number.
 
 -----
 ```
 VarPhiL(q, v, vu)
 ```
 #### Description
-```VarPhiL()``` returns $\varphi_l(q,v,v_u)$ (in the text)
+Determines $\varphi_l(q,v,v_u)$ (cf. the manuscript).
 #### Arguments
   ```q``` -- positive real number  
   ```v``` -- marginal profit function  
   ```vu``` -- positive real number, corresponding to $v_u$  
 #### Return value
-```VarPhiL()``` returns $\varphi_l(q,v,v_u)$ (in the text)
+Real number.
 
-# Grouping.jl
 
-This script defines the following global variables used for the estimation of W:
-
-```group```: list containing, for each auction group, a vector of the respective auction indeces  
-```bidderassignment```: a vector determining for every bidder the bidder group assignment {1,2,3}
-
+# Estimates
+The estimates that I have obtained and reported in the manuscript can be read in with the ```Read*.jl``` scripts. The estimates are saved in ```*.dat``` files that can be downloaded here.
