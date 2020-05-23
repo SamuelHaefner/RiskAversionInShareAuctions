@@ -1,4 +1,4 @@
-This file contains information about the Julia code used in:
+This file contains the necessary information for the replication of the resutls in:
 
 # **[Risk Aversion in Share Auctions: Estimating Rents from TRQs in Switzerland](https://dx.doi.org/10.2139/ssrn.3397027)**
 
