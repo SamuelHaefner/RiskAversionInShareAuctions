@@ -4,7 +4,7 @@ This file contains information about the Julia code used in:
 
 Author: [Samuel Häfner](https://samuelhaefner.github.io), University of St. Gallen, [samuel.haefner@unisg.ch](mailto:samuel.haefner@unisg.ch) 
 
-# Table of Content
+# Table of Contents
 
 1. [Overview](#Overview)  
 2. [Data](#Data)
