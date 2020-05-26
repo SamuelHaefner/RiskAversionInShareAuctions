@@ -1,60 +1,11 @@
+## reads in the estimates of the different AvP-variables and produces the tables
+
 include("Auxiliary.jl")
 include("Grouping.jl")
 
 using Latexify
 using Plots
 
-###########################################################################
-## Plot bounds bounds for [bidder] in auction [auction] from 
-## [Bounds] saved in Bounds[run].dat; save plot in f
-###########################################################################
-function PlotTighterBounds(Bounds, bidder, auction, f)
-    # get group no. of auction
-    g = findall([in(auction, group[x]) for x in [1:1:length(group);]])
-    auctionindexingroup = findall(x -> x == auction, group[g[1]])
-    
-    t0 = Bounds[g[1]][auctionindexingroup[1]][1]
-    t1 = Bounds[g[1]][auctionindexingroup[1]][2][1]
-    t2 = Bounds[g[1]][auctionindexingroup[1]][2][2]
-    
-    bds = Bounds[g[1]][auctionindexingroup[1]][2][2][bidder][1]
-    initvl = Bounds[g[1]][auctionindexingroup[1]][2][1][bidder][1][1]
-    initvu = Bounds[g[1]][auctionindexingroup[1]][2][1][bidder][1][2]
-
-    plot(
-        pushfirst!(copy(initvl.qval), 0),
-        [
-            pushfirst!(copy(initvl.vval), initvl.vval[1]),
-            pushfirst!(copy(initvu.vval), initvu.vval[1]),
-        ],
-        linetype = :steppre,
-        color = :orange,
-        label = ["Initial Conditions" ""],
-    )
-    plot!(
-        pushfirst!(copy(bds[1].qval), 0),
-        #pushfirst!(bds[1].vval, bds[1].vval[1]),
-        [
-            pushfirst!(copy(bds[1].vval), bds[1].vval[1]),
-            pushfirst!(copy(bds[2].vval), bds[2].vval[1]),
-        ],
-        linetype = :steppre,
-        color = :red,
-        label = ["Estimated Bounds" ""],
-        title = join(["Bidder ", bidder, " in Auction ", auction]),
-        xlabel = "q",
-        ylabel = "p",
-    )
-    bid = qpBid(bidder, auction)
-    plot!(
-        pushfirst!(copy(bid.cumqb), 0),
-        pushfirst!(copy(bid.pb), bid.pb[1]),
-        linetype = :steppre,
-        color = :black,
-        label = "Bid Schedule",
-    )
-    savefig(f)
-end
 
 #########################################################################
 ## compute AvgP_\ell^{pre} and AvgP_u^{pre} for [auction] using the 

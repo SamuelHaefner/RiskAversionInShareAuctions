@@ -1,4 +1,5 @@
-## This file contains the script to read in estimates of T and produce the plots.
+## This file contains the script to read in estimates of T and produce the plots and tables.
+## Robustness Check: W(p,q) estimated using a log normal rather than gamma
 
 include("Auxiliary.jl")
 include("Estimation.jl")

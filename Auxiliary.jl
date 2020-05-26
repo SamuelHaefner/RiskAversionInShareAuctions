@@ -1,5 +1,5 @@
 # this file contains the auxiliary functions 
-# and global variable use throughout the estimation
+# and global variable used throughout the estimation
 # cf. Readme.md for more information.
 
 # packages required

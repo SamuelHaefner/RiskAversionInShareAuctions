@@ -1,4 +1,4 @@
-## This file contains the script to read in estimates of T and produce the plots.
+## This file contains the script to read in estimates of T and produce the plots and tables.
 
 include("Auxiliary.jl")
 include("Estimation.jl")

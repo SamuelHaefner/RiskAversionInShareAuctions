@@ -1,3 +1,6 @@
+# Contains the script to read in the estimated monotonicity violations 
+# obtained and saved with TestMonGeneric.jl and produces the respective tables.
+
 using LaTeXStrings
 using Latexify
 using BSON: @save, @load  ## @save and @load
