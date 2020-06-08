@@ -100,27 +100,15 @@ ticklabels = string.(pushfirst!(log.(TData.rho[2:end]), -Inf))
 toplot = plot(
     pushfirst!(log.(TData.rho[2:end]), -11),
     TData.meanest,
+    yerror=1.96*TData.std,
     ylim = (0.1, 0.8),
     seriestype = :scatter,
-    xticks = (ticks, ticklabels),
-)
-for xvalue in [1:1:m*runs;]
-    eval(Meta.parse(string(
-        "plot!(pushfirst!(log.(TData.rho[2:end]),-11),TData.x",
-        xvalue,
-        ",seriestype=:scatter,color=:lightblue,markerstrokecolor=:lightblue)",
-    )))
-end
-plot!(
-    pushfirst!(log.(TData.rho[2:end]), -11),
-    TData.meanest,
-    ylim = (0.1, 0.8),
-    seriestype = :scatter,
-    xticks = (ticks, ticklabels),
+    #xticks = (ticks, ticklabels),
+    grid=true,
     label = "Fraction of Best-Response Violations",
     legend = :topleft,
+    xlabel = L"\ln(\rho)"
 )
-plot!(xlabel = L"\ln(\rho)")
 plot(toplot)
 savefig("ThetaEst.pdf")
 
@@ -180,57 +168,30 @@ ticklabels = string.(pushfirst!(log.(TDataG1.rho[2:end]), -Inf))
 toplot = plot(
     pushfirst!(log.(TDataG1.rho[2:end]) .- 0.12, -11.12),
     TDataG1.meanest,
+    yerror=1.96*TDataG1.std,
     ylim = (0.1, 0.8),
     seriestype = :scatter,
-    xticks = (ticks, ticklabels),
-)
-for xvalue in [1:1:m*runs;]
-    eval(Meta.parse(string(
-        "plot!(pushfirst!(log.(TDataG1.rho[2:end]).-0.12,-11.12),TDataG1.x",
-        xvalue,
-        ",seriestype=:scatter,color=:lightblue,markerstrokecolor=:lightblue)",
-    )))
-end
-plot!(
-    pushfirst!(log.(TDataG1.rho[2:end]) .- 0.12, -11.12),
-    TDataG1.meanest,
-    ylim = (0.1, 0.8),
-    seriestype = :scatter,
-    xticks = (ticks, ticklabels),
+    #xticks = (ticks, ticklabels),
     label = "Fraction of BR Violations Bidder Group 1",
     legend = :topleft,
 )
-
-for xvalue in [1:1:m*runs;]
-    eval(Meta.parse(string(
-        "plot!(pushfirst!(log.(TDataG2.rho[2:end]),-11),TDataG2.x",
-        xvalue,
-        ",seriestype=:scatter,color=:lightblue,markerstrokecolor=:lightblue)",
-    )))
-end
 plot!(
     pushfirst!(log.(TDataG2.rho[2:end]), -11),
     TDataG2.meanest,
     ylim = (0.1, 0.8),
+    yerror=1.96*TDataG2.std,
     seriestype = :scatter,
-    xticks = (ticks, ticklabels),
+    #xticks = (ticks, ticklabels),
     label = "Fraction of BR Violations Bidder Group 2",
     legend = :topleft,
 )
-
-for xvalue in [1:1:m*runs;]
-    eval(Meta.parse(string(
-        "plot!(pushfirst!(log.(TDataG3.rho[2:end]).+0.12,-11+0.12),TDataG3.x",
-        xvalue,
-        ",seriestype=:scatter,color=:lightblue,markerstrokecolor=:lightblue)",
-    )))
-end
 plot!(
     pushfirst!(log.(TDataG3.rho[2:end]) .+ 0.12, -11 + 0.12),
     TDataG3.meanest,
+    yerror=1.96*TDataG3.std,
     ylim = (0.1, 0.8),
     seriestype = :scatter,
-    xticks = (ticks, ticklabels),
+    #xticks = (ticks, ticklabels),
     label = "Fraction of BR Violations Bidder Group 3",
     legend = :topleft,
 )
@@ -464,56 +425,29 @@ toplot = plot(
     pushfirst!(log.(TDataG1.rho[2:end]) .- 0.12, -11.12),
     TDataG1.meanest,
     ylim = (0.1, 0.8),
+    yerror=1.96*TDataG1.std,
     seriestype = :scatter,
-    xticks = (ticks, ticklabels),
-)
-for xvalue in [1:1:m*runs;]
-    eval(Meta.parse(string(
-        "plot!(pushfirst!(log.(TDataG1.rho[2:end]).-0.12,-11.12),TDataG1.x",
-        xvalue,
-        ",seriestype=:scatter,color=:lightblue,markerstrokecolor=:lightblue)",
-    )))
-end
-plot!(
-    pushfirst!(log.(TDataG1.rho[2:end]) .- 0.12, -11.12),
-    TDataG1.meanest,
-    ylim = (0.1, 0.8),
-    seriestype = :scatter,
-    xticks = (ticks, ticklabels),
+    #xticks = (ticks, ticklabels),
     label = "Fraction of BR Violations Auction Group 1",
     legend = :topleft,
 )
-
-for xvalue in [1:1:m*runs;]
-    eval(Meta.parse(string(
-        "plot!(pushfirst!(log.(TDataG2.rho[2:end]),-11),TDataG2.x",
-        xvalue,
-        ",seriestype=:scatter,color=:lightblue,markerstrokecolor=:lightblue)",
-    )))
-end
 plot!(
     pushfirst!(log.(TDataG2.rho[2:end]), -11),
     TDataG2.meanest,
+    yerror=1.96*TDataG2.std,        
     ylim = (0.1, 0.8),
     seriestype = :scatter,
-    xticks = (ticks, ticklabels),
+    #xticks = (ticks, ticklabels),
     label = "Fraction of BR Violations Auction Group 2",
     legend = :topleft,
 )
-
-for xvalue in [1:1:m*runs;]
-    eval(Meta.parse(string(
-        "plot!(pushfirst!(log.(TDataG3.rho[2:end]).+0.12,-11+0.12),TDataG3.x",
-        xvalue,
-        ",seriestype=:scatter,color=:lightblue,markerstrokecolor=:lightblue)",
-    )))
-end
 plot!(
     pushfirst!(log.(TDataG3.rho[2:end]) .+ 0.12, -11 + 0.12),
     TDataG3.meanest,
+    yerror=1.96*TDataG3.std,
     ylim = (0.1, 0.8),
     seriestype = :scatter,
-    xticks = (ticks, ticklabels),
+    #xticks = (ticks, ticklabels),
     label = "Fraction of BR Violations Auction Group 3",
     legend = :topleft,
 )

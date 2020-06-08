@@ -12,8 +12,7 @@ Author: [Samuel Häfner](https://samuelhaefner.github.io), University of St. Gal
 4. [Scripts](#Scripts)  
   a. [Estimation.jl](##Estimation.jl)  
   b. [Testmon.jl](##Testmon.jl)  
-  c. [Grouping.jl](##Grouping.jl)  
-  d. [Auxiliary.jl](##Auxiliary.jl) 
+  c. [Auxiliary.jl](##Auxiliary.jl) 
 5. [Estimates](#Estimates) 
 
 # Overview
@@ -75,7 +74,7 @@ Same as above, but using the alternative estimates (robustness check).
 - ```ReadTestMon.jl```  
 Contains the script to read in the monotonicity violations obtained and saved with TestMonGeneric.jl and produces the respective tables.
 
-## Scripts for Plots in the Paper
+## Scripts to Construct the Plots in the Paper
 The last file contains scripts used for the plots:
 
 - ```Plots.jl```  
@@ -220,12 +219,29 @@ end
 ```
 
 # Scripts
-This section provides the details about the functions and global variables defined in the four main files.
+This section provides the details about the functions and global variables defined in the four main files. 
 
+The **main global variables** used throughout the replication files are defined in the file ```Auxiliary.jl``` and are the followoing.
+
+```bids```: a data frame containing the bidding data  
+```K```: max number of price-quantity pairs  
+```un```: unit of account (100 corresponds to CHF/kg)  
+```vupperbar```: upper bound on type space (in CHF)  
+```auctionindeces```: vector containing the auctionindeces corresponding to those in the data  
+```bidderindeces```: vector containing the bidderindeces corresponding to those in the data  
+```quotas```: vector with the quotas  
+```clearingprices```: vector with the market clearing prices  
+```activebidders```: vector with the number of active bidders  
+```activebidderindeces```: list of vectors with the indeces of the active bidders  
+
+In the file ```Grouping.jl``` the following, **additional global variables** used for the estimation of W are defined:
+
+```group```: list containing, for each auction group, a vector of the respective auction indeces  
+```bidderassignment```: a vector determining for every bidder the bidder group assignment {1,2,3}
+
+In the following subsections, I discuss the functions defined in the respective files ```Estimation.jl```, ```TestMon.jl```, and ```Auxiliary.jl```.
 
 ## Estimation.jl
-
-
 ```
 Wgamma(prices, auctionset, bidderassignment, n, m, P) 
 ```
@@ -432,31 +448,7 @@ Determines for a bidder in a given auction whether monotonicity of $F^j$ is viol
 #### Return value
 Two-dimensional list, [number of tests performed (corresponds to the number of bid steps), number of violations]
 
-## Grouping.jl
-
-This script defines the following global variables used for the estimation of W:
-
-```group```: list containing, for each auction group, a vector of the respective auction indeces  
-```bidderassignment```: a vector determining for every bidder the bidder group assignment {1,2,3}
-
 ## Auxiliary.jl
-
-#### Global variables:
-The script defines the following global variables that are used throughout.
-
-```bids```: a data frame containing the bidding data  
-```K```: max number of price-quantity pairs  
-```un```: unit of account (100 corresponds to CHF/kg)  
-```vupperbar```: upper bound on type space (in CHF)  
-```auctionindeces```: vector containing the auctionindeces corresponding to those in the data  
-```bidderindeces```: vector containing the bidderindeces corresponding to those in the data  
-```quotas```: vector with the quotas  
-```clearingprices```: vector with the market clearing prices  
-```activebidders```: vector with the number of active bidders  
-```activebidderindeces```: list of vectors with the indeces of the active bidders  
-
------
-
 ```
 qpBid(bidder, auction)
 ```
