@@ -11,7 +11,7 @@ function Wgamma(prices, auctionset, bidderassignment, n, m, P)
         for j in auctionset
             for i in activebidderindeces[j][findall(in.(
                 activebidderindeces[j],
-                (findall(in.(bidderassignment, g)),),
+                (bidderindeces[findall(in.(bidderassignment, g))],),
             ))]
                 push!(bidsetgroup, qpBid(i, j))
             end
@@ -109,7 +109,7 @@ function Wlnorm(prices, auctionset, bidderassignment, n, m, P)
         for j in auctionset
             for i in activebidderindeces[j][findall(in.(
                 activebidderindeces[j],
-                (findall(in.(bidderassignment, g)),),
+                (bidderindeces[findall(in.(bidderassignment, g))],),
             ))]
                 push!(bidsetgroup, qpBid(i, j))
             end
@@ -356,7 +356,7 @@ function EstimateSimpleBounds(auction, W, bidderassignment, prices, rho, m)
         boundsbidder = []
         for bootstraprun in [1:1:m;]
             bid = qpBid(bidder, auction)
-            g = bidderassignment[bidder]
+            g = bidderassignment[findall(in.(bidderindeces,bidder))][1]
             WPar = W[g][bootstraprun][sort(
                 findall(in.(prices, (bid.pb,))),
                 rev = true,
@@ -377,7 +377,7 @@ function EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
 
 
     for bidder in [1:1:activebidders[auction];]
-        g = bidderassignment[bidder]
+        g = bidderassignment[findall(in.(bidderindeces,activebidderindeces[auction][bidder]))][1]
         bid = qpBid(activebidderindeces[auction][bidder], auction)
         for bootstraprun in [1:1:m;]
             for bidstep in [length(bid.pb):-1:1;]
@@ -657,7 +657,7 @@ function EstTighterBounds(
         #only compute tighter bounds if allocated with positive amount
         if qRec(activebidderindeces[auction][bidder], auction) > 0
             bid = qpBid(activebidderindeces[auction][bidder], auction)
-            g = bidderassignment[bidder]
+            g = bidderassignment[findall(in.(bidderindeces,activebidderindeces[auction][bidder]))][1]
             for bootstraprun in [1:1:m;]
                 initvl = bounds[bidder][bootstraprun][1]
                 initvu = bounds[bidder][bootstraprun][2]
