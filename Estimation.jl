@@ -350,9 +350,10 @@ function SimpleBound(bid, WPar, rho, Q)
     return [vlb, vub]
 end
 
-function EstimateSimpleBounds(auction, W, bidderassignment, prices, rho, m)
+function EstimateSimpleBounds(auction, W, bidderassignment, prices, rhovec, m)
     bounds = []
     for bidder in activebidderindeces[auction]
+        rho=rhovec[bidderassignment[findall(in.(bidderindeces,bidder))][1]]
         boundsbidder = []
         for bootstraprun in [1:1:m;]
             bid = qpBid(bidder, auction)
@@ -644,15 +645,14 @@ function EstTighterBounds(
     bidderassignment,
     prices,
     bounds,
-    rho,
+    rhovec,
     m,
     maxiter,
     tolerance,
     )
     tighterbounds = []
     for bidder in [1:1:activebidders[auction];]
-        #for bidder in [1:1:2;]
-        print(bidder)
+        rho=rhovec[bidderassignment[findall(in.(bidderindeces,activebidderindeces[auction][bidder]))][1]]
         boundsbidder = []
         #only compute tighter bounds if allocated with positive amount
         if qRec(activebidderindeces[auction][bidder], auction) > 0

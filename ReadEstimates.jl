@@ -15,6 +15,7 @@ using Plots
 function AvgPpre(auction, bounds, j)
     AvgPpreUInd = []
     AvgPpreLInd = []
+    QReceived = []
     for i in [1:1:length(bounds);]
         push!(
             AvgPpreUInd,
@@ -32,11 +33,19 @@ function AvgPpre(auction, bounds, j)
                 bounds[i][j][1],
             ),
         )
+        push!(QReceived,qRec(activebidderindeces[auction][i], auction))
     end
-    return ([
-        sum(AvgPpreLInd) / quotas[auction],
-        sum(AvgPpreUInd) / quotas[auction],
-    ])
+
+    AvgPpre = []
+    push!(AvgPpre,[sum(AvgPpreLInd) / quotas[auction],sum(AvgPpreUInd) / quotas[auction]])
+    for i in unique(bidderassignment)
+        push!(AvgPpre,
+            [sum(AvgPpreLInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))])/
+            sum(QReceived[findall(in.(bidderassignment[activebidderindeces[auction]],i))]),
+            sum(AvgPpreUInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))])/
+            sum(QReceived[findall(in.(bidderassignment[activebidderindeces[auction]],i))])])
+    end
+    return(AvgPpre)
 end
 
 #########################################################################
@@ -47,6 +56,7 @@ end
 function AvgPpost(auction, bounds, j)
     AvgPpostUInd = []
     AvgPpostLInd = []
+    QReceived = []
     for i in [1:1:length(bounds);]
         push!(
             AvgPpostLInd,
@@ -72,11 +82,19 @@ function AvgPpost(auction, bounds, j)
                 qpBid(activebidderindeces[auction][i], auction),
             ),
         )
+        push!(QReceived,qRec(activebidderindeces[auction][i], auction))
     end
-    return ([
-        sum(AvgPpostLInd) / quotas[auction],
-        sum(AvgPpostUInd) / quotas[auction],
-    ])
+    
+    AvgPpost = []
+    push!(AvgPpost,[sum(AvgPpostLInd) / quotas[auction],sum(AvgPpostUInd) / quotas[auction]])
+    for i in unique(bidderassignment)
+        push!(AvgPpost,
+            [sum(AvgPpostLInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))])/
+            sum(QReceived[findall(in.(bidderassignment[activebidderindeces[auction]],i))]),
+            sum(AvgPpostUInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))])/
+            sum(QReceived[findall(in.(bidderassignment[activebidderindeces[auction]],i))])])
+    end
+    return(AvgPpost)
 end
 
 #########################################################################
@@ -85,6 +103,7 @@ end
 #########################################################################
 
 function AvgPrat(auction, bounds, j)
+    ### need to do this for every group!
     n = length(findall(
         [
             qRec(activebidderindeces[auction][i], auction)
@@ -131,16 +150,50 @@ function AvgPrat(auction, bounds, j)
             ),
         )
     end
-    return ([
+
+    AvgPratList = []
+    push!(AvgPratList,[
         sum(AvgPratLInd[findall(convert(
             BitArray{1},
-            -isnan.(AvgPratUInd) .+ 1,
-        ))]) / n,
-        sum(AvgPratUInd[findall(convert(
+            -isnan.(AvgPratLInd) .+ 1,
+        ))]) / length(AvgPratLInd[findall(convert(
             BitArray{1},
             -isnan.(AvgPratLInd) .+ 1,
-        ))]) / n,
+        ))]),
+        sum(AvgPratUInd[findall(convert(
+            BitArray{1},
+            -isnan.(AvgPratUInd) .+ 1,
+        ))]) / length(AvgPratUInd[findall(convert(
+            BitArray{1},
+            -isnan.(AvgPratUInd) .+ 1,
+        ))]),
     ])
+
+    for i in unique(bidderassignment)
+        if length(findall(convert(BitArray{1}, 
+            -isnan.(AvgPratLInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))]) .+ 1,
+            ))) == 0
+            push!(AvgPratList,[NaN,NaN])
+        else
+            push!(AvgPratList,[
+            sum(AvgPratLInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))][findall(convert(
+                BitArray{1},
+                -isnan.(AvgPratLInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))]) .+ 1,
+            ))]) / length(AvgPratLInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))][findall(convert(
+                BitArray{1},
+                -isnan.(AvgPratLInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))]) .+ 1,
+            ))]),
+            sum(AvgPratUInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))][findall(convert(
+                BitArray{1},
+                -isnan.(AvgPratUInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))]) .+ 1,
+            ))]) / length(AvgPratUInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))][findall(convert(
+                BitArray{1},
+                -isnan.(AvgPratUInd[findall(in.(bidderassignment[activebidderindeces[auction]],i))]) .+ 1,
+            ))])])
+        end
+        
+    end
+    return(AvgPratList)
 end
 
 #########################################################################
@@ -148,7 +201,7 @@ end
 ## [auctiongroup], computed from [Bounds]
 #########################################################################
 
-function ComputeBounds(auctiongroup, Bounds)
+function ComputeBounds(auctiongroup, Bounds,subg)
     m=length(Bounds[1][1][1][1])
     Est=[]
     for j in [1:1:m;]
@@ -193,29 +246,29 @@ function ComputeBounds(auctiongroup, Bounds)
             Ratio1 = AvgPrat(auction, t1, j)
             Ratio2 = AvgPrat(auction, t2, j)
 
-            push!(AvgPpreL0, Pre0[1])
-            push!(AvgPpreL1, Pre1[1])
-            push!(AvgPpreL2, Pre2[1])
+            push!(AvgPpreL0, Pre0[subg][1])
+            push!(AvgPpreL1, Pre1[subg][1])
+            push!(AvgPpreL2, Pre2[subg][1])
 
-            push!(AvgPpreU0, Pre0[2])
-            push!(AvgPpreU1, Pre1[2])
-            push!(AvgPpreU2, Pre2[2])
+            push!(AvgPpreU0, Pre0[subg][2])
+            push!(AvgPpreU1, Pre1[subg][2])
+            push!(AvgPpreU2, Pre2[subg][2])
 
-            push!(AvgPpostL0, Post0[1])
-            push!(AvgPpostL1, Post1[1])
-            push!(AvgPpostL2, Post2[1])
+            push!(AvgPpostL0, Post0[subg][1])
+            push!(AvgPpostL1, Post1[subg][1])
+            push!(AvgPpostL2, Post2[subg][1])
 
-            push!(AvgPpostU0, Post0[2])
-            push!(AvgPpostU1, Post1[2])
-            push!(AvgPpostU2, Post2[2])
+            push!(AvgPpostU0, Post0[subg][2])
+            push!(AvgPpostU1, Post1[subg][2])
+            push!(AvgPpostU2, Post2[subg][2])
 
-            push!(AvgPratioL0, Ratio0[1])
-            push!(AvgPratioL1, Ratio1[1])
-            push!(AvgPratioL2, Ratio2[1])
+            push!(AvgPratioL0, Ratio0[subg][1])
+            push!(AvgPratioL1, Ratio1[subg][1])
+            push!(AvgPratioL2, Ratio2[subg][1])
 
-            push!(AvgPratioU0, Ratio0[2])
-            push!(AvgPratioU1, Ratio1[2])
-            push!(AvgPratioU2, Ratio2[2])
+            push!(AvgPratioU0, Ratio0[subg][2])
+            push!(AvgPratioU1, Ratio1[subg][2])
+            push!(AvgPratioU2, Ratio2[subg][2])
         end
         push!(Est,DataFrame([
         AvgPpreL0,
@@ -246,11 +299,12 @@ end
 ## se) using the [Runs] runs of estimate filed Bounds[run].dat
 ###########################################################################
 
-function ComputeBoundsMeanStd(Runs)
+function ComputeBoundsMeanStd(Runs,subg)
     Estimates = []
     for i in Runs
         eval(Meta.parse(string("@load \"Bounds", i, ".dat\" Bounds", i)))
-        eval(Meta.parse(string("E = ComputeBounds([1:1:39;],Bounds", i, ")")))
+        eval(Meta.parse(string("E = ComputeBounds([1:1:39;],Bounds", i, ",",subg,")")))
+        eval(Meta.parse(string("Bounds", i, "= nothing")))
         append!(Estimates, E)
     end
 
@@ -271,25 +325,103 @@ end
 # read the actual estimates and construct the tables
 ######################################################################################
 
-Bds = ComputeBoundsMeanStd(40)
+# across all bidders, subg=1 
+Bds1 = ComputeBoundsMeanStd([1:1:40;],1)
 
 # table with means
 latexify(
-    Bds[1],
+    Bds1[1],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
     )
 
 # table with se
 latexify(
-    Bds[2],
+    Bds1[2],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
     )
 
 # table with estimate overview
 latexify(
-    describe(Bds[1])[:,1:5],
+    describe(Bds1[1])[:,1:5],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
     )
+
+
+# across all bidders of group 1, subg=2
+Bds2 = ComputeBoundsMeanStd([1:1:40;],2)
+
+# table with means
+latexify(
+    Bds2[1],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+# table with se
+latexify(
+    Bds2[2],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+# table with estimate overview
+latexify(
+    describe(Bds2[1][setdiff(1:end,31),:])[:,1:5],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+
+# across all bidders of group 2, subg=3
+Bds3 = ComputeBoundsMeanStd([1:1:40;],3)
+
+# table with means
+latexify(
+    Bds3[1],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+# table with se
+latexify(
+    Bds3[2],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+# table with estimate overview
+latexify(
+    describe(Bds3[1][setdiff(1:end,31),:])[:,1:5],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+
+# across all bidders of group 3, subg=4
+Bds4 = ComputeBoundsMeanStd([1:1:40;],4)
+
+# table with means
+latexify(
+    Bds4[1],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+# table with se
+latexify(
+    Bds4[2],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+# table with estimate overview
+latexify(
+    describe(Bds4[1][setdiff(1:end,31),:])[:,1:5],
+    env = :tabular,
+    fmt = x -> round(x, sigdigits = 4),
+    )
+
+#    

@@ -12,7 +12,7 @@ P = 500
 @load "WValues1.dat" W1
 W = W1
 
-rhovec = [0, exp(-5.5)]
+rhovec=[[0,0,0],[exp(-5),exp(-7),exp(-8)]]
 
 Bounds = []
 for g in [1:1:length(group);]

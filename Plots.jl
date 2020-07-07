@@ -61,23 +61,23 @@ savefig("ResamplingPlot2b.pdf")
 
 # get summary statistics for the groups
 ###########################################################################
-group = [1:1:length(unique(auctiongroup));]
-group_me = [length(quotas[findall(auctiongroup .== x)]) for x in group]
-group_min = [minimum(quotas[findall(auctiongroup .== x)]) for x in group]
-group_mean = [mean(quotas[findall(auctiongroup .== x)]) for x in group]
-group_max = [maximum(quotas[findall(auctiongroup .== x)]) for x in group]
+group_a = [1:1:length(unique(auctiongroup));]
+group_me = [length(quotas[findall(auctiongroup .== x)]) for x in group_a]
+group_min = [minimum(quotas[findall(auctiongroup .== x)]) for x in group_a]
+group_mean = [mean(quotas[findall(auctiongroup .== x)]) for x in group_a]
+group_max = [maximum(quotas[findall(auctiongroup .== x)]) for x in group_a]
 
-groupdescr = DataFrame([group,group_me,group_min,group_mean,group_max])
+groupdescr = DataFrame([group_a,group_me,group_min,group_mean,group_max])
 rename!(groupdescr, Symbol.(["Group","Size","Min","Mean","Max"]))
 latexify(groupdescr,env = :tabular,fmt = x->round(x, sigdigits = 5))
 
-group = [1:1:length(unique(bidderassignment));]
-group_me = [length(findall(bidderassignment .== x)) for x in group]
-group_min = [minimum(ab[findall(bidderassignment .== x)]) for x in group]
-group_mean = [mean(ab[findall(bidderassignment .== x)]) for x in group]
-group_max = [maximum(ab[findall(bidderassignment .== x)]) for x in group]
+group_b = [1:1:length(unique(bidderassignment));]
+group_me = [length(findall(bidderassignment .== x)) for x in group_b]
+group_min = [minimum(ab[findall(bidderassignment .== x)]) for x in group_b]
+group_mean = [mean(ab[findall(bidderassignment .== x)]) for x in group_b]
+group_max = [maximum(ab[findall(bidderassignment .== x)]) for x in group_b]
 
-groupdescr = DataFrame([group,group_me,group_min,group_mean,group_max])
+groupdescr = DataFrame([group_b,group_me,group_min,group_mean,group_max])
 rename!(groupdescr, Symbol.(["Group","Size","Min","Mean","Max"]))
 latexify(groupdescr,env = :tabular,fmt = x->round(x, sigdigits = 5))
 
@@ -85,7 +85,6 @@ latexify(groupdescr,env = :tabular,fmt = x->round(x, sigdigits = 5))
 # plot resampling algorithm
 ############################################################################
 
-# for every resampling round, construct residuals
 auction = 20
 auctionset = findall(auctiongroup .== 2)
 P = 100
@@ -95,7 +94,7 @@ n = 72
 bidset = []
 for j in auctionset
     for i in activebidderindeces[j]
-        push!(bidset, qpbid(i, j))
+        push!(bidset, qpBid(i, j))
     end
 end
 
@@ -181,7 +180,7 @@ plot!(
 
 ## plot a bunch of bid functions
 auction = 36
-bid = qpbid(activebidderindeces[auction][1], auction)
+bid = qpBid(activebidderindeces[auction][1], auction)
 bidfctplot = plot(
     pushfirst!(copy(bid.cumqb), 0) ./ 1000,
     pushfirst!(copy(bid.pb), bid.pb[1]),
@@ -195,7 +194,7 @@ bidfctplot = plot(
     size = (400, 400),
 )
 for i in activebidderindeces[auction]
-    bid = qpbid(i, auction)
+    bid = qpBid(i, auction)
     plot!(
         pushfirst!(copy(bid.cumqb), 0) ./ 1000,
         pushfirst!(copy(bid.pb), bid.pb[1]),
@@ -210,6 +209,13 @@ savefig("ResamplingPlot1b.pdf")
 ###########################################################################
 ## Plot bounds bounds for [bidder] in auction [auction] from 
 ## [Bounds] saved in Bounds[run].dat; save plot in f
+## [m=5] in data, corresponds to number of bootstrap rounds per run
+## [runs=40] corresponds to the number of rounds
+##
+## !! the function will return an err if number of points in intial bounds 
+## disagree between bootstrap rounds; this happens when W or w is missing 
+## for a point; which in turn happens when the price bid was highest among 
+## all submitted prices.
 ###########################################################################
 function PlotTighterBounds(bidder, auction, f, m, runs)
     # get group no. of auction
@@ -236,9 +242,9 @@ function PlotTighterBounds(bidder, auction, f, m, runs)
     [pushfirst!(initvl_y[x], copy(initvl_y[x][1])) for x in [1:1:m * runs;]]
 
     # xvalues
-    bds_x = Bounds[g[1]][auctionindexingroup[1]][2][2][bidder][1][2].qval
+    bds_x = copy(Bounds[g[1]][auctionindexingroup[1]][2][2][bidder][1][2].qval)
     pushfirst!(bds_x, 0)
-    initv_x = Bounds[g[1]][auctionindexingroup[1]][2][1][bidder][1][2].qval
+    initv_x = copy(Bounds[g[1]][auctionindexingroup[1]][2][1][bidder][1][2].qval)
     pushfirst!(initv_x, 0)
 
     # bagged estimate 
@@ -283,7 +289,7 @@ function PlotTighterBounds(bidder, auction, f, m, runs)
         linetype = :steppre,
         color = :red,
         label = ["Tigher Bounds" ""],
-        title = join(["Bidder ", bidder, " in Auction ", auction]),
+        title = join(["Bidder ", bidder, " in Auction ", auction, " from Group No. ", bidderassignment[activebidderindeces[auction][bidder]]]),
         xlabel = "q",
         ylabel = "p",
     )

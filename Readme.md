@@ -133,14 +133,14 @@ end
 
 ###############
 ## the following computes all the values required 
-## to compute $\Theta(\rho)$ for the values in rhovec. 
+## to compute $\Theta_g(\rho)$ for the values in rhovec. 
 ###############
 
-# define the vector of rho values
+# define the vector of rho values for with \Theta_g is computed
 rhovec = sort!(append!([exp(x) for x in [-10:0.5:0;]], 0))
 
 # the values are computed for each auction 
-# in each auction group separately
+# in each auction group [g] separately
 Theta = []
 for g in [1:1:length(group);]
     auctionset = group[g]
@@ -177,12 +177,12 @@ end
 
 ###############
 ## the following code computes both the simple and the tighter bounds 
-## for rho=0 and rho=rho^* (only the first for rho=0, and 
+## for rho=(0,0,0) and rho=rho^* (only the first for rho=0, and 
 ## both for rho=rho*) for all active bidders in a given auction
 ###############
 
-# define the two values for rho
-rhovec = [0, exp(-5.5)]
+# define the two vectors of values for rho within the three groups
+rhovec = [[0,0,0],[exp(-5),exp(-7),exp(-8)]]
 
 # take the second auction in the first auction group, g=1
 g = 1
@@ -282,7 +282,7 @@ A list of data frames, [vlb,vub], where vub is the upper bound and vlb is the lo
 
 -----
 ```
-EstimateSimpleBounds(auction, W, bidderassignment,  prices, rho, m)
+EstimateSimpleBounds(auction, W, bidderassignment,  prices, rhovec, m)
 ```
 #### Description
 Computes ```SimpleBounds()``` for all bidders in ```auction```.
@@ -291,7 +291,7 @@ Computes ```SimpleBounds()``` for all bidders in ```auction```.
 ```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```  
 ```bidderassignment``` -- bidder assignment vector  
 ```prices``` -- vector of submitted prices used for the estimation of W  
-```rho``` -- positive real number, corresponding to the risk preference $\rho$  
+```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
 ```m``` -- number of bootstrap rounds to be estimated
 #### Return value
 A list of objects returned by ```SimpleBounds()```, one entry per bidder.
@@ -337,7 +337,7 @@ A list of dataframes, [vlb,vub], where vub is the upper bound and vlb is the low
 -----
 
 ```
-EstTighterBounds(auction, W, bidderassignment, prices, bounds, rho, m, maxiter, tolerance)
+EstTighterBounds(auction, W, bidderassignment, prices, bounds, rhovec, m, maxiter, tolerance)
 ```
 #### Description
 Runs ```TighterBounds()``` for all bidders in an ```auction``` and for ```m``` bootstrap rounds.
@@ -348,7 +348,7 @@ Runs ```TighterBounds()``` for all bidders in an ```auction``` and for ```m``` b
  ```bidderassignment``` -- bidder assignment vector  
  ```prices``` -- vector of prices used for the estimation of ```W```  
  ```bounds``` -- estimated simple bounds from ```EstimateSimpleBounds()```  
-```rho``` -- positive real number, the risk preference  
+```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
 ```m``` -- number of boostratp runs  
 ```maxiter``` -- maximum number of fixed point iterations  
 ```tolerance``` -- tolerance level (used in iteration)  

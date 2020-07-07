@@ -112,12 +112,6 @@ toplot = plot(
 plot(toplot)
 savefig("ThetaEst.pdf")
 
-latexify(
-    TData[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
-
 #### Thetas by Bidder Assignment
 
 TDataG1 = DataFrame(
