@@ -8,19 +8,22 @@ Author: [Samuel Häfner](https://samuelhaefner.github.io), University of St. Gal
 
 1. [Overview](#Overview)  
 2. [Data](#Data)
-3. [Example](#Example)  
-4. [Scripts](#Scripts)  
+3. [Estimates](#Estimates) 
+4. [Example](#Example)  
+5. [Scripts](#Scripts)  
   a. [Estimation.jl](##Estimation.jl)  
   b. [Testmon.jl](##Testmon.jl)  
   c. [Auxiliary.jl](##Auxiliary.jl) 
-5. [Estimates](#Estimates) 
 
-# Overview
 
-The replication files in this repository contain both the functions for estimation as well as the scripts to read and further process the estimates. Please let me [know](mailto:samuel.haefner@unisg.ch) if anything is broken or unclear.
+# Overview of the replication files
+
+This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) contains the main functions for estimation (see the subsection *Main Files* below), the actual scripts for estimation (*Scripts for Estimation*) and to read and further process the estimates (*Scripts to Process the Estimates*), as well as scripts to produce additional plots (*Scripts to Construct the Plots in the Paper*). 
+
+Please let me [know](mailto:samuel.haefner@unisg.ch) if anything is broken or unclear.
 
 ## Main Files
-The following main files contain all relevant functions and global variables. Fr more detailed information see the respective [section](#Scripts) below.
+The following main files contain all relevant functions and global variables. For more detailed information see the respective [section](#Scripts) below.
 
 - ```Auxiliary.jl```  
  Reads in the required packages, the data set and defines the required auxiliary functions and  global variables.  
@@ -31,28 +34,26 @@ Contains the main functions for the estimation of W, $\Theta$, and the bounds.
 - ```TestMon.jl```  
 Contains the main functions to test for the monotonicity of $F^j$ in v.
 
-## Generic Scripts
-The following files contain the generic scripts used to produce the actual scripts for the estimation (cf. the section *Scripts for SLURM* below). For more information on the files, see the files themselves. 
+## Scripts for Estimation
+The estimation was conducted at [sciCORE](http://scicore.unibas.ch/) scientific computing core facility at the University of Basel, using a SLURM workload manager. 
 
-- ```EstimateWandTGeneric.jl```  
-Contains the generic script to compute and save estimates of W and Theta.  
-- ```EstimateWandTRobustGeneric.jl```  
-Contains the generic script to compute and save the robustness checks for Theta, using a log-normal distribution rather than a gamma distribution when estimating W.  
-- ```EstimateBoundsGeneric.jl```  
-Contains the generic script to compute standard and tighter bounds, using the estimates of W(p,q) from EstimateWandTGeneric.jl.
-- ```TestMonGeneric.jl```  
-Contains the generic script to test for monotonicity of F.  
-
-## Scripts for SLURM
-The following files contain the scripts to produce the .jl and .sh files that are needed to run the estimates on a SLURM workload manager. For each *Generic.jl-File above, they split up the jobs into a manageable number of bootstrap rounds.  
+The following files contain the scripts to produce the .jl and .sh files that are needed to run the estimation on a SLURM workload manager. 
 
 - ```EstimateWandTSLURM.jl```  
+Produces the required .jl and .sh files to compute and save estimates of W and Theta.  
 - ```EstimateWandTRobustSLURM.jl```  
+Produces the required files to compute and save the robustness checks for Theta, using a log-normal distribution rather than a gamma distribution when estimating W.
 - ```EstimateBoundsSLURM.jl```  
+Produces the required files to compute standard and tighter bounds, using the estimates of W(p,q) from EstimateWandTGeneric.jl.
 - ```TestMonSLURM.jl```  
+Produces the required files to test for monotonicity of F. 
 
-In order to produce the *.sh bash scripts required by SLURM, these scripts use the following generic templates.
+Essentially, the above scripts split up the jobs into a manageable number of bootstrap rounds. To do so, they require the following generic .jl and .sh scripts. For further information, see the files themselves.
 
+- ```EstimateWandTGeneric.jl```   
+- ```EstimateWandTRobustGeneric.jl```    
+- ```EstimateBoundsGeneric.jl```  
+- ```TestMonGeneric.jl```  
 - ```EstimateWandTGeneric.sh```  
 - ```EstimateWandTRobustGeneric.sh```
 - ```EstimateBoundsGeneric.sh```
@@ -60,7 +61,7 @@ In order to produce the *.sh bash scripts required by SLURM, these scripts use t
 
 *Comment 1:* The script ```TestMonWandBounds.jl``` produces the required files with the estimates of W(p,q) and the bounds for the monotonicity check. This script needs to be run before the TestMon*.jl scripts, using the bash script ```TestMonWandBounds.sh```.
 
-*Comment 2:* The estimation was conducted at [sciCORE](http://scicore.unibas.ch/) scientific computing core facility at the University of Basel. The Julia version used was 1.2. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 48 − 72 hours (EstimateBoundsGeneric.jl).
+*Comment 2:* The Julia version used was 1.2. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 48 − 72 hours (EstimateBoundsGeneric.jl).
 
 ## Scripts to Process the Estimates
 The following files contain the scripts used to read in and process the estimates produced with above *Slurm.jl scripts. Once the estimates are saved in the respective .dat files, these scripts can be run as they are.
@@ -81,7 +82,7 @@ The last file contains scripts used for the plots:
 Scripts to generate the group plots, the resampling plots, and the plot showing the estimated bounds (which is done with function ```PlotTighterBounds()```; cf. the file for more information). 
 
 # Data  
-The data are contained in the file ```setofbids.csv```. Each of the 12401 rows corresponds to a submitted price-quantity pair. The columns are the following:
+The data are contained in the file ```setofbids.csv```, which is also in the [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions). Each of the 12401 rows corresponds to a submitted price-quantity pair. The columns are the following:
 
 | Variable | Description |
 |--- | --- |
@@ -94,6 +95,37 @@ The data are contained in the file ```setofbids.csv```. Each of the 12401 rows c
 |```qr```| resulting quantity (from that price-quantity pair)|  
 |```pr```| resulting payment | 
 |```qperc```| percentage of total quota |   
+
+# Estimates
+The estimates that I have obtained and reported in the manuscript can be read in with the ```Read*.jl``` scripts as described in the [Overview section](#Overview). The estimates are saved in ```*.dat``` files. A zip archive of all required files can be downloaded [here](https://drive.google.com/file/d/1Y0kuhfirr6RaOWogrmluKlCf1KnaHrk1/view?usp=sharing).
+
+
+# Tables and Plots
+The following table gives an overview of the tables and plots in the [main paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3397027).
+
+| Figure/Table | Script | Comment|
+|---|---|---|
+|Figure 1 | none | tikz-script in .tex file |
+|Figure 2 | ```Plots.jl```| Lines 8-33 (left panel). Lines 74-82 (right panel). |
+|Figure 3 | ```ReadT.jl``` | Lines 1-69; 115-211.|
+|Figure 4 | ```Plots.jl```| Function ```PlotTighterBounds()```; see the file for further information. |
+|Figure 5  | ```Plots.jl```| Lines 35-59 (left panel). Lines 64-72 (right panel). |
+|Figure 6  |  ```Plots.jl``` | Lines 152-177 (left panel). Lines 37-46; 88-149 (right panel).|
+|Table 1 | ```Auxilary.jl``` | Various functions in ```Auxiliary.jl``` are used. For a comprehensive overview see the corresponding [section](#Scripts) below. |
+|Table 2 | ```ReadEstimates.jl``` | See file for more information. |
+|Table 3 | ```ReadEstimates.jl``` | See file for more information. |
+
+The following table gives an overview of the tables and plots in the [supplementary appendix](https://samuelhaefner.github.io/SupplementaryAppendix.pdf).
+
+| Figure/Table | Script | Line Number |
+|---|---|---|
+| Figure 1 |```ReadT.jl``` | Lines 1-69; 213-467.|
+| Figure 2 | ```ReatT.jl``` (right figure) and ```ReadTRobust.jl``` (left figure) | See files for more information. |
+| Table 1 | ```ReadT.jl``` | Lines 1-69; 213-467. |
+| Table 2 | ```ReadT.jl``` | See file for more information. |
+| Table 3 | ```ReatT.jl``` (right table) and ```ReadTRobust.jl``` (left table) | See files for more information. |
+| Tables in Section D | ```ReadEstimates.jl``` | |
+
 
 
 # Example
@@ -221,23 +253,28 @@ end
 # Scripts
 This section provides the details about the functions and global variables defined in the four main files. 
 
+## The main global variables
 The **main global variables** used throughout the replication files are defined in the file ```Auxiliary.jl``` and are the followoing.
 
-```bids```: a data frame containing the bidding data  
-```K```: max number of price-quantity pairs  
-```un```: unit of account (100 corresponds to CHF/kg)  
-```vupperbar```: upper bound on type space (in CHF)  
-```auctionindeces```: vector containing the auctionindeces corresponding to those in the data  
-```bidderindeces```: vector containing the bidderindeces corresponding to those in the data  
-```quotas```: vector with the quotas  
-```clearingprices```: vector with the market clearing prices  
-```activebidders```: vector with the number of active bidders  
-```activebidderindeces```: list of vectors with the indeces of the active bidders  
+| Variable | Description |
+|---|---|
+|```bids```| a data frame containing the bidding data | 
+|```K```| max number of price-quantity pairs|  
+|```un```| unit of account (100 corresponds to CHF/kg)|  
+|```vupperbar``` | upper bound on type space (in CHF)|  
+|```auctionindeces```| vector containing the auctionindeces corresponding to those in the data| 
+|```bidderindeces```| vector containing the bidderindeces corresponding to those in the data | 
+|```quotas```| vector with the quotas|  
+|```clearingprices```| vector with the market clearing prices | 
+|```activebidders```| vector with the number of active bidders | 
+|```activebidderindeces```| list of vectors with the indeces of the active bidders | 
 
 In the file ```Grouping.jl``` the following, **additional global variables** used for the estimation of W are defined:
 
-```group```: list containing, for each auction group, a vector of the respective auction indeces  
-```bidderassignment```: a vector determining for every bidder the bidder group assignment {1,2,3}
+| Variable | Description |
+|---|---|
+|```group```| list containing, for each auction group, a vector of the respective auction indeces | 
+|```bidderassignment```| a vector determining for every bidder the bidder group assignment {1,2,3}|
 
 In the following subsections, I discuss the functions defined in the respective files ```Estimation.jl```, ```TestMon.jl```, and ```Auxiliary.jl```.
 
@@ -708,5 +745,3 @@ Determines $\varphi_l(q,v,v_u)$ (cf. the manuscript).
 #### Return value
 Real number.
 
-# Estimates
-The estimates that I have obtained and reported in the manuscript can be read in with the ```Read*.jl``` scripts described in the [Overview section](#Overview). The estimates are saved in ```*.dat``` files. A zip archive of all files can be downloaded [here](https://drive.google.com/file/d/1Y0kuhfirr6RaOWogrmluKlCf1KnaHrk1/view?usp=sharing).

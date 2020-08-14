@@ -11,7 +11,7 @@ using Plots
 # number of runs
 runs = 40
 
-# number of boostrap rounds per runf
+# number of boostrap rounds per run
 m = 5
 
 # rhovector used

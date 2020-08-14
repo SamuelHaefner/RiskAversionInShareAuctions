@@ -104,11 +104,8 @@ for i in [1:1:P;]
     push!(resampling, rand([1:1:length(bidset);], n))
 end
 
-# for every resampling round, construct residual supply
-
-
-# bootstrap round, for every price, retrive P opponent demand and
-# fit gamma distribution to it
+# for every bootstrap round and for every price, retrive P opponent demand 
+# and fit gamma distribution to it
 q = []
 for r in [1:1:P;]
     qvals = []
@@ -150,32 +147,6 @@ plot!(
 vline!([0], linecolor = :black)
 plot(resamplingplot)
 savefig("ResamplingPlot1.pdf")
-
-## could add some bid functions
-bid1 = qpbid(17, 33)
-plot!(
-    pushfirst!(copy(bid1.cumqb), 0) ./ 1000,
-    pushfirst!(copy(bid1.pb), bid1.pb[1]),
-    linetype = :steppre,
-    color = :darkblue,
-    label = "Bid Functions",
-)
-
-bid2 = qpbid(9, 28)
-plot!(
-    pushfirst!(copy(bid2.cumqb), 0) ./ 1000,
-    pushfirst!(copy(bid2.pb), bid2.pb[1]),
-    linetype = :steppre,
-    color = :darkblue,
-)
-
-bid3 = qpbid(2, 34)
-plot!(
-    pushfirst!(copy(bid3.cumqb), 0) ./ 1000,
-    pushfirst!(copy(bid3.pb), bid3.pb[1]),
-    linetype = :steppre,
-    color = :darkblue,
-)
 
 
 ## plot a bunch of bid functions
