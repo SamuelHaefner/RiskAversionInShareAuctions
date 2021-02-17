@@ -1,6 +1,7 @@
-# this file determines the bidder groups
+# This file determines the bidder groups
 # and the auction groups used for the estimation
-# cf. Readme.md for more information.
+
+# Cf. Readme.md for more information.
 
 # group auctions
 group = []

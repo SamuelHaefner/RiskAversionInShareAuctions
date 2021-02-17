@@ -2,7 +2,7 @@ This file contains the required information for the replication of the results i
 
 # **[Risk Aversion in Share Auctions: Estimating Rents from TRQs in Switzerland](https://dx.doi.org/10.2139/ssrn.3397027)**
 
-Author: [Samuel Häfner](https://samuelhaefner.github.io), University of St. Gallen, [samuel.haefner@unisg.ch](mailto:samuel.haefner@unisg.ch).
+Author: [Samuel Häfner](https://samuelhaefner.github.io), Web3 Foundation, Zug, Switzerland, [samuel@web3.foundation](mailto:samuel@web3.foundation).
 
 # Table of Contents
 
@@ -18,71 +18,41 @@ Author: [Samuel Häfner](https://samuelhaefner.github.io), University of St. Gal
 
 # Overview of the replication files
 
-This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) contains the main functions for estimation (see the subsection *Main Files* below), the actual scripts for estimation (*Scripts for Estimation*) and to read and further process the estimates (*Scripts to Process the Estimates*), as well as scripts to produce additional plots (*Scripts to Construct the Plots in the Paper*). 
-
-Please let me [know](mailto:samuel.haefner@unisg.ch) if anything is broken or unclear.
-
-## Main Files
-The following main files contain all relevant functions and global variables. For more detailed information see the respective [section](#Scripts) below.
-
-- ```Auxiliary.jl```  
- Reads in the required packages, the data set and defines the required auxiliary functions and  global variables.  
-- ```Grouping.jl```  
-Determines the bidder groups and auction groups used for the estimation.  
-- ```Estimation.jl```  
-Contains the main functions for the estimation of W, $\Theta$, and the bounds.  
-- ```TestMon.jl```  
-Contains the main functions to test for the monotonicity of $F^j$ in v.
-
-## Scripts for Estimation
-The estimation was conducted at [sciCORE](http://scicore.unibas.ch/) scientific computing core facility at the University of Basel, using a SLURM workload manager. 
-
-The following files contain the scripts to produce the .jl and .sh files that are needed to run the estimation on a SLURM workload manager. 
-
-- ```EstimateWandTSLURM.jl```  
-Produces the required .jl and .sh files to compute and save estimates of W and Theta.  
-- ```EstimateWandTRobustSLURM.jl```  
-Produces the required files to compute and save the robustness checks for Theta, using a log-normal distribution rather than a gamma distribution when estimating W.
-- ```EstimateBoundsSLURM.jl```  
-Produces the required files to compute standard and tighter bounds, using the estimates of W(p,q) from EstimateWandTGeneric.jl.
-- ```TestMonSLURM.jl```  
-Produces the required files to test for monotonicity of F. 
-
-Essentially, the above scripts split up the jobs into a manageable number of bootstrap rounds. To do so, they require the following generic .jl and .sh scripts. For further information, see the files themselves.
-
-- ```EstimateWandTGeneric.jl```   
-- ```EstimateWandTRobustGeneric.jl```    
-- ```EstimateBoundsGeneric.jl```  
-- ```TestMonGeneric.jl```  
-- ```EstimateWandTGeneric.sh```  
-- ```EstimateWandTRobustGeneric.sh```
-- ```EstimateBoundsGeneric.sh```
-- ```TestMonGeneric.sh```
+This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) contains the following items:
+1. The *main code* used for estimation. The code comes in four main files: 
+   - ```Auxiliary.jl``` - Reads in the required packages, the data set and defines the required auxiliary functions and  global variables.  
+   - ```Grouping.jl``` - Determines the bidder groups and auction groups used for the estimation.  
+   - ```Estimation.jl``` - Contains the main functions for the estimation of W, $\Theta$, and the bounds.  
+   - ```TestMon.jl``` - Contains the main functions to test for the monotonicity of $F^j$ in v.   
+2. The *scripts to conduct the estimation*. In particular, the following files contain the scripts to produce the .jl and .sh files that are needed to run the estimation on a SLURM workload manager.  
+   - ```EstimateWandTSLURM.jl``` - Produces the required .jl and .sh files to compute and save estimates of W and Theta.  
+   - ```EstimateWandTRobustSLURM.jl``` - Produces the required files to compute and save the robustness checks for Theta, using a log-normal distribution rather than a gamma distribution when estimating W.
+   - ```EstimateBoundsSLURM.jl``` - Produces the required files to compute standard and tighter bounds, using the estimates of W(p,q) from EstimateWandTGeneric.jl.
+   - ```TestMonSLURM.jl``` - Produces the required files to test for monotonicity of F.   
+3. *Templates* used by the scripts above. Essentially, the scripts above split up the jobs into a manageable number of bootstrap rounds. To do so, they require the following generic .jl and .sh templates. For further information, see the files themselves.
+   - ```EstimateWandTGeneric.jl```   
+   - ```EstimateWandTRobustGeneric.jl```    
+   - ```EstimateBoundsGeneric.jl```  
+   - ```TestMonGeneric.jl```  
+   - ```EstimateWandTGeneric.sh```  
+   - ```EstimateWandTRobustGeneric.sh```
+   - ```EstimateBoundsGeneric.sh```
+   - ```TestMonGeneric.sh```
+3. The scripts to *read and further process the estimates* produced with above *Slurm.jl scripts. Once the estimates are saved in the respective .dat files, these scripts can be run as they are.
+   - ```ReadEstimates.jl``` - Contains the functions to read in the estimates and produce the respective tables.
+   - ```ReadT.jl``` - Script to read in estimates of T and produce the plots and tables. 
+   - ```ReadTRobust.jl``` - Same as above, but using the alternative estimates (robustness check).
+   - ```ReadTestMon.jl``` - Contains the script to read in the monotonicity violations obtained and saved with TestMonGeneric.jl and produces the respective tables.
+4. Script to produce additional plots.
+   - ```Plots.jl``` - Script to generate the group plots, the resampling plots, and the plot showing the estimated bounds (which is done with function ```PlotTighterBounds()```; cf. the file for more information).  
 
 *Comment 1:* The script ```TestMonWandBounds.jl``` produces the required files with the estimates of W(p,q) and the bounds for the monotonicity check. This script needs to be run before the TestMon*.jl scripts, using the bash script ```TestMonWandBounds.sh```.
 
-*Comment 2:* The Julia version used was 1.2. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 48 − 72 hours (EstimateBoundsGeneric.jl).
+*Comment 2:* Computation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. The Julia version used was 1.2. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 48 − 72 hours (EstimateBoundsGeneric.jl).
 
-## Scripts to Process the Estimates
-The following files contain the scripts used to read in and process the estimates produced with above *Slurm.jl scripts. Once the estimates are saved in the respective .dat files, these scripts can be run as they are.
-
-- ```ReadEstimates.jl```  
-Contains the functions to read in the estimates and produce the respective tables.
-- ```ReadT.jl```  
-Script to read in estimates of T and produce the plots and tables. 
-- ```ReadTRobust.jl```  
-Same as above, but using the alternative estimates (robustness check).
-- ```ReadTestMon.jl```  
-Contains the script to read in the monotonicity violations obtained and saved with TestMonGeneric.jl and produces the respective tables.
-
-## Scripts to Construct the Plots in the Paper
-The last file contains scripts used for the plots:
-
-- ```Plots.jl```  
-Scripts to generate the group plots, the resampling plots, and the plot showing the estimated bounds (which is done with function ```PlotTighterBounds()```; cf. the file for more information). 
 
 # Data  
-The data are contained in the file ```setofbids.csv```, which is also in the [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions). Each of the 12401 rows corresponds to a submitted price-quantity pair. The columns are the following:
+The data are contained in the file ```setofbids.csv```, which is also in the [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions). Each row corresponds to a submitted price-quantity pair. The columns are the following:
 
 | Variable | Description |
 |--- | --- |
@@ -101,7 +71,7 @@ The estimates that I have obtained and reported in the manuscript can be read in
 
 
 # Tables and Plots
-The following table gives an overview of the tables and plots in the [main paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3397027).
+The following table explains which scripts are used to produce the tables and plots in the [main paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3397027).
 
 | Figure/Table | Script | Comment|
 |---|---|---|
@@ -115,7 +85,7 @@ The following table gives an overview of the tables and plots in the [main paper
 |Table 2 | ```ReadEstimates.jl``` | See file for more information. |
 |Table 3 | ```ReadEstimates.jl``` | See file for more information. |
 
-The following table gives an overview of the tables and plots in the [supplementary appendix](https://samuelhaefner.github.io/SupplementaryAppendix.pdf).
+The following table explains which scripts are used to produce the tables and plots in the [supplementary appendix](https://samuelhaefner.github.io/SupplementaryAppendix.pdf) of the paper.
 
 | Figure/Table | Script | Line Number |
 |---|---|---|

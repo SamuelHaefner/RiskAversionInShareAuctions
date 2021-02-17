@@ -1,5 +1,6 @@
-# this file  contains the main functions to test for the monotonicity of F in v.
-# cf. Readme.md for more information
+# This file  contains the main functions to test for the monotonicity of F in v.
+
+# Cf. Readme.md for more information on the respective functions.
 
 function TestIncreasingDiff(auction, bidderset, BoundsAuction, W, R, rhoindexset, rhovec)
     T = []

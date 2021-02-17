@@ -1,12 +1,13 @@
-# this file contains the auxiliary functions 
+# This file contains the auxiliary functions 
 # and global variable used throughout the estimation
-# cf. Readme.md for more information.
+
+# Cf. Readme.md for more information.
 
 # packages required
 using CSV
 using DataFrames
 using Distributions
-using BSON: @save, @load  ## @save and @load
+using BSON: @save, @load  
 using Roots
 
 ### determine the global variables

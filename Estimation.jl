@@ -1,6 +1,7 @@
-# this file contains the main functions for 
-# the estimation of W, $\Theta$, and the bounds.  
-# cf. Readme.md for more information.
+# This file contains the main functions for the estimation 
+# of W, $\Theta$, and the different bounds.  
+
+# Cf. Readme.md for more information about the respective functions.
 
 function Wgamma(prices, auctionset, bidderassignment, n, m, P)
 
