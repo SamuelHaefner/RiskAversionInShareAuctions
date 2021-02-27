@@ -27,7 +27,7 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
 2. The *scripts to conduct the estimation*. In particular, the following files contain the scripts to produce the .jl and .sh files that are needed to run the estimation on a SLURM workload manager.  
    - ```EstimateWandTSLURM.jl``` - Produces the required .jl and .sh files to compute and save estimates of W and Theta.  
    - ```EstimateWandTRobustSLURM.jl``` - Produces the required files to compute and save the robustness checks for Theta, using a log-normal distribution rather than a gamma distribution when estimating W.
-   - ```EstimateBoundsSLURM.jl``` - Produces the required files to compute standard and tighter bounds, using the estimates of W(p,q) from EstimateWandTGeneric.jl.
+   - ```EstimateBoundsSLURM.jl``` - Produces the required files to compute standard and tighter bounds, using the estimates of W(p,q) obtained with EstimateWandTSLURM.jl.
    - ```TestMonSLURM.jl``` - Produces the required files to test for monotonicity of F.   
 3. *Templates* used by the scripts above. Essentially, the scripts above split up the jobs into a manageable number of bootstrap rounds. To do so, they require the following generic .jl and .sh templates. For further information, see the files themselves.
    - ```EstimateWandTGeneric.jl```   
