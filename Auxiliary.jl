@@ -38,7 +38,7 @@ K = 5
 un = 100
 
 # upper bound on type space (number in cents, as are the bids)
-vupperbar = 2300/un
+vupperbar = 2053/un
 
 # retreive the auction indeces of all auctions
 # only use the first 39 auctions (the last auction has only one participant)
