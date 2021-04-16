@@ -43,7 +43,7 @@ for g in [1:1:length(group);]
                     bidderassignment,
                     prices,
                     bounds,
-                    rhovec[i],
+                    rhovec[i][1],
                     m,
                 ),
             )
