@@ -17,7 +17,7 @@ end
 W1 = W
 @save "WValuesRobust1.dat" W1
 
-rhovec = sort!(append!([exp(x) for x in [-10:0.5:0;]], 0))
+rhovec = [[exp(x),exp(x),exp(x)] for x in sort!(append!([-10:0.5:0;],-Inf))]
 
 Theta = []
 for g in [1:1:length(group);]

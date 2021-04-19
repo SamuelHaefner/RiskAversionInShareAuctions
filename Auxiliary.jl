@@ -39,7 +39,7 @@ K = 5
 un = 100
 
 # upper bound on type space (number in cents, as are the bids)
-vupperbar = 2300/un
+vupperbar = 2053/un
 
 # retreive the auction indeces of all auctions
 # only use the first 39 auctions (the last auction has only one participant)
@@ -70,7 +70,7 @@ for i in [1:1:length(auctionindeces);]
     )
 end
 
-### determine the auxiliary functions
+### define the auxiliary functions
 
 function qpBid(bidder, auction)
     # retreive price-quantity pairs
@@ -248,6 +248,7 @@ function PiOverline(bidstep, bid, v, WPar, rho, Q, n)
 
     ### integrate f from bid.cumqb[j] to bid.cumqb[end]
     ### use intervals given with intpts
+    ### in general, when function is called: n=100. this gives a good approximation.
     intpts = v[v.qval .> bid.cumqb[bidstep], :qval]
     pushfirst!(intpts, bid.cumqb[bidstep])
     val = []
@@ -280,6 +281,7 @@ end
 function FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
     # retrive estimates for W(p,q) at price points p (WPar) and at the respective 
     # next higher prices among the submitted bids (WParPlus)
+    # in general, when function is called: n=100. this gives a good approximation.
     WPar = W[group][bootstraprun][sort(
         findall(in.(prices, (bid.pb,))),
         rev = true,

@@ -7,7 +7,7 @@ include("Grouping.jl")
 include("TestMon.jl")
 
 n = AvgNoBidders(bidderassignment)
-rhovec = [exp(x) for x in [-10:0.5:0;]]
+rhovec = [[exp(x),exp(x),exp(x)] for x in sort!(append!([-10:0.5:0;],-Inf))]
 
 m = 1
 P = 500
