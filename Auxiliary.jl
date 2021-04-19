@@ -14,7 +14,8 @@ using Roots
 
 # read in data
 bids = CSV.read(
-    "setofbids.csv",DataFrame,
+    "setofbids.csv",
+    DataFrame,
     delim = ',',
     missingstring = "NA",
     decimal = '.',

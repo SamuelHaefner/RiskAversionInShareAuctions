@@ -105,7 +105,6 @@ for i in [1:1:P;]
 end
 
 # for every bootstrap round and for every price, retrive P opponent demand 
-# and fit gamma distribution to it
 q = []
 for r in [1:1:P;]
     qvals = []
@@ -239,7 +238,6 @@ function PlotTighterBounds(bidder, auction, f, m, runs)
     seinitvl_y_u = [quantile([initvl_y[x][y] for x in [1:1:m * runs;]], 0.95) for y in [1:1:length(initvl_y[1]);]] - einitvl_y
     seinitvl_y_l = einitvl_y - [quantile([initvl_y[x][y] for x in [1:1:m * runs;]], 0.05) for y in [1:1:length(initvl_y[1]);]]
 
-
     plot(
         initv_x,
         [einitvu_y,einitvl_y],
@@ -274,3 +272,7 @@ function PlotTighterBounds(bidder, auction, f, m, runs)
     )
     savefig(f)
 end
+
+## Produce figures in manuscript
+PlotTighterBounds(1,20,"BoundsBidder1Auction20.pdf",5,40)
+PlotTighterBounds(8,25,"BoundsBidder1Auction20.pdf",5,40)
