@@ -13,8 +13,8 @@ for run in [1:1:20;]
     end
 
     outfile = string("TestMon",run,".sh")
-    shscript[3]=string("#SBATCH --job-name=TestMon",run)
-    shscript[5]=string("julia TestMon",run,".jl")
+    shscript[4]=string("#SBATCH --job-name=TestMon",run)
+    shscript[6]=string("julia TestMon",run,".jl")
     open(outfile,"w") do file
         for i in [1:1:length(shscript);]
             println(file, shscript[i])
@@ -24,7 +24,7 @@ end
 
 mainshscript = []
 push!(mainshscript,"#!/bin/bash")
-for run in [1:1:40;]
+for run in [1:1:20;]
     push!(mainshscript,string("sbatch TestMon",run,".sh"))
 end
 outfile = string("TestMon.sh")

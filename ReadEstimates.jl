@@ -424,5 +424,4 @@ latexify(
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
     )
-
-#    
+   
