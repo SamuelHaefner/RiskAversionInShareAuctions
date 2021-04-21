@@ -48,7 +48,7 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
 
 *Comment 1:* The script ```TestMonWandBounds.jl``` produces the required files with the estimates of W(p,q) and the bounds for the monotonicity check. This script needs to be run before the TestMon*.jl scripts, using the bash script ```TestMonWandBounds.sh```.
 
-*Comment 2:* Computation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. The Julia version used was 1.2. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 48 − 72 hours (EstimateBoundsGeneric.jl).
+*Comment 2:* Computation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. The Julia version used was 1.5. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 48 − 72 hours (EstimateBoundsGeneric.jl).
 
 
 # Data  
