@@ -67,7 +67,7 @@ The data are contained in the file ```setofbids.csv```, which is also in the [re
 |```qperc```| percentage of total quota |   
 
 # Estimates
-The estimates that I have obtained and reported in the manuscript can be read in with the ```Read*.jl``` scripts as described in the [Overview section](#Overview). The estimates are saved in ```*.dat``` files. A zip archive of all required files can be downloaded [here](https://drive.google.com/file/d/1Y0kuhfirr6RaOWogrmluKlCf1KnaHrk1/view?usp=sharing).
+The estimates that I obtained and reported in the manuscript can be read in with the ```Read*.jl``` scripts as described in the [Overview section](#Overview). The estimates are saved in ```*.dat``` files. A zip archive of all files can be downloaded [here](https://drive.google.com/file/d/1bqyIMnCVvJJlmcStgyGKClkse68GCYYS/view?usp=sharing).
 
 
 # Tables and Plots
