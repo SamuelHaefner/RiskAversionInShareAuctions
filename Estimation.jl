@@ -1,7 +1,25 @@
 # This file contains the main functions for the estimation 
 # of W, $\Theta$, and the different bounds.  
 
-# Cf. Readme.md for more information about the respective functions.
+# See Readme.md for more information.
+
+############################################################
+# Wgamma(prices, auctionset, bidderassignment, n, m, P) 
+############################################################
+#### Description
+# Estimates W(p,q) using a gamma distribution. 
+#### Arguments
+# ```prices``` -- vector of submitted prices to be used for the estimation of W.  
+# ```auctionset``` -- vector with indeces of auctions to be used for the estimation of W.  
+# ```bidderassignment``` -- bidder assignment vector  
+# ```n``` -- vector, each entry corresponding to the (average) number of active bidders from a given group  
+# ```m``` -- number of bootstrap rounds to be estimated  
+# ```P``` -- number of rounds of resampling used for estimation
+#### Return value
+# A list of parameter estimates for the distribution of W(p,q). 
+# For each group in ```bidderassignment```, each bootstrap round, 
+# and each price in the vector ```prices```.
+############################################################
 
 function Wgamma(prices, auctionset, bidderassignment, n, m, P)
 
@@ -102,6 +120,13 @@ function Wgamma(prices, auctionset, bidderassignment, n, m, P)
     return (W)
 end
 
+############################################################
+# Wlnorm(prices, auctionset, bidderassignment, n, m, P)
+############################################################
+#### Description
+# Same as ```Wgamma()```, yet using a log normal distribution.
+############################################################
+
 function Wlnorm(prices, auctionset, bidderassignment, n, m, P)
     # construct array of relevant bids, one array for every bidder group
     bidset = []
@@ -199,6 +224,22 @@ function Wlnorm(prices, auctionset, bidderassignment, n, m, P)
     end
     return (W)
 end
+
+############################################################
+# SimpleBound(bid, WPar, rho, Q)
+############################################################
+#### Description
+# Computes upper and lower bounds on the rationalizable profit 
+# functions as described in Proposition 3 and equations (9)-(10).
+#### Arguments
+# ```bid``` -- bid function  
+# ```WPar``` -- array, containing the estimated parameters of W(p,q) at (p_i^j) for steps j=1,...,k  
+# ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
+# ```Q``` -- positive real number, corresponding to the quota $Q$
+#### Return value
+# A list of dataframes, [vlb,vub], where vub is the data frame containing the upper bound 
+# and vlb is the data frame containing lower bound.
+############################################################
 
 function SimpleBound(bid, WPar, rho, Q)
     
@@ -351,6 +392,22 @@ function SimpleBound(bid, WPar, rho, Q)
     return [vlb, vub]
 end
 
+############################################################
+# EstimateSimpleBounds(auction, W, bidderassignment,  prices, rhovec, m)
+############################################################
+#### Description
+# Computes ```SimpleBounds()``` for all bidders in ```auction```.
+#### Arguments
+# ```auction``` -- auction index  
+# ```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```  
+# ```bidderassignment``` -- bidder assignment vector  
+# ```prices``` -- vector of submitted prices used for the estimation of W  
+# ```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
+# ```m``` -- number of bootstrap rounds to be estimated
+#### Return value
+#A list of objects returned by ```SimpleBounds()```, one entry per bidder.
+#############################################################
+
 function EstimateSimpleBounds(auction, W, bidderassignment, prices, rhovec, m)
     bounds = []
     for bidder in activebidderindeces[auction]
@@ -371,6 +428,25 @@ function EstimateSimpleBounds(auction, W, bidderassignment, prices, rhovec, m)
     end
     return bounds
 end
+
+#############################################################
+# EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
+#############################################################
+#### Description
+# Determines violations of the inequalities in Proposition 4 for a given auction.
+#### Arguments
+# ```auction``` -- auction index  
+# ```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```   
+# ```bidderassignment``` -- bidder assignment vector  
+# ```prices``` -- vector of prices used for the estimation of W  
+# ```bounds``` -- estimated simple bounds from ```EstimateSimpleBounds()```  
+# ```rho``` -- positive real number, the risk preference   
+# ```m``` -- number of bootstrap rounds  
+#### Return value
+# A list of two matrices, with the columns corresponding to bootstrap rounds 
+# and rows corresponding to bidder groups. The first matrix counts the number 
+# of violations, the second matrix counts the total number of test inequalities.  
+###############################################################
 
 function EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
     #define matrices, one colum for every bootrap round, one row for every bidder group
@@ -418,6 +494,28 @@ function EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
     end
     return [tested, violated]
 end
+
+###############################################################
+# TighterBounds(bid, initvl, initvu, W, g, prices, rho, Q, bootstraprun, maxiter, tolerance)
+###############################################################
+#### Description
+# Computes tighter upper and lower bounds from initial conditions ```initvl``` 
+# and ```initivu``` by runing Algorithm 2.
+#### Arguments
+# ```bid``` -- bid function  
+# ```initvl``` -- marginal profit function, the initial condition for the lower bound  
+# ```initvu``` -- marginal profit function, the initial condition for the upper bound  
+# ```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```  
+# ```g``` -- natural number, indicating the group number of the auction  
+# ```prices``` -- vector of prices used for the estimation of W  
+# ```rho``` -- positive real number, the risk preference   
+# ```bootstraprun``` -- index of boostratp run we look at  
+# ```maxiter``` -- maximum number of fixed point iterations   
+# ```tolerance``` -- tolerance level (used in iteration)  
+#### Return value
+# A list of dataframes, [vlb,vub], where vub is the data frame containing the upper bound 
+# and vlb is the data frame containing lower bound.
+################################################################
 
 function TighterBounds(
     bid,
@@ -639,6 +737,27 @@ function TighterBounds(
     end
     return [vl, vu]
 end
+
+#################################################################
+# EstTighterBounds(auction, W, bidderassignment, prices, bounds, rhovec, m, maxiter, tolerance)
+#################################################################
+#### Description
+# Runs ```TighterBounds()``` for all bidders in an ```auction``` and for ```m``` bootstrap rounds.
+#### Arguments
+# ```auction``` -- auction index  
+# ```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```  
+# ```bidderassignment``` -- bidder assignment vector  
+# ```prices``` -- vector of prices used for the estimation of ```W```  
+# ```bounds``` -- estimated simple bounds from ```EstimateSimpleBounds()```  
+# ```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
+# ```m``` -- number of boostratp runs  
+# ```maxiter``` -- maximum number of fixed point iterations  
+# ```tolerance``` -- tolerance level (used in iteration)  
+#### Return value
+# List containing for each bidder and each bootstrap round 
+# a two dimensional list [```bounds```,```tighterbounds```], where 
+# ```tighterbounds``` is the object returned by ```TighterBounds()```.
+##################################################################
 
 function EstTighterBounds(
     auction,

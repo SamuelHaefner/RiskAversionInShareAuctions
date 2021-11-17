@@ -1,7 +1,7 @@
 # This file contains the auxiliary functions 
 # and global variable used throughout the estimation
 
-# Cf. Readme.md for more information.
+# Readme.md contains additional information.
 
 # packages required
 using CSV
@@ -11,6 +11,7 @@ using BSON: @save, @load
 using Roots
 
 ### determine the global variables
+#################################################
 
 # read in data
 bids = CSV.read(
@@ -48,7 +49,7 @@ auctionindeces = unique(bids[!, :auction])[1:39]
 # retreive the bidder indeces of all registered bidders
 bidderindeces = unique(bids[!, :bidder])
 
-# retrieve, for every auction, the quota, the market clearing prices,
+# retrieve, for every auction, the quota, the market clearing price,
 # the number of active bidders, and the indices of the active bidders
 quotas = []
 clearingprices = []
@@ -71,6 +72,19 @@ for i in [1:1:length(auctionindeces);]
 end
 
 ### define the auxiliary functions
+#################################################
+
+#################################################
+# qpBid(bidder, auction)
+#################################################
+#### Description
+# Retrieve the bid function of a bidder in an auction.
+#### Arguments
+# ```bidder``` -- bidderindex  
+# ```auction``` -- auctionindex  
+#### Return value
+# A data frame: [qb (quantity points), pb (price points), cumqb (cumulated quantity points)].
+#################################################
 
 function qpBid(bidder, auction)
     # retreive price-quantity pairs
@@ -97,6 +111,18 @@ function qpBid(bidder, auction)
     rename!(bid, (:x1 => :cumqb))
 end
 
+##################################################
+# AvgNoBidders(bidderassignment)
+##################################################
+#### Description
+# Determine the average number of bidders in each bidder cluster
+#### Arguments
+# ```bidderassignment``` -- vector, each element corresponding to a bidder, 
+#                           denoting the cluster number of the respective bidder  
+#### Return value
+# A list of real numbers; one for each cluster number; returning the average no. of bidders.
+##################################################
+
 function AvgNoBidders(bidderassignment)
     avgno = []
     for g in sort(unique(bidderassignment))
@@ -113,6 +139,17 @@ function AvgNoBidders(bidderassignment)
     return convert(Array{Int64,1}, avgno)
 end
 
+##################################################
+# BidToCover(auction)
+##################################################
+#### Description
+# Determines the bid-to-cover ratio in an auction.
+#### Arguments
+# ```auction``` -- auctionindex
+#### Return value
+# Real number; corresponding to the bid-to-cover ratio.
+##################################################
+
 function BidToCover(auction)
     q = 0
     for bidder in activebidderindeces[auction]
@@ -121,9 +158,32 @@ function BidToCover(auction)
     return q / quotas[auction]
 end
 
+##################################################
+# Revenue(auction)
+##################################################
+#### Description
+# Determines the revenue from an auction.
+#### Arguments
+# ```auction``` -- auctionindex
+#### Return value
+# Real number; corresponding to the auction revenue.
+##################################################
+
 function Revenue(auction)
     revenue = sum(bids[(bids.auction .== auctionindeces[auction]), :pr])
 end
+
+##################################################
+# qRec(bidder, auction)
+##################################################
+#### Description
+# Determines the allocated quantity of a bidder in a given auction.
+#### Arguments
+# ```bidder``` -- bidderindex   
+# ```auction``` -- auctionindex
+#### Return value
+# Real number; corresponding to the allocated quantity.
+##################################################
 
 function qRec(bidder, auction)
     return sum(bids[
@@ -132,12 +192,36 @@ function qRec(bidder, auction)
     ])
 end
 
+##################################################
+# qShareRec(bidder, auction)
+##################################################
+#### Description
+# Determines the share of quota that is allocated to a bidder in a given auction.
+#### Arguments
+# ```bidder``` -- bidderindex  
+# ```auction``` -- auctionindex
+#### Return value
+# Real number; corresponding to the received share
+##################################################
+
 function qShareRec(bidder, auction)
     return sum(bids[
         (bids.bidder .== bidder) .& (bids.auction .== auctionindeces[auction]),
         :qperc,
     ])
 end
+
+##################################################
+# ActiveAuctions(bidder)
+##################################################
+#### Description
+# Determines the indeces of the auctions in which a bidder was active.
+#### Arguments
+# ```bidder``` -- bidderindex 
+#### Return value
+# A list of integers; corresponding to the indices of the auctions in 
+# which the bidder was active.
+##################################################
 
 function ActiveAuctions(bidder)
     activeauctions = []
@@ -149,6 +233,17 @@ function ActiveAuctions(bidder)
     return activeauctions
 end
 
+##################################################
+# AvgBid(bidder)
+##################################################
+#### Description
+# Determines the average bid of a bidder across the auctions in which that bidder was active.
+#### Arguments
+# ```bidder``` -- bidderindex
+#### Return value
+# Real number; corresponding to the average bid of the bidder.
+##################################################
+
 function AvgBid(bidder)
     qbid = []
     for i in ActiveAuctions(bidder)
@@ -156,6 +251,17 @@ function AvgBid(bidder)
     end
     return mean(qbid)
 end
+
+##################################################
+# ShareSuccBidders(auction)
+##################################################
+#### Description
+# Determines the  share of succesfull bidders (with non-zero allocated quantity) in an auction.
+#### Arguments
+# ```auction``` -- auctionindex
+#### Return value
+# Real number; corresponding to the share of successful bidders.
+##################################################
 
 function ShareSuccBidders(auction)
     succ = 0
@@ -167,6 +273,17 @@ function ShareSuccBidders(auction)
     return succ / activebidders[auction]
 end
 
+##################################################
+# SuccessRate(bidder)
+##################################################
+#### Description
+# Returns the success rate of a bidder (succesfull participation/total participation).
+#### Arguments
+# ```bidder``` -- bidderindex
+#### Return value
+# Real number; corresponding to the bidder's success rate.
+##################################################
+
 function SuccessRate(bidder)
     succ = 0
     for i in ActiveAuctions(bidder)
@@ -176,6 +293,18 @@ function SuccessRate(bidder)
     end
     return succ / length(ActiveAuctions(bidder))
 end
+
+##################################################
+# StepBid(q, bid)
+##################################################
+#### Description
+# Determines the value of $\beta_{bid}(q)$ (cf. the manuscript for a definition).
+#### Arguments
+# ```q``` -- positive real number
+# ```bid``` -- bid function as returned from qpBid(bidder, auction)
+#### Return value
+# Real number; corresponding to the value of $\beta_{bid}(q)$.
+###################################################
 
 function StepBid(q, bid)
     if q <= minimum(bid[!, :cumqb])
@@ -187,6 +316,20 @@ function StepBid(q, bid)
     return bid[length(bid[bid.cumqb .< q, :cumqb]) + 1, :pb]
 end
 
+###################################################
+# NoStepBid(q, bid)
+###################################################
+#### Description
+# Determines the step of the step function $\beta_b$ at ```q```. 
+# That is, returns the number of downward jumps that have occured 
+# strictly before ```q```, plus one.
+#### Arguments
+# ```q``` positive real number
+# ```bid``` bid function as returned from qpBid(bidder, auction)
+#### Return value
+# Integer; see description.
+###################################################
+
 function NoStepBid(q, bid)
     if q <= minimum(bid[!, :cumqb])
         return 1
@@ -196,6 +339,21 @@ function NoStepBid(q, bid)
     end
     return length(bid[bid.cumqb .< q, :cumqb]) + 1
 end
+
+###################################################
+# StepV(q, v)
+###################################################
+#### Description
+# Returns the value of the profit function v(q).
+#### Arguments
+# ```q``` -- positive real number  
+# ```v``` -- marginal profit function, 
+#            which is a data frame with columns ```qval``` 
+#            (quantities, need to be increasing) and 
+#            ```vval``` (the values of v)
+#### Return value
+# Real number; corresponding to the value of the profit function v(q).
+###################################################
 
 function StepV(q, v)
     if q <= minimum(v[!, :qval])
@@ -207,6 +365,18 @@ function StepV(q, v)
     return v[length(v[v.qval .< q, :qval]) + 1, :vval]
 end
 
+###################################################
+# IntBid(a, b, bid)
+###################################################
+#### Description
+# Returns the value of $\int_a^b\beta_{bid}(q)dq$.
+#### Arguments
+# ```a```, ```b``` -- positive real numbers
+# ```bid``` -- bid function as returned from qpBid(bidder, auction)
+#### Return value
+# Real number; value of $\int_a^b\beta_{bid}(q)dq$.
+###################################################
+
 function IntBid(a, b, bid)
     x = bid[(bid.cumqb .> a) .& (bid.cumqb .< b), :cumqb]
     push!(x, b)
@@ -217,6 +387,18 @@ function IntBid(a, b, bid)
     return round(x' * y; digits = 4)
 end
 
+###################################################
+# IntV(a, b, v)
+###################################################
+#### Description
+# Returns the value of $\int_a^b v(q)dq$.
+#### Arguments
+# ```a```, ```b``` -- positive real numbers
+# ```v``` -- marginal profit function
+#### Return value
+# Real number; value of $\int_a^b v(q)dq$.
+###################################################
+
 function IntV(a, b, v)
     x = v[(v.qval .> a) .& (v.qval .< b), :qval]
     push!(x, b)
@@ -226,6 +408,23 @@ function IntV(a, b, v)
     x = x[2:end] - x[1:end - 1]
     return round(x' * y; digits = 4)
 end
+
+###################################################
+# PiOverline(bidstep, bid, v, WPar, rho, Q, n)
+###################################################
+#### Description
+# Returns the value of $\overline{\Pi}_i^j(b,v)$ (cf. the manuscript for a definition).
+#### Arguments
+# ```bidstep``` -- positive natural number, corresponding to the number of the step under consideration, j  
+# ```bid``` -- bid function  
+#```v``` -- marginal profit function  
+# ```WPar``` -- array, containing the estimated parameters of the distribution of D(p_i^j) for steps j=1,...,k  
+# ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
+# ```Q``` -- positive real number, corresponding to the quota $Q$  
+# ```n``` -- positive natural number, indicating the number of support points used for integration  
+#### Return value
+# Real number; value of $\overline{\Pi}_i^j(b,v)$. 
+###################################################
 
 function PiOverline(bidstep, bid, v, WPar, rho, Q, n)
     if rho == 0
@@ -248,7 +447,7 @@ function PiOverline(bidstep, bid, v, WPar, rho, Q, n)
 
     ### integrate f from bid.cumqb[j] to bid.cumqb[end]
     ### use intervals given with intpts
-    ### in general, when function is called: n=100. this gives a good approximation.
+    ### in general, when function is called, use n=100. this gives a good approximation.
     intpts = v[v.qval .> bid.cumqb[bidstep], :qval]
     pushfirst!(intpts, bid.cumqb[bidstep])
     val = []
@@ -264,9 +463,34 @@ function PiOverline(bidstep, bid, v, WPar, rho, Q, n)
     end
 end
 
+###################################################
+# w(q, WPar, dp)
+###################################################
+#### Description
+# Computes $w_i(p,q)$.
+#### Arguments
+# ```q``` -- positive real number  
+# ```WPar``` -- array, containing two sets of estimated parameters 
+#               of the distribution of D(p); one for p_i^j and one for p_i^j + dp.   
+# ```dp``` -- positive real number  
+#### Return value
+# Real number; value of $w_i(p,q)$.
+###################################################
+
 function w(q, WPar, dp)
     return (cdf(WPar[1], q) - cdf(WPar[2], q)) / dp
 end
+
+####################################################
+# PriceBids(auctionset)
+####################################################
+#### Description
+# Returns all submitted prices in ```auctionset``` in ascending order.
+#### Arguments
+# ```auctionset``` -- vector, containing auction indeces
+#### Return value
+# List of real numbers; prices submitted in the auctions in ```auctionset```.
+####################################################
 
 function PriceBids(auctionset)
     pricebidsarr =
@@ -277,6 +501,26 @@ function PriceBids(auctionset)
     end
     return sort!(unique(pricebids / un))
 end
+
+####################################################
+# FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
+####################################################
+#### Description
+# ```FOC()``` returns the value of $F^j$ (cf. the manuscript).
+#### Arguments
+# ```bidstep``` -- positive natural number, corresponding to the number of the step under consideration, j  
+# ```bid``` -- bid function  
+# ```v``` -- marginal profit function  
+# ```W``` -- estimates of W as returned from ```Wgamma()``` or ```Wlnorm()```  
+# ```group``` -- natural number, indicating the group number of the auction  
+# ```prices``` -- vector of submitted prices used for the estimation of W  
+# ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
+# ```Q``` -- positive real number, corresponding to the quota $Q$  
+# ```bootstraprun``` -- natural number, indicating the boostrap run number   
+# ```n``` -- positive natural number, indicating the number of support points used for integration  
+#### Return value
+# Real number; value of $F^j$.
+###################################################
 
 function FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
     # retrive estimates for W(p,q) at price points p (WPar) and at the respective 
@@ -313,7 +557,7 @@ function FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
         return 0
     end
 
-    # need to distinguish between first and other steps (as in first step, 
+    # need to distinguish between first and other steps (because in first step, 
     # integration starts at 0)
     if bidstep >= 2
         f(x) =
@@ -383,6 +627,19 @@ function FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
     end
 end
 
+#################################################
+# VarPhiU(q, v, vl)
+#################################################
+#### Description
+# Determines $\varphi_u(q,v,v_l)$ (cf. the manuscript).
+#### Arguments
+# ```q``` -- positive real number  
+# ```v``` -- marginal profit function  
+# ```vl``` -- positive real number, corresponding to $v_l$  
+#### Return value
+# Real number; value of $\varphi_u(q,v,v_l)$.
+#################################################
+
 function VarPhiU(q, v, vl)
     vnew = DataFrame(
         vval = max.(fill(convert(Float64, v), length(vl[vl.qval .<= q, :qval])),
@@ -394,6 +651,20 @@ function VarPhiU(q, v, vl)
     end
     append!(vnew, vl[vl.qval .> q, :])
 end
+
+#################################################
+# VarPhiL(q, v, vu)
+#################################################
+#### Description
+# Determines $\varphi_l(q,v,v_u)$ (cf. the manuscript).
+#### Arguments
+# ```q``` -- positive real number  
+# ```v``` -- marginal profit function  
+# ```vu``` -- positive real number, corresponding to $v_u$  
+#### Return value
+# Real number; value of $\varphi_l(q,v,v_u)$.
+#################################################
+
 
 function VarPhiL(q, v, vu)
     vnew = DataFrame(

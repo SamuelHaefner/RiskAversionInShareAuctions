@@ -211,6 +211,7 @@ latexify(
 )
 
 ## By Auction Group
+# compute for group 1
 Tested = []
 Violated = []
 for runno in [1:1:runs;]
@@ -220,6 +221,7 @@ for runno in [1:1:runs;]
         for rho in [1:1:length(rhovec);]
             global TestedRho = zeros(length(unique(bidderassignment)), 1)
             global ViolatedRho = zeros(length(unique(bidderassignment)), 1)
+            # compute for group 1
             for g in 1
                 for auction in [1:1:length(group[g]);]
                     eval(Meta.parse(string(
@@ -278,6 +280,7 @@ TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TData, (:x1 => :std))
 TDataG1 = hcat(TData, TDataAdd)
 
+# compute for group 2
 Tested = []
 Violated = []
 for runno in [1:1:runs;]
@@ -287,6 +290,7 @@ for runno in [1:1:runs;]
         for rho in [1:1:length(rhovec);]
             global TestedRho = zeros(length(unique(bidderassignment)), 1)
             global ViolatedRho = zeros(length(unique(bidderassignment)), 1)
+            # compute for group 2
             for g in 2
                 for auction in [1:1:length(group[g]);]
                     eval(Meta.parse(string(
@@ -345,6 +349,7 @@ TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TData, (:x1 => :std))
 TDataG2 = hcat(TData, TDataAdd)
 
+# compute for group 3
 Tested = []
 Violated = []
 for runno in [1:1:runs;]
@@ -354,6 +359,7 @@ for runno in [1:1:runs;]
         for rho in [1:1:length(rhovec);]
             global TestedRho = zeros(length(unique(bidderassignment)), 1)
             global ViolatedRho = zeros(length(unique(bidderassignment)), 1)
+            # compute for group 3
             for g in 3
                 for auction in [1:1:length(group[g]);]
                     eval(Meta.parse(string(

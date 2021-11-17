@@ -7,14 +7,15 @@ Author: [Samuel Häfner](https://samuelhaefner.github.io), Web3 Foundation, Zug,
 # Table of Contents
 
 1. [Overview](#Overview)  
-2. [Data](#Data)
-3. [Estimates](#Estimates) 
-4. [Example](#Example)  
-5. [Scripts](#Scripts)  
+2. [Estimation](#Estimation)
+3. [Data](#Data)
+5. [Example](#Example)  
+6. [Scripts](#Scripts)  
   a. [Estimation.jl](##Estimation.jl)  
   b. [Testmon.jl](##Testmon.jl)  
   c. [Auxiliary.jl](##Auxiliary.jl) 
 
+Section [Overview](#Overview) gives an overview of the files in this repository. Section [Estimation](#Estimation) describes how the estimation procedure is done on a SLURM Workload Manager. Section [Data](#Data) describes the data set. Section [Example](#Example) provides some example code to jump right into the estimation on a local machine. Section [Scripts](#Scripts) describes all functions in the scripts.
 
 # Overview of the replication files
 
@@ -24,7 +25,7 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
    - ```Grouping.jl``` - Determines the bidder groups and auction groups used for the estimation.  
    - ```Estimation.jl``` - Contains the main functions for the estimation of W, $\Theta$, and the bounds.  
    - ```TestMon.jl``` - Contains the main functions to test for the monotonicity of $F^j$ in v.   
-2. The *scripts to conduct the estimation*. In particular, the following files contain the scripts to produce the .jl and .sh files that are needed to run the estimation on a SLURM workload manager.  
+2. The *scripts to conduct the estimation*. In particular, the following files contain the scripts to produce the .jl and .sh files that can then be run on a SLURM workload manager.  
    - ```EstimateWandTSLURM.jl``` - Produces the required .jl and .sh files to compute and save estimates of W and Theta.  
    - ```EstimateWandTRobustSLURM.jl``` - Produces the required files to compute and save the robustness checks for Theta, using a log-normal distribution rather than a gamma distribution when estimating W.
    - ```EstimateBoundsSLURM.jl``` - Produces the required files to compute standard and tighter bounds, using the estimates of W(p,q) obtained with EstimateWandTSLURM.jl.
@@ -46,13 +47,22 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
 4. Script to produce additional plots.
    - ```Plots.jl``` - Script to generate the group plots, the resampling plots, and the plot showing the estimated bounds (which is done with function ```PlotTighterBounds()```; cf. the file for more information).  
 
-*Comment 1:* The script ```TestMonWandBounds.jl``` produces the required files with the estimates of W(p,q) and the bounds for the monotonicity check. This script needs to be run before the TestMon*.jl scripts, using the bash script ```TestMonWandBounds.sh```.
+*Comment 1:* The script ```TestMonWandBounds.jl``` produces the required files containing the estimates of W(p,q) and the bounds for the monotonicity check. This script needs to be run before the TestMon*.jl scripts, using the bash script ```TestMonWandBounds.sh```.
 
 *Comment 2:* Computation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. The Julia version used was 1.5. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 48 − 72 hours (EstimateBoundsGeneric.jl).
 
+# Estimation Procedure on a SLURM Workload Manager
+The estimation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. This allows to run several bootstrap rounds in parallel. Below, I describe the basic procedure to do so. Further down, I give an example of how the programs can be run locally.
+1. Upload the data file (see below) and the *main code* files (Point 1 above) to the relevant folder.
+2. Run the scripts under Point 2 above locally. This produces a host of *.jl and *.sh files.
+3. Upload these files together with ```TestMonWandBounds.sh``` to the relevant folder and run the following main .sh files: (1) ```EstimateWandT.sh```, (2) ```EstimateWandTRobust.sh```, (3) ```EstimateBounds.sh```, (4) ```TestMonWandBounds.sh```, (5) ```TestMon.sh```. Scripts (1) and (2) can be run in parallel, but they need to be competed before running (3). Script (4) needs to be run before script (5) (see Comment 1 above).
+4. After the scripts completed, download the *.dat files with the estimates.
+5. Run the scripts under Point 4 above.
+
+*Comment 3:* The estimates that I obtained and reported in the manuscript can be downloaded [here](https://drive.google.com/file/d/1bqyIMnCVvJJlmcStgyGKClkse68GCYYS/view?usp=sharing). This file contains the .dat files, so that the interested reader may directly jump to Point 5 above.
 
 # Data  
-The data are contained in the file ```setofbids.csv```, which is also in the [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions). Each row corresponds to a submitted price-quantity pair. The columns are the following:
+The auction data is contained in the file ```setofbids.csv```, which is also in the [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions). Each row corresponds to a submitted price-quantity pair. The columns are the following:
 
 | Variable | Description |
 |--- | --- |
@@ -65,9 +75,6 @@ The data are contained in the file ```setofbids.csv```, which is also in the [re
 |```qr```| resulting quantity (from that price-quantity pair)|  
 |```pr```| resulting payment | 
 |```qperc```| percentage of total quota |   
-
-# Estimates
-The estimates that I obtained and reported in the manuscript can be read in with the ```Read*.jl``` scripts as described in the [Overview section](#Overview). The estimates are saved in ```*.dat``` files. A zip archive of all files can be downloaded [here](https://drive.google.com/file/d/1bqyIMnCVvJJlmcStgyGKClkse68GCYYS/view?usp=sharing).
 
 
 # Tables and Plots
@@ -285,7 +292,7 @@ Computes upper and lower bounds on the rationalizable profit functions as descri
 ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
 ```Q``` -- positive real number, corresponding to the quota $Q$
 #### Return value
-A list of data frames, [vlb,vub], where vub is the upper bound and vlb is the lower bound.
+A list of dataframes, [vlb,vub], where vub is the data frame containing the upper bound and vlb is the data frame containing lower bound.
 
 -----
 ```
@@ -319,7 +326,7 @@ Determines violations of the inequalities in Proposition 4 for a given auction.
   ```rho``` -- positive real number, the risk preference   
   ```m``` -- number of bootstrap rounds  
 #### Return value
-A list of two matrices, with columns corresponding to bootrap round and rows corresponding to bidder groups. The first matrix counts the number of violations, the second matrix counts the total number of test inequalities.  
+A list of two matrices, with the columns corresponding to bootstrap rounds and rows corresponding to bidder groups. The first matrix counts the number of violations, the second matrix counts the total number of test inequalities.  
 
 -----
 ```
@@ -339,7 +346,7 @@ Computes tighter upper and lower bounds from initial conditions ```initvl``` and
  ```maxiter``` -- maximum number of fixed point iterations   
  ```tolerance``` -- tolerance level (used in iteration)  
  #### Return value
-A list of dataframes, [vlb,vub], where vub is the upper bound and vlb is the lower bound.
+A list of dataframes, [vlb,vub], where vub is the data frame containing the upper bound and vlb is the data frame containing lower bound.
 
 -----
 
@@ -348,10 +355,9 @@ EstTighterBounds(auction, W, bidderassignment, prices, bounds, rhovec, m, maxite
 ```
 #### Description
 Runs ```TighterBounds()``` for all bidders in an ```auction``` and for ```m``` bootstrap rounds.
-#### Arguments
-
-```auction``` -- auction index  
-```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```  
+#### Arguments  
+ ```auction``` -- auction index  
+ ```W``` -- estimate of W, as returned from ```Wgamma()``` or  ```Wlnorm()```  
  ```bidderassignment``` -- bidder assignment vector  
  ```prices``` -- vector of prices used for the estimation of ```W```  
  ```bounds``` -- estimated simple bounds from ```EstimateSimpleBounds()```  
@@ -360,7 +366,7 @@ Runs ```TighterBounds()``` for all bidders in an ```auction``` and for ```m``` b
 ```maxiter``` -- maximum number of fixed point iterations  
 ```tolerance``` -- tolerance level (used in iteration)  
 #### Return value
-List containing for each biddera and each bootstrapround a two dimensional list [```bounds```,tighterbounds], where tighterbounds is the object returned by ```TighterBounds()```.
+List containing for each bidder and each bootstrap round a two dimensional list [```bounds```,```tighterbounds```], where ```tighterbounds``` is the object returned by ```TighterBounds()```.
 
 
 ## TestMon.jl
@@ -476,7 +482,7 @@ Determine the average number of bidders in each bidder cluster
 #### Arguments
   ```bidderassignment``` -- vector, each element corresponding to a bidder, denoting the cluster number of the respective bidder  
 #### Return value
-A list of real numbers.
+A list of real numbers; one for each cluster number; returning the average no. of bidders.
 
 -----
 ```
@@ -487,7 +493,7 @@ Determines the bid-to-cover ratio in an auction.
 #### Arguments
   ```auction``` -- auctionindex
 #### Return value
-Real number.
+Real number; corresponding to the bid-to-cover ratio.
 
 -----
 ```
@@ -498,7 +504,7 @@ Determines the revenue from an auction.
 #### Arguments
   ```auction``` -- auctionindex
 #### Return value
-Real number.
+Real number; corresponding to the auction revenue.
 
 -----
 ```
@@ -510,7 +516,7 @@ Determines the allocated quantity of a bidder in a given auction.
   ```bidder``` -- bidderindex   
   ```auction``` -- auctionindex
 #### Return value
-Real number.
+Real number; corresponding to the allocated quantity.
 
 ----
 ```
@@ -522,18 +528,18 @@ Determines the share of quota that is allocated to a bidder in a given auction.
   ```bidder``` -- bidderindex  
   ```auction``` -- auctionindex
 #### Return value
-Real number.
+Real number; corresponding to the received share.
 
 ----
 ```
 ActiveAuctions(bidder)
 ```
 #### Description
-Determines the indeces of the auctions in which a bidder is active
+Determines the indeces of the auctions in which a bidder is active.
 #### Arguments
   ```bidder``` -- bidderindex 
 #### Return value
-A list of integers.
+A list of integers; corresponding to the indices of the auctions in which the bidder was active.
 
 -----
 ```
@@ -544,7 +550,7 @@ Determines the average bid of a bidder across the auctions in which that bidder 
 #### Arguments
   ```bidder``` -- bidderindex
 #### Return value
-Real number.
+Real number; corresponding to the average bid of the bidder.
 
 -----
 ```
@@ -555,7 +561,7 @@ Determines the  share of succesfull bidders (with non-zero allocated quantity) i
 #### Arguments
   ```auction``` -- auctionindex
 #### Return value
-Real number.
+Real number; corresponding to the share of successful bidders.
 
 ----
 ```
@@ -566,7 +572,7 @@ Returns the success rate of a bidder (succesfull participation/total participati
 #### Arguments
   ```bidder``` -- bidderindex
 #### Return value
-Real number.
+Real number; corresponding to the bidder's success rate.
 
 ----
 ```
@@ -578,7 +584,7 @@ Determines the value of $\beta_b(q)$ (cf. the manuscript for a definition).
   ```q``` -- positive real number
   ```bid``` -- bid function as returned from qpBid(bidder, auction)
 #### Return value
-Real number.
+Real number; value of $\beta_{bid}(q)$.
 
 ----
 ```
@@ -590,7 +596,7 @@ Determines the step of the step function $\beta_b$ at ```q```. That is, returns 
   ```q``` positive real number
   ```bid``` bid function as returned from qpBid(bidder, auction)
 #### Return value
-Integer.
+Integer; see description.
 
 -----
 ```
@@ -602,19 +608,19 @@ Returns the value of the profit function v(q).
   ```q``` -- positive real number  
   ```v``` -- marginal profit function, which is a data frame with columns ```qval``` (quantities, need to be increasing) and ```vval``` (the values of v)
 #### Return value
-Real number.
+Real number; corresponding to the value of the profit function v(q).
 
 -----
  ```
  IntBid(a, b, bid)
  ```
  #### Description
- Returns the value of $\int_a^b\beta_b(q)dq$
+ Returns the value of $\int_a^b\beta_{bid}(q)dq$.
  #### Arguments
   ```a```, ```b``` -- positive real numbers
   ```bid``` -- bid function as returned from qpBid(bidder, auction)
 #### Return value
-Real number.
+Real number; value of $\int_a^b\beta_{bid}(q)dq$.
 
 ----
 ```
@@ -626,7 +632,7 @@ Returns the value of $\int_a^b v(q)dq$.
   ```a```, ```b``` -- positive real numbers
   ```v``` -- marginal profit function
 #### Return value
-Real number.
+Real number; value of $\int_a^b v(q)dq$.
 
 ----
 ```
@@ -656,18 +662,18 @@ Computes $w_i(p,q)$.
   ```WPar``` -- array, containing two sets of estimated parameters of the distribution of D(p); one for p_i^j and one for p_i^j + dp.   
   ```dp``` -- positive real number  
 #### Return value
-Real number.
+Real number; value of $w_i(p,q)$.
 
 ------
 ```
-PriceBids()
+PriceBids(auctionset)
 ```
 #### Description
 Returns all submitted prices in ```auctionset``` in ascending order.
 #### Arguments
   ```auctionset``` -- vector, containing auction indeces
 #### Return value
-List of real numbers.
+List of real numbers; prices submitted in the auctions in ```auctionset```.
 
 -----
 ```
@@ -687,7 +693,7 @@ FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
   ```bootstraprun``` -- natural number, indicating the boostrap run number   
   ```n``` -- positive natural number, indicating the number of support points used for integration  
 #### Return value
-Real number.
+Real number; value of $F^j$.
 
 -----
 ```
@@ -700,7 +706,7 @@ Determines $\varphi_u(q,v,v_l)$ (cf. the manuscript).
   ```v``` -- marginal profit function  
   ```vl``` -- positive real number, corresponding to $v_l$  
 #### Return value
-Real number.
+Real number; value of $\varphi_u(q,v,v_l)$.
 
 -----
 ```
@@ -713,5 +719,5 @@ Determines $\varphi_l(q,v,v_u)$ (cf. the manuscript).
   ```v``` -- marginal profit function  
   ```vu``` -- positive real number, corresponding to $v_u$  
 #### Return value
-Real number.
+Real number; value of $\varphi_l(q,v,v_u)$.
 
