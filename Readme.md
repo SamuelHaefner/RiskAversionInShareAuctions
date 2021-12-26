@@ -4,18 +4,35 @@ This file contains the required information for the replication of the results i
 
 Author: [Samuel Häfner](https://samuelhaefner.github.io), Web3 Foundation, Zug, Switzerland, [samuel@web3.foundation](mailto:samuel@web3.foundation).
 
+Current version: Dec 25, 2021.
+
 # Table of Contents
 
-1. [Overview](#Overview)  
-2. [Estimation](#Estimation)
-3. [Data](#Data)
-5. [Example](#Example)  
-6. [Scripts](#Scripts)  
+1. [Data](#Data)
+2. [Overview of Replication Files](#Overview)  
+3. [Estimation Procedure on a SLURM Workload Manager](#Estimation)
+4. [Example](#Example) 
+5. [Tables and Plots](#Tables)
+6. [Scripts in More Details](#Scripts)  
   a. [Estimation.jl](##Estimation.jl)  
-  b. [Testmon.jl](##Testmon.jl)  
+  b. [TestMon.jl](##Testmon.jl)  
   c. [Auxiliary.jl](##Auxiliary.jl) 
 
-Section [Overview](#Overview) gives an overview of the files in this repository. Section [Estimation](#Estimation) describes how the estimation procedure is done on a SLURM Workload Manager. Section [Data](#Data) describes the data set. Section [Example](#Example) provides some example code to jump right into the estimation on a local machine. Section [Scripts](#Scripts) describes all functions in the scripts.
+# Data  
+The auction data is contained in the file ```setofbids.csv```. Each row corresponds to a submitted price-quantity pair. The columns are the following:
+
+| Variable | Description |
+|--- | --- |
+|```auction```| auction id |    
+|```quotatot``` | quota (in kg) | 
+|```bid_id``` | bid id |  
+|```bidder``` | bidder id | 
+|```qb```| quantity point (not cumulative, in kg) |  
+|```pb```| price point (in Swiss cents) | 
+|```qr```| resulting quantity (from that price-quantity pair)|  
+|```pr```| resulting payment | 
+|```qperc```| percentage of total quota |   
+
 
 # Overview of the replication files
 
@@ -40,8 +57,8 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
    - ```EstimateBoundsGeneric.sh```
    - ```TestMonGeneric.sh```
 3. The scripts to *read and further process the estimates* produced with above *Slurm.jl scripts. Once the estimates are saved in the respective .dat files, these scripts can be run as they are.
-   - ```ReadEstimates.jl``` - Contains the functions to read in the estimates and produce the respective tables.
-   - ```ReadT.jl``` - Script to read in estimates of T and produce the plots and tables. 
+   - ```ReadEstimates.jl``` - Scripts and functions to read in the estimates of the bounds and produce the respective tables.
+   - ```ReadT.jl``` - Scripts to read in estimates of T and produce the plots and tables. 
    - ```ReadTRobust.jl``` - Same as above, but using the alternative estimates (robustness check).
    - ```ReadTestMon.jl``` - Contains the script to read in the monotonicity violations obtained and saved with TestMonGeneric.jl and produces the respective tables.
 4. Script to produce additional plots.
@@ -51,77 +68,37 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
 
 *Comment 2:* Computation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. The Julia version used was 1.5. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 48 − 72 hours (EstimateBoundsGeneric.jl).
 
+
 # Estimation Procedure on a SLURM Workload Manager
 The estimation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. This allows to run several bootstrap rounds in parallel. Below, I describe the basic procedure to do so. Further down, I give an example of how the programs can be run locally.
 1. Upload the data file (see below) and the *main code* files (Point 1 above) to the relevant folder.
-2. Run the scripts under Point 2 above locally. This produces a host of *.jl and *.sh files.
-3. Upload these files together with ```TestMonWandBounds.sh``` to the relevant folder and run the following main .sh files: (1) ```EstimateWandT.sh```, (2) ```EstimateWandTRobust.sh```, (3) ```EstimateBounds.sh```, (4) ```TestMonWandBounds.sh```, (5) ```TestMon.sh```. Scripts (1) and (2) can be run in parallel, but they need to be competed before running (3). Script (4) needs to be run before script (5) (see Comment 1 above).
+2. Run the scripts under Point 2 in Section [Overview](#Overview) above locally. This produces a host of *.jl and *.sh files.
+3. Upload these files together with ```TestMonWandBounds.sh``` and ```TestMonWandBounds.jl``` to the relevant folder and run the following main .sh files: (1) ```EstimateWandT.sh```, (2) ```EstimateWandTRobust.sh```, (3) ```EstimateBounds.sh```, (4) ```TestMonWandBounds.sh```, (5) ```TestMon.sh```. Scripts (1) and (2) can be run in parallel, but they need to be completed before running (3). Script (4) needs to be run before script (5) (see Comment 1 above).
 4. After the scripts completed, download the *.dat files with the estimates.
-5. Run the scripts under Point 4 above.
+5. Run the scripts described under Point 4 in Section [Overview](#Overview) above.
 
 *Comment 3:* The estimates that I obtained and reported in the manuscript can be downloaded [here](https://drive.google.com/file/d/1bqyIMnCVvJJlmcStgyGKClkse68GCYYS/view?usp=sharing). This file contains the .dat files, so that the interested reader may directly jump to Point 5 above.
 
-# Data  
-The auction data is contained in the file ```setofbids.csv```, which is also in the [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions). Each row corresponds to a submitted price-quantity pair. The columns are the following:
-
-| Variable | Description |
-|--- | --- |
-|```auction```| auction id |    
-|```quotatot``` | quota (in kg) | 
-|```bid_id``` | bid id |  
-|```bidder``` | bidder id | 
-|```qb```| quantity point (not cumulative, in kg) |  
-|```pb```| price point (in Swiss cents) | 
-|```qr```| resulting quantity (from that price-quantity pair)|  
-|```pr```| resulting payment | 
-|```qperc```| percentage of total quota |   
-
-
-# Tables and Plots
-The following table explains which scripts are used to produce the tables and plots in the [main paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3397027).
-
-| Figure/Table | Script | Comment|
-|---|---|---|
-|Figure 1 | none | tikz-script in .tex file |
-|Figure 2 | ```Plots.jl```| Lines 8-33 (left panel). Lines 74-82 (right panel). |
-|Figure 3 | ```ReadT.jl``` | Lines 1-69; 115-211.|
-|Figure 4 | ```Plots.jl```| Function ```PlotTighterBounds()```; see the file for further information. |
-|Figure 5  | ```Plots.jl```| Lines 35-59 (left panel). Lines 64-72 (right panel). |
-|Figure 6  |  ```Plots.jl``` | Lines 152-177 (left panel). Lines 37-46; 88-149 (right panel).|
-|Table 1 | ```Auxilary.jl``` | Various functions in ```Auxiliary.jl``` are used. For a comprehensive overview see the corresponding [section](#Scripts) below. |
-|Table 2 | ```ReadEstimates.jl``` | See file for more information. |
-|Table 3 | ```ReadEstimates.jl``` | See file for more information. |
-
-The following table explains which scripts are used to produce the tables and plots in the [supplementary appendix](https://samuelhaefner.github.io/SupplementaryAppendix.pdf) of the paper.
-
-| Figure/Table | Script | Line Number |
-|---|---|---|
-| Figure 1 |```ReadT.jl``` | Lines 1-69; 213-467.|
-| Figure 2 | ```ReatT.jl``` (right figure) and ```ReadTRobust.jl``` (left figure) | See files for more information. |
-| Table 1 | ```ReadT.jl``` | Lines 1-69; 213-467. |
-| Table 2 | ```ReadT.jl``` | See file for more information. |
-| Table 3 | ```ReatT.jl``` (right table) and ```ReadTRobust.jl``` (left table) | See files for more information. |
-| Tables in Section D | ```ReadEstimates.jl``` | |
-
-
-
 # Example
 
-The following code goes through the basic computations. Doing one bootstrap round, the code first estimates W(p,q), then computes $\Theta(\rho)$, and last determines the bounds for $\rho=0$ and $\rho=\rho^*$. 
+The following code, which can be run locally, goes through the basic computations. Doing one bootstrap round, the code first estimates W(p,q), then computes $\Theta(\rho)$, and last determines the bounds for $\rho=0$ and $\rho=\rho^*$. 
 
 ```julia
-###############
+#######################################################################
 ## load the data set. 
 ## define global variables and relevant functions
-###############
+##
+## required packages: CSV; DataFrames; Distributions; 
+##                    BSON: @save, @load;  Roots
+#######################################################################
 include("Auxiliary.jl")
 include("Estimation.jl")
 include("Grouping.jl")
 include("TestMon.jl")
 
-###############
+#######################################################################
 ## the following lines compute the estimates of W(p,q).  
-###############
+#######################################################################
 
 # obtain the average number of active bidders for each bidder group  
 n = AvgNoBidders(bidderassignment)
@@ -140,13 +117,18 @@ for i in [1:1:length(group);]
     push!(W, Wgamma(prices, auctionset, bidderassignment, n, m, P))
 end
 
-###############
-## the following computes all the values required 
+######################################################################
+## The following computes all the values required 
 ## to compute $\Theta_g(\rho)$ for the values in rhovec. 
-###############
+##
+## The result is a list of the following form:
+## Theta[auctiongroup][auction][rhovalue][totalpairs=1,violations=2],
+## the entries of which consists of three numbers, one corresponding
+## to each bidder group.
+######################################################################
 
 # define the vector of rho values for with \Theta_g is computed
-rhovec = sort!(append!([exp(x) for x in [-10:0.5:0;]], 0))
+rhovec = [[exp(x),exp(x),exp(x)] for x in sort!(append!([-10:0.5:0;],-Inf))]
 
 # the values are computed for each auction 
 # in each auction group [g] separately
@@ -174,7 +156,7 @@ for g in [1:1:length(group);]
                     bidderassignment,
                     prices,
                     bounds,
-                    rhovec[i],
+                    rhovec[i][1],
                     m,
                 ),
             )
@@ -184,17 +166,27 @@ for g in [1:1:length(group);]
     push!(Theta, ThetaGroup)
 end
 
-###############
-## the following code computes both the simple and the tighter bounds 
+########################################################################
+## The following code computes both the simple and the tighter bounds 
 ## for rho=(0,0,0) and rho=rho^* (only the first for rho=0, and 
 ## both for rho=rho*) for all active bidders in a given auction
-###############
+##
+## The result is a list called BoundAuctions,
+##    BoundsAuction[1] -- List of length=77, each element corresponding to 
+##                          the simple bounds under risk neutrality of  
+##                          an active bidder
+##    BoundsAuction[2] -- List of length=2. The first element is a list as above
+##                          but under risk aversion, \rho^*.
+##                          The second element is a list containing the 
+##                          tighter bounds for each bidder under \rho^*.
+########################################################################
 
 # define the two vectors of values for rho within the three groups
 rhovec = [[0,0,0],[exp(-5),exp(-7),exp(-8)]]
 
 # take the second auction in the first auction group, g=1
 g = 1
+prices = PriceBids(group[g])
 auction = group[g][2]
 BoundsAuction = []
 for i in [1:1:length(rhovec);]
@@ -227,7 +219,35 @@ for i in [1:1:length(rhovec);]
 end
 ```
 
-# Scripts
+
+# Tables and Plots
+The following table explains which scripts are used to produce the tables and plots in the [main paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3397027).
+
+| Figure/Table | Script | Comment|
+|---|---|---|
+|Figure 1 | none | tikz-script in .tex file |
+|Figure 2 | ```Plots.jl```| Lines 8-33 (left panel). Lines 74-82 (right panel). |
+|Figure 3 | ```ReadT.jl``` | Lines 1-69; 115-211.|
+|Figure 4 | ```Plots.jl```| Function ```PlotTighterBounds()```; see the file for further information. |
+|Figure 5  | ```Plots.jl```| Lines 35-59 (left panel). Lines 64-72 (right panel). |
+|Figure 6  |  ```Plots.jl``` | Lines 152-177 (left panel). Lines 37-46; 88-149 (right panel).|
+|Table 1 | ```Auxilary.jl``` | Various functions in ```Auxiliary.jl``` are used. For a comprehensive overview see the corresponding [section](#Scripts) below. |
+|Table 2 | ```ReadEstimates.jl``` | See file for more information. |
+|Table 3 | ```ReadEstimates.jl``` | See file for more information. |
+
+The following table explains which scripts are used to produce the tables and plots in the [supplementary appendix](https://samuelhaefner.github.io/SupplementaryAppendix.pdf) of the paper.
+
+| Figure/Table | Script | Line Number |
+|---|---|---|
+| Figure 1 |```ReadT.jl``` | Lines 1-69; 213-467.|
+| Figure 2 | ```ReatT.jl``` (right figure) and ```ReadTRobust.jl``` (left figure) | See files for more information. |
+| Table 1 | ```ReadT.jl``` | Lines 1-69; 213-467. |
+| Table 2 | ```ReadT.jl``` | See file for more information. |
+| Table 3 | ```ReatT.jl``` (right table) and ```ReadTRobust.jl``` (left table) | See files for more information. |
+| Tables in Section D | ```ReadEstimates.jl``` | |
+
+
+# Scripts in More Detail
 This section provides the details about the functions and global variables defined in the four main files. 
 
 ## The main global variables

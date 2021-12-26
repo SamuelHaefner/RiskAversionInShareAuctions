@@ -1,4 +1,4 @@
-## reads in the estimates of the different AvP-variables and produces the tables
+## Reads in the estimates of the different AvP-variables and produces the respective tables
 
 include("Auxiliary.jl")
 include("Grouping.jl")
@@ -289,7 +289,7 @@ function ComputeBounds(auctiongroup, Bounds,subg)
         AvgPratioU0,
         AvgPratioU1,
         AvgPratioU2,
-        ]))  
+        ],:auto))  
     end
     return(Est)
 end
@@ -318,7 +318,7 @@ function ComputeBoundsMeanStd(Runs,subg)
             Std[a, e] = std([Estimates[x][a, e] for x in [1:1:length(Estimates);]])
         end
     end
-    return ([DataFrame(Means), DataFrame(Std)])
+    return ([DataFrame(Means,:auto), DataFrame(Std,:auto)])
 end
 
 

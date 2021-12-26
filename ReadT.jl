@@ -74,16 +74,14 @@ TData = DataFrame(
             sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
             for x in [1:1:length(rhovec);]
         ] for y in [1:1:m*runs;]
-    ])],
-)
+    ])],:auto)
 rename!(TData, (:x1 => :rho))
 rename!(TData, (:x2 => :meanest))
 TDataAdd = DataFrame([
     [
         sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
         for x in [1:1:length(rhovec);]
-    ] for y in [1:1:m*runs;]
-])
+    ] for y in [1:1:m*runs;]],:auto)
 TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TData, (:x1 => :std))
 TData = hcat(TData, TDataAdd)
@@ -117,13 +115,11 @@ savefig("ThetaEst.pdf")
 TDataG1 = DataFrame(
     [rhovec mean([
         [Violated[y][x][1] / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
-    ])],
-)
+    ])],:auto)
 rename!(TDataG1, (:x1 => :rho))
 rename!(TDataG1, (:x2 => :meanest))
 TDataAdd = DataFrame([
-    [Violated[y][x][1] / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
-])
+    [Violated[y][x][1] / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
 TDataG1 = hcat(TDataG1, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataG1, (:x1 => :std))
 TDataG1 = hcat(TDataG1, TDataAdd)
@@ -131,13 +127,11 @@ TDataG1 = hcat(TDataG1, TDataAdd)
 TDataG2 = DataFrame(
     [rhovec mean([
         [Violated[y][x][2] / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
-    ])],
-)
+    ])],:auto)
 rename!(TDataG2, (:x1 => :rho))
 rename!(TDataG2, (:x2 => :meanest))
 TDataAdd = DataFrame([
-    [Violated[y][x][2] / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
-])
+    [Violated[y][x][2] / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
 TDataG2 = hcat(TDataG2, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataG2, (:x1 => :std))
 TDataG2 = hcat(TDataG2, TDataAdd)
@@ -145,13 +139,11 @@ TDataG2 = hcat(TDataG2, TDataAdd)
 TDataG3 = DataFrame(
     [rhovec mean([
         [Violated[y][x][3] / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
-    ])],
-)
+    ])],:auto)
 rename!(TDataG3, (:x1 => :rho))
 rename!(TDataG3, (:x2 => :meanest))
 TDataAdd = DataFrame([
-    [Violated[y][x][3] / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
-])
+    [Violated[y][x][3] / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
 TDataG3 = hcat(TDataG3, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataG3, (:x1 => :std))
 TDataG3 = hcat(TDataG3, TDataAdd)
@@ -266,8 +258,7 @@ TData = DataFrame(
             sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
             for x in [1:1:length(rhovec);]
         ] for y in [1:1:m*runs;]
-    ])],
-)
+    ])],:auto)
 rename!(TData, (:x1 => :rho))
 rename!(TData, (:x2 => :meanest))
 TDataAdd = DataFrame([
@@ -275,7 +266,7 @@ TDataAdd = DataFrame([
         sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
         for x in [1:1:length(rhovec);]
     ] for y in [1:1:m*runs;]
-])
+],:auto)
 TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TData, (:x1 => :std))
 TDataG1 = hcat(TData, TDataAdd)
@@ -335,8 +326,7 @@ TData = DataFrame(
             sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
             for x in [1:1:length(rhovec);]
         ] for y in [1:1:m*runs;]
-    ])],
-)
+    ])],:auto)
 rename!(TData, (:x1 => :rho))
 rename!(TData, (:x2 => :meanest))
 TDataAdd = DataFrame([
@@ -344,7 +334,7 @@ TDataAdd = DataFrame([
         sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
         for x in [1:1:length(rhovec);]
     ] for y in [1:1:m*runs;]
-])
+],:auto)
 TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TData, (:x1 => :std))
 TDataG2 = hcat(TData, TDataAdd)
@@ -404,8 +394,7 @@ TData = DataFrame(
             sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
             for x in [1:1:length(rhovec);]
         ] for y in [1:1:m*runs;]
-    ])],
-)
+    ])],:auto)
 rename!(TData, (:x1 => :rho))
 rename!(TData, (:x2 => :meanest))
 TDataAdd = DataFrame([
@@ -413,7 +402,7 @@ TDataAdd = DataFrame([
         sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
         for x in [1:1:length(rhovec);]
     ] for y in [1:1:m*runs;]
-])
+],:auto)
 TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TData, (:x1 => :std))
 TDataG3 = hcat(TData, TDataAdd)
