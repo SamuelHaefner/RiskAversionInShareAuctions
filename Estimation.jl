@@ -492,14 +492,11 @@ function CheckDecreasing(bid, WPar, rho, Q)
                 vubnew = fill(vupperbar, i)
                 append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
                 sort!(vub, :qval)
-                # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-                if length(vlb.qval) >= 2
-                    for i in [1:1:length(vlb.qval);]
-                        vub[i, :vval] = maximum(vub[i:end, :vval])
-                        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
-                    end
+                # check necessary condition: vul[i-1] \geq vub[i] for all i = 2,...,\ell_i
+                for i in [1:1:length(vlb.qval)-1;]
+                    if vub.vval[i] < vlb.vval[i+1] return 0 end
                 end
-                return [vlb, vub]
+                return 1
             else
                 vlbnew = min(
                     vupperbar,
@@ -524,14 +521,11 @@ function CheckDecreasing(bid, WPar, rho, Q)
                 vubnew = fill(vupperbar, i)
                 append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
                 sort!(vub, :qval)
-                # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-                if length(vlb.qval) >= 2
-                    for i in [1:1:length(vlb.qval);]
-                        vub[i, :vval] = maximum(vub[i:end, :vval])
-                        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
-                    end
+                # check necessary condition: vul[i-1] \geq vub[i] for all i = 2,...,\ell_i
+                for i in [1:1:length(vlb.qval)-1;]
+                    if vub.vval[i] < vlb.vval[i+1] return 0 end
                 end
-                return [vlb, vub]
+                return 1
             else
                 vubnew = max(
                     bid.pb[i-1],
@@ -579,15 +573,11 @@ function CheckDecreasing(bid, WPar, rho, Q)
     push!(vub, [vupperbar bid.cumqb[1]])
     sort!(vub, :qval)
 
-    # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-    if length(vlb.qval) >= 2
-        for i in [1:1:length(vlb.qval);]
-            vub[i, :vval] = maximum(vub[i:end, :vval])
-            vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
-        end
+    # check necessary condition: vul[i-1] \geq vub[i] for all i = 2,...,\ell_i
+    for i in [1:1:length(vlb.qval)-1;]
+        if vub.vval[i] < vlb.vval[i+1] return 0 end
     end
-
-    return [vlb, vub]
+    return 1
 end
 
 ############################################################
@@ -606,8 +596,22 @@ end
 # A vector of zeros or ones, one element per bidder in the auction
 #############################################################
 
-function CheckSimpleBoundsDecreasing(auction, W, bidderassignment, prices, rhovec, m)
-    ...
+function CheckSimpleBoundsDecreasing(auction, W, bidderassignment, prices, rhovec)
+    check = zeros(length(activebidderindeces[auction]))  
+    i=1
+    for bidder in activebidderindeces[auction]
+        bid = qpBid(bidder, auction)
+        rho=rhovec[bidderassignment[findall(in.(bidderindeces,bidder))][1]]
+        bootstraprun=1
+        g = bidderassignment[findall(in.(bidderindeces,bidder))][1]
+        WPar = W[g][bootstraprun][sort(
+                findall(in.(prices, (bid.pb,))),
+                rev = true,
+            )]
+        check[i] = CheckDecreasing(bid, WPar, rho, quotas[auction])
+        i+=1
+    end
+    return check
 end
 
 #############################################################
