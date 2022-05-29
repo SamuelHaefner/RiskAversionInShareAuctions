@@ -8,9 +8,15 @@ include("Grouping.jl")
 #rhovec = [0,0,0]
 rhovec = [exp(-5),exp(-7),exp(-8)]
 
-auctionset = group[2]
-auction = auctionset[15]
-prices = PriceBids(auctionset)
+check = zeros(length(quotas))
 
-c = CheckSimpleBoundsDecreasing(auction, W1[2], bidderassignment, prices, rhovec)
-sum(c)/length(c)
+for g in [1:1:length(group);]
+    auctionset = group[g]
+    prices = PriceBids(auctionset)
+    for auction in auctionset
+        c = CheckSimpleBoundsDecreasing(auction, W1[g], bidderassignment, prices, rhovec)
+        check[auction]=sum(c)/length(c)
+    end
+end
+
+
