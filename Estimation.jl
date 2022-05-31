@@ -392,6 +392,308 @@ function SimpleBound(bid, WPar, rho, Q)
     return [vlb, vub]
 end
 
+function SimpleBoundPure(bid, WPar, rho, Q)
+    
+    ## start with last quantity point
+    vlb = DataFrame(vval = bid.pb[end], qval = bid.cumqb[end])
+    ## no information in case of just one (p,q)-pair
+    if length(bid.pb) == 1
+        return [vlb, DataFrame(vval = vupperbar, qval = bid.cumqb[end])]
+    end
+    ## abort if WPar is not properly defined
+    if (ismissing(WPar[length(bid.pb)-1]) || ismissing(WPar[length(bid.pb)]))
+        return [
+            DataFrame(vval = bid.pb, qval = bid.cumqb),
+            DataFrame(
+                vval = fill(vupperbar, length(bid.cumqb)),
+                qval = bid.cumqb,
+            ),
+        ]
+    else  
+        ##using vlb on last step gives \PiOverline_i^j = 0
+        vub = DataFrame(
+            vval = max(
+                bid.pb[length(bid.pb)-1],
+                min(
+                    vupperbar,
+                    bid.pb[length(bid.pb)-1] +
+                    (bid.pb[length(bid.pb)-1] - bid.pb[length(bid.pb)]) *
+                    cdf(WPar[length(bid.pb)], Q - bid.cumqb[length(bid.pb)-1]) / (
+                        cdf(
+                            WPar[length(bid.pb)-1],
+                            Q - bid.cumqb[length(bid.pb)-1],
+                        ) - cdf(
+                            WPar[length(bid.pb)],
+                            Q - bid.cumqb[length(bid.pb)-1],
+                        )
+                    ),
+                ),
+            ),
+            qval = bid.cumqb[end],
+        )
+    end
+
+    ## move backwards through quantity points, if more than two in bid
+    if length(bid.pb) >= 3
+        for i in [length(bid.pb)-1:-1:2;]
+            # abort early if WPar is not properly defined
+            if (ismissing(WPar[i]) || ismissing(WPar[i+1]))
+                vlbnew = bid.pb[1:i]
+                qvalnew = bid.cumqb[1:i]
+                append!(vlb, DataFrame(vval = vlbnew, qval = qvalnew))
+                sort!(vlb, :qval)
+                vubnew = fill(vupperbar, i)
+                append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
+                sort!(vub, :qval)
+                # construct decreasing bounds \overline{v}_i and \underline{v}_i;
+                #if length(vlb.qval) >= 2
+                #    for i in [1:1:length(vlb.qval);]
+                #        vub[i, :vval] = maximum(vub[i:end, :vval])
+                #        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
+                #    end
+                #end
+                return [vlb, vub]
+            else
+                vlbnew = min(
+                    vupperbar,
+                    max(
+                        bid.pb[i],
+                        bid.pb[i] +
+                        (bid.pb[i] - bid.pb[i+1]) * (
+                            cdf(WPar[i+1], Q - bid.cumqb[i]) -
+                            rho * PiOverline(i, bid, vub, WPar, rho, Q, 100)[1]
+                        ) / (
+                            cdf(WPar[i], Q - bid.cumqb[i]) -
+                            cdf(WPar[i+1], Q - bid.cumqb[i])
+                        ),
+                    ),
+                )
+            end
+            push!(vlb, [vlbnew bid.cumqb[i]])
+            sort!(vlb, :qval)
+            # abort early if WPar is not properly defined
+            if (ismissing(WPar[i-1]) || ismissing(WPar[i]))
+                qvalnew = bid.cumqb[1:i]
+                vubnew = fill(vupperbar, i)
+                append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
+                sort!(vub, :qval)
+                # construct decreasing bounds \overline{v}_i and \underline{v}_i;
+                #if length(vlb.qval) >= 2
+                #    for i in [1:1:length(vlb.qval);]
+                #        vub[i, :vval] = maximum(vub[i:end, :vval])
+                #        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
+                #    end
+                #end
+                return [vlb, vub]
+            else
+                vubnew = max(
+                    bid.pb[i-1],
+                    min(
+                        vupperbar,
+                        bid.pb[i-1] +
+                        (bid.pb[i-1] - bid.pb[i]) * (
+                            cdf(WPar[i], Q - bid.cumqb[i-1]) -
+                            rho *
+                            PiOverline(i - 1, bid, vlb, WPar, rho, Q, 100)[1]
+                        ) / (
+                            cdf(WPar[i-1], Q - bid.cumqb[i-1]) -
+                            cdf(WPar[i], Q - bid.cumqb[i-1])
+                        ),
+                    ),
+                )
+            end
+            push!(vub, [vubnew bid.cumqb[i]])
+            sort!(vub, :qval)
+        end
+    end
+
+    ## lower bound at first quantity point
+    if (ismissing(WPar[1]) || ismissing(WPar[2]))
+        vlbnew = bid.pb[1]
+    else
+        vlbnew = min(
+            vupperbar,
+            max(
+                bid.pb[1],
+                bid.pb[1] +
+                (bid.pb[1] - bid.pb[2]) * (
+                    cdf(WPar[2], Q - bid.cumqb[1]) -
+                    rho * PiOverline(1, bid, vub, WPar, rho, Q, 100)[1]
+                ) / (
+                    cdf(WPar[1], Q - bid.cumqb[1]) -
+                    cdf(WPar[2], Q - bid.cumqb[1])
+                ),
+            ),
+        )
+    end
+    push!(vlb, [vlbnew bid.cumqb[1]])
+    sort!(vlb, :qval)
+    ## upper bound at first quantity point is vupperbar
+    push!(vub, [vupperbar bid.cumqb[1]])
+    sort!(vub, :qval)
+
+    # construct decreasing bounds \overline{v}_i and \underline{v}_i;
+    #if length(vlb.qval) >= 2
+    #    for i in [1:1:length(vlb.qval);]
+    #        vub[i, :vval] = maximum(vub[i:end, :vval])
+    #        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
+    #    end
+    #end
+
+    return [vlb, vub]
+end
+
+function SimpleBoundAlt(bid, WPar, rho, Q)
+    
+    ## start with last quantity point
+    vlb = DataFrame(vval = bid.pb[end], qval = bid.cumqb[end])
+    ## no information in case of just one (p,q)-pair
+    if length(bid.pb) == 1
+        return [vlb, DataFrame(vval = vupperbar, qval = bid.cumqb[end])]
+    end
+    ## abort if WPar is not properly defined
+    if (ismissing(WPar[length(bid.pb)-1]) || ismissing(WPar[length(bid.pb)]))
+        return [
+            DataFrame(vval = bid.pb, qval = bid.cumqb),
+            DataFrame(
+                vval = fill(vupperbar, length(bid.cumqb)),
+                qval = bid.cumqb,
+            ),
+        ]
+    else  
+        ##using vlb on last step gives \PiOverline_i^j = 0
+        vub = DataFrame(
+            vval = max(
+                bid.pb[length(bid.pb)-1],
+                min(
+                    vupperbar,
+                    bid.pb[length(bid.pb)-1] +
+                    (bid.pb[length(bid.pb)-1] - bid.pb[length(bid.pb)]) *
+                    cdf(WPar[length(bid.pb)], Q - bid.cumqb[length(bid.pb)-1]) / (
+                        cdf(
+                            WPar[length(bid.pb)-1],
+                            Q - bid.cumqb[length(bid.pb)-1],
+                        ) - cdf(
+                            WPar[length(bid.pb)],
+                            Q - bid.cumqb[length(bid.pb)-1],
+                        )
+                    ),
+                ),
+            ),
+            qval = bid.cumqb[end],
+        )
+    end
+
+    ## move backwards through quantity points, if more than two in bid
+    if length(bid.pb) >= 3
+        for i in [length(bid.pb)-1:-1:2;]
+            # abort early if WPar is not properly defined
+            if (ismissing(WPar[i]) || ismissing(WPar[i+1]))
+                vlbnew = bid.pb[1:i]
+                qvalnew = bid.cumqb[1:i]
+                append!(vlb, DataFrame(vval = vlbnew, qval = qvalnew))
+                sort!(vlb, :qval)
+                vubnew = fill(vupperbar, i)
+                append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
+                sort!(vub, :qval)
+                # construct decreasing bounds \overline{v}_i and \underline{v}_i;
+                #if length(vlb.qval) >= 2
+                #    for i in [1:1:length(vlb.qval);]
+                #        vub[i, :vval] = maximum(vub[i:end, :vval])
+                #        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
+                #    end
+                #end
+                return [vlb, vub]
+            else
+                vlbnew = min(
+                    vupperbar,
+                    max(
+                        bid.pb[i],
+                        bid.pb[i] +
+                        (bid.pb[i] - bid.pb[i+1]) * (
+                            cdf(WPar[i+1], Q - bid.cumqb[i]) -
+                            rho * PiOverline(i, bid, vub, WPar, rho, Q, 100)[1]
+                        ) / (
+                            cdf(WPar[i], Q - bid.cumqb[i]) -
+                            cdf(WPar[i+1], Q - bid.cumqb[i])
+                        ),
+                    ),
+                )
+            end
+            push!(vlb, [vlbnew bid.cumqb[i]])
+            sort!(vlb, :qval)
+            # abort early if WPar is not properly defined
+            if (ismissing(WPar[i-1]) || ismissing(WPar[i]))
+                qvalnew = bid.cumqb[1:i]
+                vubnew = fill(vupperbar, i)
+                append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
+                sort!(vub, :qval)
+                # construct decreasing bounds \overline{v}_i and \underline{v}_i;
+                #if length(vlb.qval) >= 2
+                #    for i in [1:1:length(vlb.qval);]
+                #        vub[i, :vval] = maximum(vub[i:end, :vval])
+                #        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
+                #    end
+                #end
+                return [vlb, vub]
+            else
+                vubnew = max(
+                    bid.pb[i-1],
+                    min(
+                        vupperbar,
+                        bid.pb[i-1] +
+                        (bid.pb[i-1] - bid.pb[i]) * (
+                            cdf(WPar[i], Q - bid.cumqb[i-1]) -
+                            rho *
+                            PiOverline(i - 1, bid, vlb, WPar, rho, Q, 100)[1]
+                        ) / (
+                            cdf(WPar[i-1], Q - bid.cumqb[i-1]) -
+                            cdf(WPar[i], Q - bid.cumqb[i-1])
+                        ),
+                    ),
+                )
+            end
+            push!(vub, [vubnew bid.cumqb[i]])
+            sort!(vub, :qval)
+        end
+    end
+
+    ## lower bound at first quantity point
+    if (ismissing(WPar[1]) || ismissing(WPar[2]))
+        vlbnew = bid.pb[1]
+    else
+        vlbnew = min(
+            vupperbar,
+            max(
+                bid.pb[1],
+                bid.pb[1] +
+                (bid.pb[1] - bid.pb[2]) * (
+                    cdf(WPar[2], Q - bid.cumqb[1]) -
+                    rho * PiOverline(1, bid, vub, WPar, rho, Q, 100)[1]
+                ) / (
+                    cdf(WPar[1], Q - bid.cumqb[1]) -
+                    cdf(WPar[2], Q - bid.cumqb[1])
+                ),
+            ),
+        )
+    end
+    push!(vlb, [vlbnew bid.cumqb[1]])
+    sort!(vlb, :qval)
+    ## upper bound at first quantity point is vupperbar
+    push!(vub, [vupperbar bid.cumqb[1]])
+    sort!(vub, :qval)
+
+    # construct decreasing bounds \overline{v}_i and \underline{v}_i;
+    #if length(vlb.qval) >= 2
+    #    for i in [1:1:length(vlb.qval);]
+    #        vub[i, :vval] = maximum(vub[i:end, :vval])
+    #        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
+    #    end
+    #end
+
+    return [vlb, vub]
+end
+
 function SimpleBoundV2(bid, WPar, rho, Q)
     
     ## start with last quantity point
@@ -650,8 +952,8 @@ function CheckDecreasing(bid, WPar, rho, Q)
                 append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
                 sort!(vub, :qval)
                 # check necessary condition: vul[i-1] \geq vub[i] for all i = 2,...,\ell_i
-                for i in [1:1:length(vlb.qval)-1;]
-                    if vub.vval[i] < vlb.vval[i+1] return 0 end
+                for i in [1:1:length(vlb.qval);]
+                    if vub.vval[i] < vlb.vval[i] return 0 end
                 end
                 return 1
             else
@@ -679,8 +981,8 @@ function CheckDecreasing(bid, WPar, rho, Q)
                 append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
                 sort!(vub, :qval)
                 # check necessary condition: vul[i-1] \geq vub[i] for all i = 2,...,\ell_i
-                for i in [1:1:length(vlb.qval)-1;]
-                    if vub.vval[i] < vlb.vval[i+1] return 0 end
+                for i in [1:1:length(vlb.qval);]
+                    if vub.vval[i] < vlb.vval[i] return 0 end
                 end
                 return 1
             else
@@ -731,8 +1033,8 @@ function CheckDecreasing(bid, WPar, rho, Q)
     sort!(vub, :qval)
 
     # check necessary condition: vul[i-1] \geq vub[i] for all i = 2,...,\ell_i
-    for i in [1:1:length(vlb.qval)-1;]
-        if vub.vval[i] < vlb.vval[i+1] return 0 end
+    for i in [1:1:length(vlb.qval);]
+        if vub.vval[i] < vlb.vval[i] return 0 end
     end
     return 1
 end
