@@ -8,6 +8,17 @@ include("Grouping.jl")
 #rhovec = [0,0,0]
 rhovec = [exp(-5),exp(-7),exp(-8)]
 
+checkAlt = zeros(length(quotas))
+
+for g in [1:1:length(group);]
+    auctionset = group[g]
+    prices = PriceBids(auctionset)
+    for auction in auctionset
+        c = CheckSimpleBoundsAltDecreasing(auction, W1[g], bidderassignment, prices, rhovec)
+        checkAlt[auction]=sum(c)/length(c)
+    end
+end
+
 checkRA = zeros(length(quotas))
 
 for g in [1:1:length(group);]
