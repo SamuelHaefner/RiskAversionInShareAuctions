@@ -640,11 +640,12 @@ function SimpleBoundNew(bid, WPar, rho, Q)
                         vlb[i, :vval] = maximum(vlb[i:end, :vval])
                     end
                 end
+                # TBD: don't do this now, but check later for Theta (and ignore for estimation of bounds)
                 # check condition: vul[i] \geq vub[i] for all i = 1,...,\ell_i
                 # return NA if violated
-                for i in [1:1:length(vlb.qval);]
-                    if vub.vval[i] < vlb.vval[i] return [DataFrame(vval=NaN,qval=NaN),DataFrame(vval=NaN,qval=NaN)] end
-                end
+                #for i in [1:1:length(vlb.qval);]
+                #    if vub.vval[i] < vlb.vval[i] return [DataFrame(vval=NaN,qval=NaN),DataFrame(vval=NaN,qval=NaN)] end
+                #end
                 return [vlb, vub]
             else
                 vlbnew = min(
@@ -677,11 +678,12 @@ function SimpleBoundNew(bid, WPar, rho, Q)
                         vlb[i, :vval] = maximum(vlb[i:end, :vval])
                     end
                 end
+                # TBD: don't do this now, but check later for Theta (and ignore for estimation of bounds)
                 # check condition: vul[i] \geq vub[i] for all i = 1,...,\ell_i
                 # return NA if violated
-                for i in [1:1:length(vlb.qval);]
-                    if vub.vval[i] < vlb.vval[i] return [DataFrame(vval=NaN,qval=NaN),DataFrame(vval=NaN,qval=NaN)] end
-                end
+                #for i in [1:1:length(vlb.qval);]
+                #    if vub.vval[i] < vlb.vval[i] return [DataFrame(vval=NaN,qval=NaN),DataFrame(vval=NaN,qval=NaN)] end
+                #end
                 return [vlb, vub]
             else
                 vubnew = max(
@@ -737,11 +739,12 @@ function SimpleBoundNew(bid, WPar, rho, Q)
             vlb[i, :vval] = maximum(vlb[i:end, :vval])
         end
     end
+    # TBD: don't do this now, but check later for Theta (and ignore for estimation of bounds)
     # check condition: vul[i] \geq vub[i] for all i = 1,...,\ell_i
     # return NA if violated
-    for i in [1:1:length(vlb.qval);]
-        if vub.vval[i] < vlb.vval[i] return [DataFrame(vval=NaN,qval=NaN),DataFrame(vval=NaN,qval=NaN)] end
-    end
+    #for i in [1:1:length(vlb.qval);]
+    #    if vub.vval[i] < vlb.vval[i] return [DataFrame(vval=NaN,qval=NaN),DataFrame(vval=NaN,qval=NaN)] end
+    #end
     return [vlb, vub]
 end
 
@@ -923,6 +926,7 @@ function EstThetaNew(auction, W, bidderassignment, prices, bounds, rho, m)
         g = bidderassignment[findall(in.(bidderindeces,activebidderindeces[auction][bidder]))][1]
         bid = qpBid(activebidderindeces[auction][bidder], auction)
         for bootstraprun in [1:1:m;]
+            # TBD: bounds wont't return NA, should do condition check here
             if isnan(bounds[bidder][bootstraprun][1].vval[1])
                 violatedP4[g, bootstraprun] += length(bid.pb)
                 tested[g, bootstraprun] += length(bid.pb)
