@@ -4,7 +4,7 @@ include("Grouping.jl")
 
 n = AvgNoBidders(bidderassignment)
 
-m = 5
+m = 2
 P = 500
 
 @load "WValues1.dat" W1

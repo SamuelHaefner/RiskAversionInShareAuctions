@@ -925,13 +925,16 @@ function EstThetaNew(auction, W, bidderassignment, prices, bounds, rho, m)
     for bidder in [1:1:activebidders[auction];]
         g = bidderassignment[findall(in.(bidderindeces,activebidderindeces[auction][bidder]))][1]
         bid = qpBid(activebidderindeces[auction][bidder], auction)
+        println(bid)
         for bootstraprun in [1:1:m;]
-            # TBD: bounds wont't return NA, should do condition check here
-            if isnan(bounds[bidder][bootstraprun][1].vval[1])
-                violatedP4[g, bootstraprun] += length(bid.pb)
-                tested[g, bootstraprun] += length(bid.pb)
-            else 
-                for bidstep in [length(bid.pb):-1:1;]
+            println(m)
+            for bidstep in [length(bid.pb):-1:1;]
+                ## bounds do not always have the same length, depending on bootstrap round??
+                println(bounds[bidder][bootstraprun][2])
+                println(bounds[bidder][bootstraprun][1])
+                if bounds[bidder][bootstraprun][2].vval[bidstep] < bounds[bidder][bootstraprun][1].vval[bidstep]
+                    violatedP4[g, bootstraprun] += 1
+                else 
                     ## compute values of F^j for upper and lower bounds
                     uc = FOC(
                         bidstep,
@@ -959,10 +962,10 @@ function EstThetaNew(auction, W, bidderassignment, prices, bounds, rho, m)
                     )
                     ## test for violation
                     if (uc > 0 || lc < 0)
-                        violatedP5[g, bootstraprun] += 1
+                    violatedP5[g, bootstraprun] += 1
                     end
-                    tested[g, bootstraprun] += 1
                 end
+            tested[g, bootstraprun] += 1
             end
         end
     end
