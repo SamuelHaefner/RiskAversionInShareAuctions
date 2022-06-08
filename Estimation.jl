@@ -548,7 +548,7 @@ function SimpleBoundPure(bid, WPar, rho, Q)
     ## upper bound at first quantity point is vupperbar
     push!(vub, [vupperbar bid.cumqb[1]])
     sort!(vub, :qval)
-
+    #
     # construct decreasing bounds \overline{v}_i and \underline{v}_i;
     #if length(vlb.qval) >= 2
     #    for i in [1:1:length(vlb.qval);]
@@ -671,6 +671,10 @@ function SimpleBoundNew(bid, WPar, rho, Q)
                 vubnew = fill(vupperbar, i)
                 append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
                 sort!(vub, :qval)
+                vlbnew = bid.pb[1:(i-1)]
+                qvalnew = bid.cumqb[1:(i-1)]
+                append!(vlb, DataFrame(vval = vlbnew, qval = qvalnew))
+                sort!(vlb, :qval)
                 # construct decreasing bounds \overline{v}_i and \underline{v}_i;
                 if length(vlb.qval) >= 2
                     for i in [1:1:length(vlb.qval);]
