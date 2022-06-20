@@ -230,14 +230,15 @@ end
 ############################################################
 #### Description
 # Computes upper and lower bounds on the rationalizable profit 
-# functions as described in Proposition 3 and equations (9)-(10).
+# functions as described in Proposition 3.
 #### Arguments
 # ```bid``` -- bid function  
 # ```WPar``` -- array, containing the estimated parameters of W(p,q) at (p_i^j) for steps j=1,...,k  
 # ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
 # ```Q``` -- positive real number, corresponding to the quota $Q$
 #### Return value
-# A list of dataframes, [vlb,vub], where vub is the data frame containing the upper bound 
+# Returns a list of dataframes, [vlb,vub], 
+# where vub is the data frame containing the upper bound 
 # and vlb is the data frame containing lower bound.
 ############################################################
 
@@ -294,11 +295,11 @@ function SimpleBound(bid, WPar, rho, Q)
                 vubnew = fill(vupperbar, i)
                 append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
                 sort!(vub, :qval)
-                # construct decreasing bounds \overline{v}_i and \underline{v}_i;
+                # construct decreasing bounds \overline{v}_i and \underline{v}_i form Prop. 3;
                 if length(vlb.qval) >= 2
                     for i in [1:1:length(vlb.qval);]
-                        vub[i, :vval] = maximum(vub[i:end, :vval])
-                        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
+                        vub[i, :vval] = max(bid.pb[i], minimum(vub[1:i, :vval]))
+                        vlb[i, :vval] = maximum(vlb[i:end, :vval])
                     end
                 end
                 return [vlb, vub]
@@ -326,181 +327,17 @@ function SimpleBound(bid, WPar, rho, Q)
                 vubnew = fill(vupperbar, i)
                 append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
                 sort!(vub, :qval)
-                # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-                if length(vlb.qval) >= 2
-                    for i in [1:1:length(vlb.qval);]
-                        vub[i, :vval] = maximum(vub[i:end, :vval])
-                        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
-                    end
-                end
-                return [vlb, vub]
-            else
-                vubnew = max(
-                    bid.pb[i-1],
-                    min(
-                        vupperbar,
-                        bid.pb[i-1] +
-                        (bid.pb[i-1] - bid.pb[i]) * (
-                            cdf(WPar[i], Q - bid.cumqb[i-1]) -
-                            rho *
-                            PiOverline(i - 1, bid, vlb, WPar, rho, Q, 100)[1]
-                        ) / (
-                            cdf(WPar[i-1], Q - bid.cumqb[i-1]) -
-                            cdf(WPar[i], Q - bid.cumqb[i-1])
-                        ),
-                    ),
-                )
-            end
-            push!(vub, [vubnew bid.cumqb[i]])
-            sort!(vub, :qval)
-        end
-    end
-
-    ## lower bound at first quantity point
-    if (ismissing(WPar[1]) || ismissing(WPar[2]))
-        vlbnew = bid.pb[1]
-    else
-        vlbnew = min(
-            vupperbar,
-            max(
-                bid.pb[1],
-                bid.pb[1] +
-                (bid.pb[1] - bid.pb[2]) * (
-                    cdf(WPar[2], Q - bid.cumqb[1]) -
-                    rho * PiOverline(1, bid, vub, WPar, rho, Q, 100)[1]
-                ) / (
-                    cdf(WPar[1], Q - bid.cumqb[1]) -
-                    cdf(WPar[2], Q - bid.cumqb[1])
-                ),
-            ),
-        )
-    end
-    push!(vlb, [vlbnew bid.cumqb[1]])
-    sort!(vlb, :qval)
-    ## upper bound at first quantity point is vupperbar
-    push!(vub, [vupperbar bid.cumqb[1]])
-    sort!(vub, :qval)
-
-    # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-    if length(vlb.qval) >= 2
-        for i in [1:1:length(vlb.qval);]
-            vub[i, :vval] = maximum(vub[i:end, :vval])
-            vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
-        end
-    end
-
-    return [vlb, vub]
-end
-
-############################################################
-# SimpleBound(bid, WPar, rho, Q)
-############################################################
-#### Description
-# Computes upper and lower bounds on the rationalizable profit 
-# functions at the submitted quantitiy points as described in Proposition 3.
-# (w/o making them decreasing.)
-#### Arguments
-# ```bid``` -- bid function  
-# ```WPar``` -- array, containing the estimated parameters of W(p,q) at (p_i^j) for steps j=1,...,k  
-# ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
-# ```Q``` -- positive real number, corresponding to the quota $Q$
-#### Return value
-# A list of dataframes, [vlb,vub], where vub is the data frame containing the upper bounds 
-# and vlb is the data frame containing lower bounds.
-############################################################
-
-function SimpleBoundPure(bid, WPar, rho, Q)
-    
-    ## start with last quantity point
-    vlb = DataFrame(vval = bid.pb[end], qval = bid.cumqb[end])
-    ## no information in case of just one (p,q)-pair
-    if length(bid.pb) == 1
-        return [vlb, DataFrame(vval = vupperbar, qval = bid.cumqb[end])]
-    end
-    ## abort if WPar is not properly defined
-    if (ismissing(WPar[length(bid.pb)-1]) || ismissing(WPar[length(bid.pb)]))
-        return [
-            DataFrame(vval = bid.pb, qval = bid.cumqb),
-            DataFrame(
-                vval = fill(vupperbar, length(bid.cumqb)),
-                qval = bid.cumqb,
-            ),
-        ]
-    else  
-        ##using vlb on last step gives \PiOverline_i^j = 0
-        vub = DataFrame(
-            vval = max(
-                bid.pb[length(bid.pb)-1],
-                min(
-                    vupperbar,
-                    bid.pb[length(bid.pb)-1] +
-                    (bid.pb[length(bid.pb)-1] - bid.pb[length(bid.pb)]) *
-                    cdf(WPar[length(bid.pb)], Q - bid.cumqb[length(bid.pb)-1]) / (
-                        cdf(
-                            WPar[length(bid.pb)-1],
-                            Q - bid.cumqb[length(bid.pb)-1],
-                        ) - cdf(
-                            WPar[length(bid.pb)],
-                            Q - bid.cumqb[length(bid.pb)-1],
-                        )
-                    ),
-                ),
-            ),
-            qval = bid.cumqb[end],
-        )
-    end
-
-    ## move backwards through quantity points, if more than two in bid
-    if length(bid.pb) >= 3
-        for i in [length(bid.pb)-1:-1:2;]
-            # abort early if WPar is not properly defined
-            if (ismissing(WPar[i]) || ismissing(WPar[i+1]))
-                vlbnew = bid.pb[1:i]
-                qvalnew = bid.cumqb[1:i]
+                vlbnew = bid.pb[1:(i-1)]
+                qvalnew = bid.cumqb[1:(i-1)]
                 append!(vlb, DataFrame(vval = vlbnew, qval = qvalnew))
                 sort!(vlb, :qval)
-                vubnew = fill(vupperbar, i)
-                append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
-                sort!(vub, :qval)
-                # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-                #if length(vlb.qval) >= 2
-                #    for i in [1:1:length(vlb.qval);]
-                #        vub[i, :vval] = maximum(vub[i:end, :vval])
-                #        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
-                #    end
-                #end
-                return [vlb, vub]
-            else
-                vlbnew = min(
-                    vupperbar,
-                    max(
-                        bid.pb[i],
-                        bid.pb[i] +
-                        (bid.pb[i] - bid.pb[i+1]) * (
-                            cdf(WPar[i+1], Q - bid.cumqb[i]) -
-                            rho * PiOverline(i, bid, vub, WPar, rho, Q, 100)[1]
-                        ) / (
-                            cdf(WPar[i], Q - bid.cumqb[i]) -
-                            cdf(WPar[i+1], Q - bid.cumqb[i])
-                        ),
-                    ),
-                )
-            end
-            push!(vlb, [vlbnew bid.cumqb[i]])
-            sort!(vlb, :qval)
-            # abort early if WPar is not properly defined
-            if (ismissing(WPar[i-1]) || ismissing(WPar[i]))
-                qvalnew = bid.cumqb[1:i]
-                vubnew = fill(vupperbar, i)
-                append!(vub, DataFrame(vval = vubnew, qval = qvalnew))
-                sort!(vub, :qval)
-                # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-                #if length(vlb.qval) >= 2
-                #    for i in [1:1:length(vlb.qval);]
-                #        vub[i, :vval] = maximum(vub[i:end, :vval])
-                #        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
-                #    end
-                #end
+                # construct decreasing bounds \overline{v}_i and \underline{v}_i from Prop. 3;
+                if length(vlb.qval) >= 2
+                    for i in [1:1:length(vlb.qval);]
+                        vub[i, :vval] = max(bid.pb[i], minimum(vub[1:i, :vval]))
+                        vlb[i, :vval] = maximum(vlb[i:end, :vval])
+                    end
+                end
                 return [vlb, vub]
             else
                 vubnew = max(
@@ -548,39 +385,37 @@ function SimpleBoundPure(bid, WPar, rho, Q)
     ## upper bound at first quantity point is vupperbar
     push!(vub, [vupperbar bid.cumqb[1]])
     sort!(vub, :qval)
-    #
-    # construct decreasing bounds \overline{v}_i and \underline{v}_i;
-    #if length(vlb.qval) >= 2
-    #    for i in [1:1:length(vlb.qval);]
-    #        vub[i, :vval] = maximum(vub[i:end, :vval])
-    #        vlb[i, :vval] = max(bid.pb[i], minimum(vlb[1:i, :vval]))
-    #    end
-    #end
 
+    # construct decreasing bounds \overline{v}_i and \underline{v}_i from Prop. 3;
+    if length(vlb.qval) >= 2
+        for i in [1:1:length(vlb.qval);]
+            vub[i, :vval] = max(bid.pb[i], minimum(vub[1:i, :vval]))
+            vlb[i, :vval] = maximum(vlb[i:end, :vval])
+        end
+    end
     return [vlb, vub]
 end
 
 ############################################################
-# SimpleBoundNew(bid, WPar, rho, Q)
+# SimpleBoundRobust(bid, WPar, rho, Q)
 ############################################################
 #### Description
 # Computes upper and lower bounds on the rationalizable profit 
-# functions as described in Proposition 3 and equations (9)-(10)
-# and checks if there is a decreasing profit function that can be 
-# rationalized by the bounds
+# functions as described in Proposition 3.
+# If the bounds violated the inequalities (15) in Proposition 4,
+# return upper bound = vupperbar and lower bound = bid.
 #### Arguments
 # ```bid``` -- bid function  
 # ```WPar``` -- array, containing the estimated parameters of W(p,q) at (p_i^j) for steps j=1,...,k  
 # ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
 # ```Q``` -- positive real number, corresponding to the quota $Q$
 #### Return value
-# If there is no rationalizable profit function, return NA.
-# On the other hand, return a list of dataframes, [vlb,vub], 
+# Return a list of dataframes, [vlb,vub], 
 # where vub is the data frame containing the upper bound 
 # and vlb is the data frame containing lower bound.
 ############################################################
 
-function SimpleBoundNew(bid, WPar, rho, Q)
+function SimpleBoundRobust(bid, WPar, rho, Q)
     
     ## start with last quantity point
     vlb = DataFrame(vval = bid.pb[end], qval = bid.cumqb[end])
@@ -640,12 +475,11 @@ function SimpleBoundNew(bid, WPar, rho, Q)
                         vlb[i, :vval] = maximum(vlb[i:end, :vval])
                     end
                 end
-                # TBD: don't do this now, but check later for Theta (and ignore for estimation of bounds)
                 # check condition: vul[i] \geq vub[i] for all i = 1,...,\ell_i
-                # return NA if violated
-                #for i in [1:1:length(vlb.qval);]
-                #    if vub.vval[i] < vlb.vval[i] return [DataFrame(vval=NaN,qval=NaN),DataFrame(vval=NaN,qval=NaN)] end
-                #end
+                # if it fails for some i, then return the most conservative estimate of bounds (i.e., between bid and vupperbar)
+                for i in [1:1:length(vlb.qval);]
+                    if vub.vval[i] < vlb.vval[i] return [DataFrame(vval = bid.pb, qval = bid.cumqb),DataFrame(vval = fill(vupperbar,length(bid.pb)), qval = bid.cumqb)] end
+                end
                 return [vlb, vub]
             else
                 vlbnew = min(
@@ -682,12 +516,11 @@ function SimpleBoundNew(bid, WPar, rho, Q)
                         vlb[i, :vval] = maximum(vlb[i:end, :vval])
                     end
                 end
-                # TBD: don't do this now, but check later for Theta (and ignore for estimation of bounds)
                 # check condition: vul[i] \geq vub[i] for all i = 1,...,\ell_i
-                # return NA if violated
-                #for i in [1:1:length(vlb.qval);]
-                #    if vub.vval[i] < vlb.vval[i] return [DataFrame(vval=NaN,qval=NaN),DataFrame(vval=NaN,qval=NaN)] end
-                #end
+                # if it fails for some i, then return the most conservative estimate of bounds (i.e., between bid and vupperbar)
+                for i in [1:1:length(vlb.qval);]
+                    if vub.vval[i] < vlb.vval[i] return [DataFrame(vval = bid.pb, qval = bid.cumqb),DataFrame(vval = fill(vupperbar,length(bid.pb)), qval = bid.cumqb)] end
+                end
                 return [vlb, vub]
             else
                 vubnew = max(
@@ -743,12 +576,11 @@ function SimpleBoundNew(bid, WPar, rho, Q)
             vlb[i, :vval] = maximum(vlb[i:end, :vval])
         end
     end
-    # TBD: don't do this now, but check later for Theta (and ignore for estimation of bounds)
     # check condition: vul[i] \geq vub[i] for all i = 1,...,\ell_i
-    # return NA if violated
-    #for i in [1:1:length(vlb.qval);]
-    #    if vub.vval[i] < vlb.vval[i] return [DataFrame(vval=NaN,qval=NaN),DataFrame(vval=NaN,qval=NaN)] end
-    #end
+    # if it fails for some i, then return the most conservative estimate of bounds (i.e., between bid and vupperbar)
+    for i in [1:1:length(vlb.qval);]
+        if vub.vval[i] < vlb.vval[i] return [DataFrame(vval = bid.pb, qval = bid.cumqb),DataFrame(vval = fill(vupperbar,length(bid.pb)), qval = bid.cumqb)] end
+    end
     return [vlb, vub]
 end
 
@@ -765,7 +597,7 @@ end
 # ```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
 # ```m``` -- number of bootstrap rounds to be estimated
 #### Return value
-#A list of objects returned by ```SimpleBounds()```, one entry per bidder.
+#A list of objects returned by ```SimpleBound()```, one entry per bidder.
 #############################################################
 
 function EstimateSimpleBounds(auction, W, bidderassignment, prices, rhovec, m)
@@ -790,10 +622,10 @@ function EstimateSimpleBounds(auction, W, bidderassignment, prices, rhovec, m)
 end
 
 ############################################################
-# EstimateSimpleBoundsNew(auction, W, bidderassignment,  prices, rhovec, m)
+# EstimateSimpleBoundsRobust(auction, W, bidderassignment,  prices, rhovec, m)
 ############################################################
 #### Description
-# Computes ```SimpleBounds()``` for all bidders in ```auction```.
+# Computes ```SimpleBoundsRobust()``` for all bidders in ```auction```.
 #### Arguments
 # ```auction``` -- auction index  
 # ```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```  
@@ -802,10 +634,10 @@ end
 # ```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
 # ```m``` -- number of bootstrap rounds to be estimated
 #### Return value
-#A list of objects returned by ```SimpleBoundNew()```, one entry per bidder.
+#A list of objects returned by ```SimpleBoundRobust()```, one entry per bidder.
 #############################################################
 
-function EstimateSimpleBoundsNew(auction, W, bidderassignment, prices, rhovec, m)
+function EstimateSimpleBoundsRobust(auction, W, bidderassignment, prices, rhovec, m)
     bounds = []
     for bidder in activebidderindeces[auction]
         rho=rhovec[bidderassignment[findall(in.(bidderindeces,bidder))][1]]
@@ -818,7 +650,7 @@ function EstimateSimpleBoundsNew(auction, W, bidderassignment, prices, rhovec, m
                 rev = true,
             )]
             boundsbidderbootstraprun =
-                SimpleBoundNew(bid, WPar, rho, quotas[auction])
+                SimpleBoundRobust(bid, WPar, rho, quotas[auction])
             push!(boundsbidder, boundsbidderbootstraprun)
         end
         push!(bounds, boundsbidder)
@@ -826,101 +658,29 @@ function EstimateSimpleBoundsNew(auction, W, bidderassignment, prices, rhovec, m
     return bounds
 end
 
-
 #############################################################
 # EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
 #############################################################
 #### Description
-# Determines violations of the inequalities in Proposition 4 for a given auction.
+# Determines fraction of violations of the inequalities 
+# in Proposition 4 for a given auction.
 #### Arguments
 # ```auction``` -- auction index  
 # ```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```   
 # ```bidderassignment``` -- bidder assignment vector  
 # ```prices``` -- vector of prices used for the estimation of W  
-# ```bounds``` -- estimated simple bounds from ```EstimateSimpleBounds()```  
-# ```rho``` -- positive real number, the risk preference   
-# ```m``` -- number of bootstrap rounds  
-#### Return value
-# A list of two matrices, with the columns corresponding to bootstrap rounds 
-# and rows corresponding to bidder groups. The first matrix counts the number 
-# of violations, the second matrix counts the total number of test inequalities.  
-###############################################################
-
-function EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
-    #define matrices, one colum for every bootrap round, one row for every bidder group
-    tested = zeros(length(unique(bidderassignment)), m)  
-    violated = zeros(length(unique(bidderassignment)), m) 
-
-
-    for bidder in [1:1:activebidders[auction];]
-        g = bidderassignment[findall(in.(bidderindeces,activebidderindeces[auction][bidder]))][1]
-        bid = qpBid(activebidderindeces[auction][bidder], auction)
-        for bootstraprun in [1:1:m;]
-            for bidstep in [length(bid.pb):-1:1;]
-                ## compute values of F^j for upper and lower bounds
-                uc = FOC(
-                    bidstep,
-                    bid,
-                    bounds[bidder][bootstraprun][1],
-                    W,
-                    g,
-                    prices,
-                    rho,
-                    quotas[auction],
-                    bootstraprun,
-                    100,
-                )
-                lc = FOC(
-                    bidstep,
-                    bid,
-                    bounds[bidder][bootstraprun][2],
-                    W,
-                    g,
-                    prices,
-                    rho,
-                    quotas[auction],
-                    bootstraprun,
-                    100,
-                )
-                ## test for violation
-                if (uc > 0 || lc < 0)
-                    violated[g, bootstraprun] += 1
-                end
-                tested[g, bootstraprun] += 1
-            end
-        end
-    end
-    return [tested, violated]
-end
-
-#############################################################
-# EstThetaNew(auction, W, bidderassignment, prices, bounds, rho, m)
-#############################################################
-#### Description
-# Determines fraction of violations of:
-# (1) The bounds from Proposition 3 (tbd.) 
-# (2) The inequalities in Proposition 4 for a given auction.
-#### Arguments
-# ```auction``` -- auction index  
-# ```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```   
-# ```bidderassignment``` -- bidder assignment vector  
-# ```prices``` -- vector of prices used for the estimation of W  
-# ```bounds``` -- estimated simple bounds from ```EstimateSimpleBounds()```  
+# ```bounds``` -- estimated simple bounds from ```EstimateSimpleBoundsRobust()```  
 # ```rho``` -- positive real number, the risk preference   
 # ```m``` -- number of bootstrap rounds  
 #### Return value
 # A list of three matrices, with the columns corresponding to bootstrap rounds 
 # and rows corresponding to bidder groups. The first matrix counts the number 
-# of violations of the bounds from Proposition 3, the second matrix
-# counts the number of violations among those that do not violate Proposition 3, 
+# of violations of the first inequality in Prop. 4, the second matrix
+# counts the number of violations of the second inequality in Prop. 4, 
 # and the third matrix counts the total number of submitted steps.  
 ###############################################################
 
-## Also check whether there is a profit function satisfying the foc wrt quantities
-## Adapt fct. that returns simple bounds to return NA if that condition fails
-## wheight by number of steps to make it comparable to Theta as is?
-## or only take those that pass to check Thethat?
-function EstThetaNew(auction, W, bidderassignment, prices, bounds, rho, m)
+function EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
     #define matrices, one colum for every bootrap round, one row for every bidder group
     tested = zeros(length(unique(bidderassignment)), m)  
     violatedP4 = zeros(length(unique(bidderassignment)), m)
@@ -929,13 +689,8 @@ function EstThetaNew(auction, W, bidderassignment, prices, bounds, rho, m)
     for bidder in [1:1:activebidders[auction];]
         g = bidderassignment[findall(in.(bidderindeces,activebidderindeces[auction][bidder]))][1]
         bid = qpBid(activebidderindeces[auction][bidder], auction)
-        println(bid)
         for bootstraprun in [1:1:m;]
-            println(m)
             for bidstep in [length(bid.pb):-1:1;]
-                ## bounds do not always have the same length, depending on bootstrap round??
-                println(bounds[bidder][bootstraprun][2])
-                println(bounds[bidder][bootstraprun][1])
                 if bounds[bidder][bootstraprun][2].vval[bidstep] < bounds[bidder][bootstraprun][1].vval[bidstep]
                     violatedP4[g, bootstraprun] += 1
                 else 

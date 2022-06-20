@@ -7,6 +7,7 @@ include("Grouping.jl")
 using LaTeXStrings
 using Latexify
 using Plots
+using StatsPlots
 
 # number of runs
 runs = 40
@@ -22,18 +23,21 @@ for runno in [1:1:runs;]
 end
 
 Tested = []
-Violated = []
+ViolatedPAll = []
+ViolatedQAll = []
 for runno in [1:1:runs;]
     for bootstrapround in [1:1:m;]
-        global TestedRhoBootstrap = []
-        global ViolatedRhoBootstrap = []
+        global TestedPQBootstrap = []
+        global ViolatedQBootstrap = []
+        global ViolatedPBootstrap = []
         for rho in [1:1:length(rhovec);]
-            global TestedRho = zeros(length(unique(bidderassignment)), 1)
-            global ViolatedRho = zeros(length(unique(bidderassignment)), 1)
+            global TestedPQ = zeros(length(unique(bidderassignment)), 1)
+            global ViolatedP = zeros(length(unique(bidderassignment)), 1)
+            global ViolatedQ = zeros(length(unique(bidderassignment)), 1)
             for g in [1:1:length(group);]
                 for auction in [1:1:length(group[g]);]
                     eval(Meta.parse(string(
-                        "TestedRho.+=Theta",
+                        "TestedPQ.+=Theta",
                         runno,
                         "[",
                         g,
@@ -46,7 +50,7 @@ for runno in [1:1:runs;]
                         "]",
                     )))
                     eval(Meta.parse(string(
-                        "ViolatedRho.+=Theta",
+                        "ViolatedQ.+=Theta",
                         runno,
                         "[",
                         g,
@@ -58,166 +62,306 @@ for runno in [1:1:runs;]
                         bootstrapround,
                         "]",
                     )))
+                    eval(Meta.parse(string(
+                        "ViolatedP.+=Theta",
+                        runno,
+                        "[",
+                        g,
+                        "][",
+                        auction,
+                        "][",
+                        rho,
+                        "][3][:,",
+                        bootstrapround,
+                        "]",
+                    )))
                 end
             end
-            push!(TestedRhoBootstrap, TestedRho)
-            push!(ViolatedRhoBootstrap, ViolatedRho)
+            push!(TestedPQBootstrap, TestedPQ)
+            push!(ViolatedQBootstrap, ViolatedQ)
+            push!(ViolatedPBootstrap, ViolatedP)
         end
-        push!(Tested, TestedRhoBootstrap)
-        push!(Violated, ViolatedRhoBootstrap)
+        push!(Tested, TestedPQBootstrap)
+        push!(ViolatedQAll, ViolatedQBootstrap)
+        push!(ViolatedPAll, ViolatedPBootstrap)
     end
 end
 
-TData = DataFrame(
+TDataQ = DataFrame(
     [rhovec mean([
         [
-            sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            sum((ViolatedQAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
             for x in [1:1:length(rhovec);]
         ] for y in [1:1:m*runs;]
     ])],:auto)
-rename!(TData, (:x1 => :rho))
-rename!(TData, (:x2 => :meanest))
+rename!(TDataQ, (:x1 => :rho))
+rename!(TDataQ, (:x2 => :meanest))
 TDataAdd = DataFrame([
     [
-        sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        sum((ViolatedQAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
         for x in [1:1:length(rhovec);]
     ] for y in [1:1:m*runs;]],:auto)
-TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
-rename!(TData, (:x1 => :std))
-TData = hcat(TData, TDataAdd)
+TDataQ = hcat(TDataQ, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataQ, (:x1 => :std))
+TDataQ = hcat(TDataQ, TDataAdd)
 
-latexify(
-    TData[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
+TDataP = DataFrame(
+    [rhovec mean([
+        [
+            sum((ViolatedPAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            for x in [1:1:length(rhovec);]
+        ] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataP, (:x1 => :rho))
+rename!(TDataP, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [
+        sum((ViolatedPAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        for x in [1:1:length(rhovec);]
+    ] for y in [1:1:m*runs;]],:auto)
+TDataP = hcat(TDataP, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataP, (:x1 => :std))
+TDataP = hcat(TDataP, TDataAdd)
+
+TDataSum= DataFrame(
+    [rhovec mean([
+        [
+            sum(((ViolatedPAll[y][x]+ViolatedQAll[y][x]) ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            for x in [1:1:length(rhovec);]
+        ] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataSum, (:x1 => :rho))
+rename!(TDataSum, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [
+        sum(((ViolatedPAll[y][x]+ViolatedQAll[y][x]) ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        for x in [1:1:length(rhovec);]
+    ] for y in [1:1:m*runs;]],:auto)
+TDataSum = hcat(TDataSum, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataSum, (:x1 => :std))
+TDataSum = hcat(TDataSum, TDataAdd)
+
+DataMeanest=vcat(TDataQ.meanest',TDataP.meanest')'
+ctg = repeat([L"\Theta_{Q}", L"\Theta_{P}"], inner = 22)
+nam = repeat(pushfirst!(log.(TDataP.rho[2:end]), -11),outer=2)
+p=groupedbar(
+    nam,
+    xlabel = L"\ln(\rho)",
+    DataMeanest,
+    bar_position=:stack,
+    group = ctg, 
+    bar_width=0.5,
+    title="Gamma distribution",
+    legend = :topleft
+)
+p=plot(p,size = [500, 400])
+plot(p)
+savefig(p,"BRViolationsGamma.pdf")
+
+data = hcat(
+    TDataQ[:, [:rho, :meanest]],
+    TDataP[:, [:meanest]],
+    TDataSum[:,[:meanest, :std]],
+    makeunique=true
 )
 
-default(lab = "")
-ticks = pushfirst!(log.(TData.rho[2:end]), -11)
-ticklabels = string.(pushfirst!(log.(TData.rho[2:end]), -Inf))
-toplot = plot(
-    pushfirst!(log.(TData.rho[2:end]), -11),
-    TData.meanest,
-    yerror=1.96*TData.std,
-    ylim = (0.1, 0.8),
-    seriestype = :scatter,
-    #xticks = (ticks, ticklabels),
-    grid=true,
-    label = "Fraction of Best-Response Violations",
-    legend = :topleft,
-    xlabel = L"\ln(\rho)"
+t=latexify(
+    data,
+    env=:tabular,
+    fmt = x -> round(x, sigdigits = 3),
 )
-plot(toplot)
-savefig("ThetaEst.pdf")
+write("BRViolationsGamma.txt",t)
+
+
 
 #### Thetas by Bidder Assignment
 
-TDataG1 = DataFrame(
+TDataQG1 = DataFrame(
     [rhovec mean([
-        [Violated[y][x][1] / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
+        [ViolatedQAll[y][x][1] / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
     ])],:auto)
-rename!(TDataG1, (:x1 => :rho))
-rename!(TDataG1, (:x2 => :meanest))
+rename!(TDataQG1, (:x1 => :rho))
+rename!(TDataQG1, (:x2 => :meanest))
 TDataAdd = DataFrame([
-    [Violated[y][x][1] / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
-TDataG1 = hcat(TDataG1, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
-rename!(TDataG1, (:x1 => :std))
-TDataG1 = hcat(TDataG1, TDataAdd)
+    [ViolatedQAll[y][x][1] / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
+TDataQG1 = hcat(TDataQG1, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataQG1, (:x1 => :std))
+TDataQG1 = hcat(TDataQG1, TDataAdd)
 
-TDataG2 = DataFrame(
+TDataPG1 = DataFrame(
     [rhovec mean([
-        [Violated[y][x][2] / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
+        [ViolatedPAll[y][x][1] / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
     ])],:auto)
-rename!(TDataG2, (:x1 => :rho))
-rename!(TDataG2, (:x2 => :meanest))
+rename!(TDataPG1, (:x1 => :rho))
+rename!(TDataPG1, (:x2 => :meanest))
 TDataAdd = DataFrame([
-    [Violated[y][x][2] / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
-TDataG2 = hcat(TDataG2, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
-rename!(TDataG2, (:x1 => :std))
-TDataG2 = hcat(TDataG2, TDataAdd)
+    [ViolatedPAll[y][x][1] / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
+TDataPG1 = hcat(TDataPG1, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataPG1, (:x1 => :std))
+TDataPG1 = hcat(TDataPG1, TDataAdd)
 
-TDataG3 = DataFrame(
+TDataSumG1 = DataFrame(
     [rhovec mean([
-        [Violated[y][x][3] / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
+        [(ViolatedPAll[y][x][1]+ViolatedQAll[y][x][1]) / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
     ])],:auto)
-rename!(TDataG3, (:x1 => :rho))
-rename!(TDataG3, (:x2 => :meanest))
+rename!(TDataSumG1, (:x1 => :rho))
+rename!(TDataSumG1, (:x2 => :meanest))
 TDataAdd = DataFrame([
-    [Violated[y][x][3] / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
-TDataG3 = hcat(TDataG3, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
-rename!(TDataG3, (:x1 => :std))
-TDataG3 = hcat(TDataG3, TDataAdd)
+    [(ViolatedPAll[y][x][1]+ViolatedQAll[y][x][1]) / Tested[y][x][1] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
+TDataSumG1 = hcat(TDataSumG1, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataSumG1, (:x1 => :std))
+TDataSumG1 = hcat(TDataSumG1, TDataAdd)
 
-default(lab = "")
-ticks = pushfirst!(log.(TDataG1.rho[2:end]), -11)
-ticklabels = string.(pushfirst!(log.(TDataG1.rho[2:end]), -Inf))
-toplot = plot(
-    pushfirst!(log.(TDataG1.rho[2:end]) .- 0.12, -11.12),
-    TDataG1.meanest,
-    yerror=1.96*TDataG1.std,
-    ylim = (0.1, 0.8),
-    seriestype = :scatter,
-    #xticks = (ticks, ticklabels),
-    label = "Fraction of BR Violations Bidder Group 1",
-    legend = :topleft,
+TDataQG2 = DataFrame(
+    [rhovec mean([
+        [ViolatedQAll[y][x][2] / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataQG2, (:x1 => :rho))
+rename!(TDataQG2, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [ViolatedQAll[y][x][2] / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
+TDataQG2 = hcat(TDataQG2, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataQG2, (:x1 => :std))
+TDataQG2 = hcat(TDataQG2, TDataAdd)
+
+TDataPG2 = DataFrame(
+    [rhovec mean([
+        [ViolatedPAll[y][x][2] / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataPG2, (:x1 => :rho))
+rename!(TDataPG2, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [ViolatedPAll[y][x][2] / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
+TDataPG2 = hcat(TDataPG2, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataPG2, (:x1 => :std))
+TDataPG2 = hcat(TDataPG2, TDataAdd)
+
+TDataSumG2 = DataFrame(
+    [rhovec mean([
+        [(ViolatedPAll[y][x][2]+ViolatedQAll[y][x][2]) / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataSumG2, (:x1 => :rho))
+rename!(TDataSumG2, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [(ViolatedPAll[y][x][2]+ViolatedQAll[y][x][2]) / Tested[y][x][2] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
+TDataSumG2 = hcat(TDataSumG2, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataSumG2, (:x1 => :std))
+TDataSumG2 = hcat(TDataSumG2, TDataAdd)
+
+TDataQG3 = DataFrame(
+    [rhovec mean([
+        [ViolatedQAll[y][x][3] / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataQG3, (:x1 => :rho))
+rename!(TDataQG3, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [ViolatedQAll[y][x][3] / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
+TDataQG3 = hcat(TDataQG3, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataQG3, (:x1 => :std))
+TDataQG3 = hcat(TDataQG3, TDataAdd)
+
+TDataPG3 = DataFrame(
+    [rhovec mean([
+        [ViolatedPAll[y][x][3] / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataPG3, (:x1 => :rho))
+rename!(TDataPG3, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [ViolatedPAll[y][x][3] / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
+TDataPG3 = hcat(TDataPG3, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataPG3, (:x1 => :std))
+TDataPG3 = hcat(TDataPG3, TDataAdd)
+
+TDataSumG3 = DataFrame(
+    [rhovec mean([
+        [(ViolatedPAll[y][x][3]+ViolatedQAll[y][x][3]) / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataSumG3, (:x1 => :rho))
+rename!(TDataSumG3, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [(ViolatedPAll[y][x][3]+ViolatedQAll[y][x][3]) / Tested[y][x][3] for x in [1:1:length(rhovec);]] for y in [1:1:m*runs;]],:auto)
+TDataSumG3 = hcat(TDataSumG3, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataSumG3, (:x1 => :std))
+TDataSumG3 = hcat(TDataSumG3, TDataAdd)
+
+DataMeanest1=vcat(TDataQG1.meanest',TDataPG1.meanest')'
+DataMeanest2=vcat(TDataQG2.meanest',TDataPG2.meanest')'
+DataMeanest3=vcat(TDataQG3.meanest',TDataPG3.meanest')'
+ctg = repeat([L"\Theta_{Q,g}", L"\Theta_{P,g}"], inner = 22)
+nam = repeat(pushfirst!(log.(TDataP.rho[2:end]), -11),outer=2)
+p1=groupedbar(
+    nam,
+    xlabel = L"\ln(\rho)",
+    DataMeanest1,
+    bar_position=:stack,
+    group = ctg, 
+    bar_width=0.5,
+    title = "Bidder Group g=1",
+    legend = :topleft
 )
-plot!(
-    pushfirst!(log.(TDataG2.rho[2:end]), -11),
-    TDataG2.meanest,
-    ylim = (0.1, 0.8),
-    yerror=1.96*TDataG2.std,
-    seriestype = :scatter,
-    #xticks = (ticks, ticklabels),
-    label = "Fraction of BR Violations Bidder Group 2",
-    legend = :topleft,
+p2=groupedbar(
+    nam,
+    xlabel = L"\ln(\rho)",
+    DataMeanest2,
+    bar_position=:stack,
+    group = ctg, 
+    bar_width=0.5,
+    title = "Bidder Group g=2",
+    legend = :topleft
 )
-plot!(
-    pushfirst!(log.(TDataG3.rho[2:end]) .+ 0.12, -11 + 0.12),
-    TDataG3.meanest,
-    yerror=1.96*TDataG3.std,
-    ylim = (0.1, 0.8),
-    seriestype = :scatter,
-    #xticks = (ticks, ticklabels),
-    label = "Fraction of BR Violations Bidder Group 3",
-    legend = :topleft,
+p3=groupedbar(
+    nam,
+    xlabel = L"\ln(\rho)",
+    DataMeanest3,
+    bar_position=:stack,
+    group = ctg, 
+    bar_width=0.5,
+    title = "Bidder Group g=3",
+    legend = :topleft
+)
+p=plot(p1,p2,p3,layout=(1,3),size = [1600, 400])
+plot(p)
+savefig(p,"BRViolationsBidderGroups.pdf")
+
+data = hcat(
+    TDataQG1[:, [:rho, :meanest]],
+    TDataPG1[:, [:meanest]],
+    TDataSumG1[:,[:meanest, :std]],
+    TDataQG2[:, [:meanest]],
+    TDataPG2[:, [:meanest]],
+    TDataSumG2[:,[:meanest, :std]],
+    TDataQG3[:, [:meanest]],
+    TDataPG3[:, [:meanest]],
+    TDataSumG3[:,[:meanest, :std]],
+    makeunique=true
 )
 
-plot!(xlabel = L"\ln(\rho)")
-plot(toplot)
-savefig("ThetaEstBidderGroups.pdf")
+t=latexify(
+    data,
+    env=:tabular,
+    fmt = x -> round(x, sigdigits = 3),
+)
+write("BRViolationsBidderGroups.txt",t)
 
-latexify(
-    TDataG1[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
-latexify(
-    TDataG2[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
-latexify(
-    TDataG3[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
 
 ## By Auction Group
 # compute for group 1
 Tested = []
-Violated = []
+ViolatedPAll = []
+ViolatedQAll = []
 for runno in [1:1:runs;]
     for bootstrapround in [1:1:m;]
-        global TestedRhoBootstrap = []
-        global ViolatedRhoBootstrap = []
+        global TestedPQBootstrap = []
+        global ViolatedQBootstrap = []
+        global ViolatedPBootstrap = []
         for rho in [1:1:length(rhovec);]
-            global TestedRho = zeros(length(unique(bidderassignment)), 1)
-            global ViolatedRho = zeros(length(unique(bidderassignment)), 1)
-            # compute for group 1
+            global TestedPQ = zeros(length(unique(bidderassignment)), 1)
+            global ViolatedP = zeros(length(unique(bidderassignment)), 1)
+            global ViolatedQ = zeros(length(unique(bidderassignment)), 1)
             for g in 1
                 for auction in [1:1:length(group[g]);]
                     eval(Meta.parse(string(
-                        "TestedRho.+=Theta",
+                        "TestedPQ.+=Theta",
                         runno,
                         "[",
                         g,
@@ -230,7 +374,7 @@ for runno in [1:1:runs;]
                         "]",
                     )))
                     eval(Meta.parse(string(
-                        "ViolatedRho.+=Theta",
+                        "ViolatedQ.+=Theta",
                         runno,
                         "[",
                         g,
@@ -242,50 +386,103 @@ for runno in [1:1:runs;]
                         bootstrapround,
                         "]",
                     )))
+                    eval(Meta.parse(string(
+                        "ViolatedP.+=Theta",
+                        runno,
+                        "[",
+                        g,
+                        "][",
+                        auction,
+                        "][",
+                        rho,
+                        "][3][:,",
+                        bootstrapround,
+                        "]",
+                    )))
                 end
             end
-            push!(TestedRhoBootstrap, TestedRho)
-            push!(ViolatedRhoBootstrap, ViolatedRho)
+            push!(TestedPQBootstrap, TestedPQ)
+            push!(ViolatedQBootstrap, ViolatedQ)
+            push!(ViolatedPBootstrap, ViolatedP)
         end
-        push!(Tested, TestedRhoBootstrap)
-        push!(Violated, ViolatedRhoBootstrap)
+        push!(Tested, TestedPQBootstrap)
+        push!(ViolatedQAll, ViolatedQBootstrap)
+        push!(ViolatedPAll, ViolatedPBootstrap)
     end
 end
 
-TData = DataFrame(
+
+TDataQ = DataFrame(
     [rhovec mean([
         [
-            sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            sum((ViolatedQAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
             for x in [1:1:length(rhovec);]
         ] for y in [1:1:m*runs;]
     ])],:auto)
-rename!(TData, (:x1 => :rho))
-rename!(TData, (:x2 => :meanest))
+rename!(TDataQ, (:x1 => :rho))
+rename!(TDataQ, (:x2 => :meanest))
 TDataAdd = DataFrame([
     [
-        sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        sum((ViolatedQAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
         for x in [1:1:length(rhovec);]
-    ] for y in [1:1:m*runs;]
-],:auto)
-TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
-rename!(TData, (:x1 => :std))
-TDataG1 = hcat(TData, TDataAdd)
+    ] for y in [1:1:m*runs;]],:auto)
+TDataQ = hcat(TDataQ, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataQ, (:x1 => :std))
+TDataQG1 = hcat(TDataQ, TDataAdd)
+
+TDataP = DataFrame(
+    [rhovec mean([
+        [
+            sum((ViolatedPAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            for x in [1:1:length(rhovec);]
+        ] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataP, (:x1 => :rho))
+rename!(TDataP, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [
+        sum((ViolatedPAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        for x in [1:1:length(rhovec);]
+    ] for y in [1:1:m*runs;]],:auto)
+TDataP = hcat(TDataP, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataP, (:x1 => :std))
+TDataPG1 = hcat(TDataP, TDataAdd)
+
+TDataSum= DataFrame(
+    [rhovec mean([
+        [
+            sum(((ViolatedPAll[y][x]+ViolatedQAll[y][x]) ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            for x in [1:1:length(rhovec);]
+        ] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataSum, (:x1 => :rho))
+rename!(TDataSum, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [
+        sum(((ViolatedPAll[y][x]+ViolatedQAll[y][x]) ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        for x in [1:1:length(rhovec);]
+    ] for y in [1:1:m*runs;]],:auto)
+TDataSum = hcat(TDataSum, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataSum, (:x1 => :std))
+TDataSumG1 = hcat(TDataSum, TDataAdd)
 
 # compute for group 2
 Tested = []
-Violated = []
+ViolatedPAll = []
+ViolatedQAll = []
 for runno in [1:1:runs;]
     for bootstrapround in [1:1:m;]
-        global TestedRhoBootstrap = []
-        global ViolatedRhoBootstrap = []
+        global TestedPQBootstrap = []
+        global ViolatedQBootstrap = []
+        global ViolatedPBootstrap = []
         for rho in [1:1:length(rhovec);]
-            global TestedRho = zeros(length(unique(bidderassignment)), 1)
-            global ViolatedRho = zeros(length(unique(bidderassignment)), 1)
-            # compute for group 2
+            global TestedPQ = zeros(length(unique(bidderassignment)), 1)
+            global ViolatedP = zeros(length(unique(bidderassignment)), 1)
+            global ViolatedQ = zeros(length(unique(bidderassignment)), 1)
             for g in 2
                 for auction in [1:1:length(group[g]);]
                     eval(Meta.parse(string(
-                        "TestedRho.+=Theta",
+                        "TestedPQ.+=Theta",
                         runno,
                         "[",
                         g,
@@ -298,7 +495,7 @@ for runno in [1:1:runs;]
                         "]",
                     )))
                     eval(Meta.parse(string(
-                        "ViolatedRho.+=Theta",
+                        "ViolatedQ.+=Theta",
                         runno,
                         "[",
                         g,
@@ -310,50 +507,103 @@ for runno in [1:1:runs;]
                         bootstrapround,
                         "]",
                     )))
+                    eval(Meta.parse(string(
+                        "ViolatedP.+=Theta",
+                        runno,
+                        "[",
+                        g,
+                        "][",
+                        auction,
+                        "][",
+                        rho,
+                        "][3][:,",
+                        bootstrapround,
+                        "]",
+                    )))
                 end
             end
-            push!(TestedRhoBootstrap, TestedRho)
-            push!(ViolatedRhoBootstrap, ViolatedRho)
+            push!(TestedPQBootstrap, TestedPQ)
+            push!(ViolatedQBootstrap, ViolatedQ)
+            push!(ViolatedPBootstrap, ViolatedP)
         end
-        push!(Tested, TestedRhoBootstrap)
-        push!(Violated, ViolatedRhoBootstrap)
+        push!(Tested, TestedPQBootstrap)
+        push!(ViolatedQAll, ViolatedQBootstrap)
+        push!(ViolatedPAll, ViolatedPBootstrap)
     end
 end
 
-TData = DataFrame(
+
+TDataQ = DataFrame(
     [rhovec mean([
         [
-            sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            sum((ViolatedQAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
             for x in [1:1:length(rhovec);]
         ] for y in [1:1:m*runs;]
     ])],:auto)
-rename!(TData, (:x1 => :rho))
-rename!(TData, (:x2 => :meanest))
+rename!(TDataQ, (:x1 => :rho))
+rename!(TDataQ, (:x2 => :meanest))
 TDataAdd = DataFrame([
     [
-        sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        sum((ViolatedQAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
         for x in [1:1:length(rhovec);]
-    ] for y in [1:1:m*runs;]
-],:auto)
-TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
-rename!(TData, (:x1 => :std))
-TDataG2 = hcat(TData, TDataAdd)
+    ] for y in [1:1:m*runs;]],:auto)
+TDataQ = hcat(TDataQ, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataQ, (:x1 => :std))
+TDataQG2 = hcat(TDataQ, TDataAdd)
+
+TDataP = DataFrame(
+    [rhovec mean([
+        [
+            sum((ViolatedPAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            for x in [1:1:length(rhovec);]
+        ] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataP, (:x1 => :rho))
+rename!(TDataP, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [
+        sum((ViolatedPAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        for x in [1:1:length(rhovec);]
+    ] for y in [1:1:m*runs;]],:auto)
+TDataP = hcat(TDataP, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataP, (:x1 => :std))
+TDataPG2 = hcat(TDataP, TDataAdd)
+
+TDataSum= DataFrame(
+    [rhovec mean([
+        [
+            sum(((ViolatedPAll[y][x]+ViolatedQAll[y][x]) ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            for x in [1:1:length(rhovec);]
+        ] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataSum, (:x1 => :rho))
+rename!(TDataSum, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [
+        sum(((ViolatedPAll[y][x]+ViolatedQAll[y][x]) ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        for x in [1:1:length(rhovec);]
+    ] for y in [1:1:m*runs;]],:auto)
+TDataSum = hcat(TDataSum, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataSum, (:x1 => :std))
+TDataSumG2 = hcat(TDataSum, TDataAdd)
 
 # compute for group 3
 Tested = []
-Violated = []
+ViolatedPAll = []
+ViolatedQAll = []
 for runno in [1:1:runs;]
     for bootstrapround in [1:1:m;]
-        global TestedRhoBootstrap = []
-        global ViolatedRhoBootstrap = []
+        global TestedPQBootstrap = []
+        global ViolatedQBootstrap = []
+        global ViolatedPBootstrap = []
         for rho in [1:1:length(rhovec);]
-            global TestedRho = zeros(length(unique(bidderassignment)), 1)
-            global ViolatedRho = zeros(length(unique(bidderassignment)), 1)
-            # compute for group 3
+            global TestedPQ = zeros(length(unique(bidderassignment)), 1)
+            global ViolatedP = zeros(length(unique(bidderassignment)), 1)
+            global ViolatedQ = zeros(length(unique(bidderassignment)), 1)
             for g in 3
                 for auction in [1:1:length(group[g]);]
                     eval(Meta.parse(string(
-                        "TestedRho.+=Theta",
+                        "TestedPQ.+=Theta",
                         runno,
                         "[",
                         g,
@@ -366,7 +616,7 @@ for runno in [1:1:runs;]
                         "]",
                     )))
                     eval(Meta.parse(string(
-                        "ViolatedRho.+=Theta",
+                        "ViolatedQ.+=Theta",
                         runno,
                         "[",
                         g,
@@ -378,89 +628,144 @@ for runno in [1:1:runs;]
                         bootstrapround,
                         "]",
                     )))
+                    eval(Meta.parse(string(
+                        "ViolatedP.+=Theta",
+                        runno,
+                        "[",
+                        g,
+                        "][",
+                        auction,
+                        "][",
+                        rho,
+                        "][3][:,",
+                        bootstrapround,
+                        "]",
+                    )))
                 end
             end
-            push!(TestedRhoBootstrap, TestedRho)
-            push!(ViolatedRhoBootstrap, ViolatedRho)
+            push!(TestedPQBootstrap, TestedPQ)
+            push!(ViolatedQBootstrap, ViolatedQ)
+            push!(ViolatedPBootstrap, ViolatedP)
         end
-        push!(Tested, TestedRhoBootstrap)
-        push!(Violated, ViolatedRhoBootstrap)
+        push!(Tested, TestedPQBootstrap)
+        push!(ViolatedQAll, ViolatedQBootstrap)
+        push!(ViolatedPAll, ViolatedPBootstrap)
     end
 end
 
-TData = DataFrame(
+
+TDataQ = DataFrame(
     [rhovec mean([
         [
-            sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            sum((ViolatedQAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
             for x in [1:1:length(rhovec);]
         ] for y in [1:1:m*runs;]
     ])],:auto)
-rename!(TData, (:x1 => :rho))
-rename!(TData, (:x2 => :meanest))
+rename!(TDataQ, (:x1 => :rho))
+rename!(TDataQ, (:x2 => :meanest))
 TDataAdd = DataFrame([
     [
-        sum((Violated[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        sum((ViolatedQAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
         for x in [1:1:length(rhovec);]
-    ] for y in [1:1:m*runs;]
-],:auto)
-TData = hcat(TData, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
-rename!(TData, (:x1 => :std))
-TDataG3 = hcat(TData, TDataAdd)
+    ] for y in [1:1:m*runs;]],:auto)
+TDataQ = hcat(TDataQ, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataQ, (:x1 => :std))
+TDataQG3 = hcat(TDataQ, TDataAdd)
 
-default(lab = "")
-ticks = pushfirst!(log.(TDataG1.rho[2:end]), -11)
-ticklabels = string.(pushfirst!(log.(TDataG1.rho[2:end]), -Inf))
-toplot = plot(
-    pushfirst!(log.(TDataG1.rho[2:end]) .- 0.12, -11.12),
-    TDataG1.meanest,
-    ylim = (0.1, 0.8),
-    yerror=1.96*TDataG1.std,
-    seriestype = :scatter,
-    #xticks = (ticks, ticklabels),
-    label = "Fraction of BR Violations Auction Group 1",
-    legend = :topleft,
+TDataP = DataFrame(
+    [rhovec mean([
+        [
+            sum((ViolatedPAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            for x in [1:1:length(rhovec);]
+        ] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataP, (:x1 => :rho))
+rename!(TDataP, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [
+        sum((ViolatedPAll[y][x] ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        for x in [1:1:length(rhovec);]
+    ] for y in [1:1:m*runs;]],:auto)
+TDataP = hcat(TDataP, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataP, (:x1 => :std))
+TDataPG3 = hcat(TDataP, TDataAdd)
+
+TDataSum= DataFrame(
+    [rhovec mean([
+        [
+            sum(((ViolatedPAll[y][x]+ViolatedQAll[y][x]) ./ Tested[y][x]) .* [105, 15, 3]) / 123
+            for x in [1:1:length(rhovec);]
+        ] for y in [1:1:m*runs;]
+    ])],:auto)
+rename!(TDataSum, (:x1 => :rho))
+rename!(TDataSum, (:x2 => :meanest))
+TDataAdd = DataFrame([
+    [
+        sum(((ViolatedPAll[y][x]+ViolatedQAll[y][x]) ./ Tested[y][x]) .* [105, 15, 3]) / 123
+        for x in [1:1:length(rhovec);]
+    ] for y in [1:1:m*runs;]],:auto)
+TDataSum = hcat(TDataSum, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
+rename!(TDataSum, (:x1 => :std))
+TDataSumG3 = hcat(TDataSum, TDataAdd)
+
+DataMeanest1=vcat(TDataQG1.meanest',TDataPG1.meanest')'
+DataMeanest2=vcat(TDataQG2.meanest',TDataPG2.meanest')'
+DataMeanest3=vcat(TDataQG3.meanest',TDataPG3.meanest')'
+ctg = repeat([L"\Theta_{Q,g}", L"\Theta_{P,g}"], inner = 22)
+nam = repeat(pushfirst!(log.(TDataP.rho[2:end]), -11),outer=2)
+p1=groupedbar(
+    nam,
+    xlabel = L"\ln(\rho)",
+    DataMeanest1,
+    bar_position=:stack,
+    group = ctg, 
+    bar_width=0.5,
+    title = "Bidder Group a=1",
+    legend = :topleft
 )
-plot!(
-    pushfirst!(log.(TDataG2.rho[2:end]), -11),
-    TDataG2.meanest,
-    yerror=1.96*TDataG2.std,        
-    ylim = (0.1, 0.8),
-    seriestype = :scatter,
-    #xticks = (ticks, ticklabels),
-    label = "Fraction of BR Violations Auction Group 2",
-    legend = :topleft,
+p2=groupedbar(
+    nam,
+    xlabel = L"\ln(\rho)",
+    DataMeanest2,
+    bar_position=:stack,
+    group = ctg, 
+    bar_width=0.5,
+    title = "Auction Group a=2",
+    legend = :topleft
 )
-plot!(
-    pushfirst!(log.(TDataG3.rho[2:end]) .+ 0.12, -11 + 0.12),
-    TDataG3.meanest,
-    yerror=1.96*TDataG3.std,
-    ylim = (0.1, 0.8),
-    seriestype = :scatter,
-    #xticks = (ticks, ticklabels),
-    label = "Fraction of BR Violations Auction Group 3",
-    legend = :topleft,
+p3=groupedbar(
+    nam,
+    xlabel = L"\ln(\rho)",
+    DataMeanest3,
+    bar_position=:stack,
+    group = ctg, 
+    bar_width=0.5,
+    title = "Bidder Group a=3",
+    legend = :topleft
+)
+p=plot(p1,p2,p3,layout=(1,3),size = [1600, 400])
+plot(p)
+savefig(p,"BRViolationsAuctionGroups.pdf")
+
+data = hcat(
+    TDataQG1[:, [:rho, :meanest]],
+    TDataPG1[:, [:meanest]],
+    TDataSumG1[:,[:meanest, :std]],
+    TDataQG2[:, [:meanest]],
+    TDataPG2[:, [:meanest]],
+    TDataSumG2[:,[:meanest, :std]],
+    TDataQG3[:, [:meanest]],
+    TDataPG3[:, [:meanest]],
+    TDataSumG3[:,[:meanest, :std]],
+    makeunique=true
 )
 
-plot!(xlabel = L"\ln(\rho)")
-plot(toplot)
-savefig("ThetaEstAuctionGroups.pdf")
-
-latexify(
-    TDataG1[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
+t=latexify(
+    data,
+    env=:tabular,
+    fmt = x -> round(x, sigdigits = 3),
 )
-latexify(
-    TDataG2[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
-latexify(
-    TDataG3[:, [:rho, :meanest, :std]],
-    env = :tabular,
-    fmt = x -> round(x, sigdigits = 4),
-)
-
+write("BRViolationsAuctionGroups.txt",t)
 
 ## CE-Computation
 CE(x, rho) = -1 / rho * log(0.5 * (1 + exp(-rho * x)))

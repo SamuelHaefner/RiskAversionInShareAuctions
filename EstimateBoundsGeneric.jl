@@ -22,7 +22,7 @@ for g in [1:1:length(group);]
     @time for auction in auctionset
         BoundsAuction = []
         for i in [1:1:length(rhovec);]
-            simplebounds = EstimateSimpleBounds(
+            simplebounds = EstimateSimpleBoundsRobust(
                 auction,
                 W[g],
                 bidderassignment,

@@ -330,26 +330,28 @@ end
 Bds1 = ComputeBoundsMeanStd([1:1:40;],1)
 
 # table with means
-latexify(
+alldata_means=latexify(
     Bds1[1],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
     )
+write("AllEstMean.txt",alldata_means)
 
 # table with se
-latexify(
+alldata_se = latexify(
     Bds1[2],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
     )
+write("AllEstSE.txt",alldata_se)
 
 # table with estimate overview
-latexify(
+alldata_summary=latexify(
     describe(Bds1[1])[:,1:5],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
     )
-
+write("AllEstSummary.txt",alldata_summary)
 
 # across all bidders of group 1, subg=2
 Bds2 = ComputeBoundsMeanStd([1:1:40;],2)
@@ -369,12 +371,12 @@ latexify(
     )
 
 # table with estimate overview
-latexify(
+summary1 = latexify(
     describe(Bds2[1][setdiff(1:end,31),:])[:,1:5],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
     )
-
+write("Group1Summary.txt",summary1)
 
 # across all bidders of group 2, subg=3
 Bds3 = ComputeBoundsMeanStd([1:1:40;],3)
@@ -394,12 +396,12 @@ latexify(
     )
 
 # table with estimate overview
-latexify(
+summary2=latexify(
     describe(Bds3[1][setdiff(1:end,31),:])[:,1:5],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
     )
-
+write("Group2Summary.txt",summary2)
 
 # across all bidders of group 3, subg=4
 Bds4 = ComputeBoundsMeanStd([1:1:40;],4)
@@ -419,9 +421,9 @@ latexify(
     )
 
 # table with estimate overview
-latexify(
+summary2=latexify(
     describe(Bds4[1][setdiff(1:end,31),:])[:,1:5],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
-    )
-   
+)
+write("Group3Summary.txt",summary3)  

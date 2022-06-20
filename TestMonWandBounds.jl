@@ -26,7 +26,7 @@ for g in [1:1:length(group);]
     @time for auction in auctionset
         global BoundsAuction = []
         for i in [1:1:length(rhovec);]
-            push!(BoundsAuction, EstimateSimpleBounds(auction, W[g], bidderassignment, prices, rhovec[i], m))
+            push!(BoundsAuction, EstimateSimpleBoundsRobust(auction, W[g], bidderassignment, prices, rhovec[i], m))
         end
         eval(Meta.parse(string("@save \"BoundsTestMon", auction, ".dat\" BoundsAuction")))
     end
