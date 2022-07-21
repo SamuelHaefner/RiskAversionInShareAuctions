@@ -56,18 +56,21 @@ T200 = DataFrame(
     )
 
 
-latexify(
+t1=latexify(
     T50[:, [:rho, :av, :se]],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
-    )
-latexify(
+)
+write("MonotonicityTest50.txt",t1)
+t2=latexify(
     T100[:, [:rho, :av, :se]],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
-    )
-latexify(
+)
+write("MonotonicityTest100.txt",t2)
+t3=latexify(
     T200[:, [:rho, :av, :se]],
     env = :tabular,
     fmt = x -> round(x, sigdigits = 4),
-    )
+)
+write("MonotonicityTest200.txt",t3)
