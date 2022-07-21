@@ -70,7 +70,9 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
 
 
 # Estimation Procedure on a SLURM Workload Manager
-The estimation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. This allows to run several bootstrap rounds in parallel. Below, I describe the basic procedure to do so. Further down, I give an example of how the programs can be run locally.
+The estimation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. This allows to run several bootstrap rounds in parallel. 
+
+Below, I describe the basic procedure to do so. Further down, I give an example of how the programs can be run locally.
 1. Upload the data file (see below) and the *main code* files (Point 1 above) to the relevant folder.
 2. Run the scripts under Point 2 in Section [Overview](#Overview) above locally. This produces a host of *.jl and *.sh files.
 3. Upload these files together with ```TestMonWandBounds.sh``` and ```TestMonWandBounds.jl``` to the relevant folder and run the following main .sh files: (1) ```EstimateWandT.sh```, (2) ```EstimateWandTRobust.sh```, (3) ```EstimateBounds.sh```, (4) ```TestMonWandBounds.sh```, (5) ```TestMon.sh```. Scripts (1) and (2) can be run in parallel, but they need to be completed before running (3). Script (4) needs to be run before script (5) (see Comment 1 above).
@@ -190,7 +192,7 @@ prices = PriceBids(group[g])
 auction = group[g][2]
 BoundsAuction = []
 for i in [1:1:length(rhovec);]
-  simplebounds = EstimateSimpleBounds(
+  simplebounds = EstimateSimpleBoundsRobust(
     auction,
     W[g],
     bidderassignment,
@@ -315,6 +317,28 @@ Computes upper and lower bounds on the rationalizable profit functions as descri
 A list of dataframes, [vlb,vub], where vub is the data frame containing the upper bound and vlb is the data frame containing lower bound.
 
 -----
+
+```
+SimpleBoundRobust(bid, WPar, rho, Q)
+```
+
+#### Description
+Computes upper and lower bounds on the rationalizable profit 
+functions as described in Proposition 3.
+If the bounds violated the inequalities (15) in Proposition 4,
+return upper bound = vupperbar and lower bound = bid.
+#### Arguments
+```bid``` -- bid function  
+```WPar``` -- array, containing the estimated parameters of W(p,q) at (p_i^j) for steps j=1,...,k  
+```rho``` -- positive real number, corresponding to the risk preference $\rho$  
+```Q``` -- positive real number, corresponding to the quota $Q$
+#### Return value
+Return a list of dataframes, [vlb,vub], 
+where vub is the data frame containing the upper bound 
+and vlb is the data frame containing lower bound.
+
+-----
+
 ```
 EstimateSimpleBounds(auction, W, bidderassignment,  prices, rhovec, m)
 ```
@@ -329,6 +353,24 @@ Computes ```SimpleBounds()``` for all bidders in ```auction```.
 ```m``` -- number of bootstrap rounds to be estimated
 #### Return value
 A list of objects returned by ```SimpleBounds()```, one entry per bidder.
+
+-----
+
+```
+EstimateSimpleBoundsRobust(auction, W, bidderassignment,  prices, rhovec, m)
+```
+
+#### Description
+Computes ```SimpleBoundsRobust()``` for all bidders in ```auction```.
+#### Arguments
+```auction``` -- auction index  
+```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```  
+```bidderassignment``` -- bidder assignment vector  
+```prices``` -- vector of submitted prices used for the estimation of W  
+```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
+```m``` -- number of bootstrap rounds to be estimated
+#### Return value
+A list of objects returned by ```SimpleBoundRobust()```, one entry per bidder.
 
 -----
 
