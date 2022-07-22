@@ -79,7 +79,7 @@ Below, I describe the basic procedure to do so. Further down, I give an example 
 4. After the scripts completed, download the *.dat files with the estimates.
 5. Run the scripts described under Point 4 in Section [Overview](#Overview) above.
 
-*Comment 3:* The estimates that I obtained and reported in the manuscript can be downloaded [here](https://drive.google.com/file/d/1bqyIMnCVvJJlmcStgyGKClkse68GCYYS/view?usp=sharing). This file contains the .dat files, so that the interested reader may directly jump to Point 5 above.
+*Comment 3:* The estimates that I obtained and reported in the manuscript can be downloaded [here](https://drive.google.com/file/d/1SCfj8dPIYREuEzHvy70rzSfKE5MA6ksS/view?usp=sharing). This file contains the .dat files, so that the interested reader may directly jump to Point 5 above.
 
 # Example
 
@@ -227,26 +227,29 @@ The following table explains which scripts are used to produce the tables and pl
 
 | Figure/Table | Script | Comment|
 |---|---|---|
-|Figure 1 | none | tikz-script in .tex file |
-|Figure 2 | ```Plots.jl```| Lines 8-33 (left panel). Lines 74-82 (right panel). |
-|Figure 3 | ```ReadT.jl``` | Lines 1-69; 115-211.|
-|Figure 4 | ```Plots.jl```| Function ```PlotTighterBounds()```; see the file for further information. |
-|Figure 5  | ```Plots.jl```| Lines 35-59 (left panel). Lines 64-72 (right panel). |
-|Figure 6  |  ```Plots.jl``` | Lines 152-177 (left panel). Lines 37-46; 88-149 (right panel).|
+|Figure 1 | none | tikz-scripts in separate .tex files (available upon request) |
+|Figure 2 | none | tikz-script in separate .tex file (available upon request) |
+|Figure 3 | ```Plots.jl```| Lines 9-34 (left panel). Lines 63-83 (right panel). |
+|Figure 4 | ```ReadT.jl``` | Lines 1-88; 177-324.|
+|Figure 5 | ```Plots.jl```| Function ```PlotTighterBounds()```; see the file for further information. |
+|Figure 6  | ```Plots.jl```| Lines 36-60 (left panel). Lines 63-83 (right panel). |
+|Figure 7  |  ```Plots.jl``` | Lines 152-177 (left panel). Lines 37-46; 88-149 (right panel).|
+|Figure 8 | ```Plots.jl``` | Lines 278-604. |
 |Table 1 | ```Auxilary.jl``` | Various functions in ```Auxiliary.jl``` are used. For a comprehensive overview see the corresponding [section](#Scripts) below. |
-|Table 2 | ```ReadEstimates.jl``` | See file for more information. |
+|Table 2 | ```ReadT.jl``` | Lines 326-344. |
 |Table 3 | ```ReadEstimates.jl``` | See file for more information. |
+|Table 4 | ```ReadTestMon.jl``` | See file for more information. |
+|Table 5 | ```ReadEstimates.jl``` | See file for more information. |
 
 The following table explains which scripts are used to produce the tables and plots in the [supplementary appendix](https://samuelhaefner.github.io/SupplementaryAppendix.pdf) of the paper.
 
 | Figure/Table | Script | Line Number |
 |---|---|---|
-| Figure 1 |```ReadT.jl``` | Lines 1-69; 213-467.|
+| Figure 1 |```ReadT.jl``` | Lines 1-88; 347-768.|
 | Figure 2 | ```ReatT.jl``` (right figure) and ```ReadTRobust.jl``` (left figure) | See files for more information. |
-| Table 1 | ```ReadT.jl``` | Lines 1-69; 213-467. |
-| Table 2 | ```ReadT.jl``` | See file for more information. |
-| Table 3 | ```ReatT.jl``` (right table) and ```ReadTRobust.jl``` (left table) | See files for more information. |
-| Tables in Section D | ```ReadEstimates.jl``` | |
+| Table 1 | ```ReadT.jl``` | Lines 1-88; 347-768. |
+| Table 2 | ```ReatT.jl``` (right table) and ```ReadTRobust.jl``` (left table) | See files for more information. |
+| Tables in Section D | ```ReadEstimates.jl``` | See files for more information. |
 
 
 # Scripts in More Detail

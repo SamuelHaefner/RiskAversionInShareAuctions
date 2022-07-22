@@ -170,7 +170,7 @@ t=latexify(
     env=:tabular,
     fmt = x -> round(x, sigdigits = 3),
 )
-write("BRViolationsGamma.txt",t)
+write("BRViolationsLogNorm.txt",t)
 
 
 

@@ -711,7 +711,7 @@ TDataSumG3 = hcat(TDataSum, TDataAdd)
 DataMeanest1=vcat(TDataQG1.meanest',TDataPG1.meanest')'
 DataMeanest2=vcat(TDataQG2.meanest',TDataPG2.meanest')'
 DataMeanest3=vcat(TDataQG3.meanest',TDataPG3.meanest')'
-ctg = repeat([L"\Theta_{Q,g}", L"\Theta_{P,g}"], inner = 22)
+ctg = repeat([L"\Theta_{Q,a}", L"\Theta_{P,a}"], inner = 22)
 nam = repeat(pushfirst!(log.(TDataP.rho[2:end]), -11),outer=2)
 p1=groupedbar(
     nam,
@@ -720,7 +720,7 @@ p1=groupedbar(
     bar_position=:stack,
     group = ctg, 
     bar_width=0.5,
-    title = "Bidder Group a=1",
+    title = "Auction Group a=1",
     legend = :topleft
 )
 p2=groupedbar(
