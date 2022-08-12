@@ -447,8 +447,18 @@ function TighterBoundsIterations(
                 )
                 if bidstep == length(bid.pb)
                     ## check values at upper and lower end of interval
-                    if fl(StepV(q, initvu)) < 0 || fl(StepV(q, initvl)) > 0
-                        push!(vvals, StepV(q, initvl))
+                    if fl(StepV(q, initvu)) < 0 
+                        push!(vvals,StepV(q, initvu))
+                    elseif fl(maximum([StepV(bid.cumqb[bidstep], vl), 
+                            StepV(bid.cumqb[bidstep] + 1, vl),
+                            ])) > 0
+                        push!(
+                            vvals,
+                            maximum([
+                                StepV(bid.cumqb[bidstep], vl),
+                                StepV(bid.cumqb[bidstep] + 1, vl),
+                            ]),
+                        )
                     else
                         push!(
                             vvals,
@@ -465,11 +475,11 @@ function TighterBoundsIterations(
                     end
                 else
                     ## check values at upper and lower end of interval
-                    if fl(StepV(q, initvu)) < 0 ||
-                       fl(maximum([
-                        StepV(bid.cumqb[bidstep], vl),
-                        StepV(bid.cumqb[bidstep] + 1, vl),
-                        ])) > 0
+                    if fl(StepV(q, initvu)) < 0 
+                        push!(vvals,StepV(q, initvu))
+                    elseif fl(maximum([StepV(bid.cumqb[bidstep], vl), 
+                            StepV(bid.cumqb[bidstep] + 1, vl),
+                            ])) > 0
                         push!(
                             vvals,
                             maximum([

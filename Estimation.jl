@@ -826,6 +826,7 @@ function TighterBounds(
                     elseif fu(StepV(q, initvl)) > 0
                         push!(vvals, StepV(q, initvl))
                     else
+                        # find root
                         push!(
                             vvals,
                             try
@@ -846,6 +847,7 @@ function TighterBounds(
                     elseif fu(StepV(bid.cumqb[bidstep] + 1, vu)) > 0
                         push!(vvals, StepV(bid.cumqb[bidstep] + 1, vu))
                     else
+                        # find root
                         push!(
                             vvals,
                             try
@@ -896,9 +898,12 @@ function TighterBounds(
                 )
                 if bidstep == length(bid.pb)
                     ## check values at upper and lower end of interval
-                    if fl(StepV(q, initvu)) < 0 || fl(StepV(q, initvl)) > 0
+                    if fl(StepV(q, initvu)) < 0 
+                        push!(vvals, StepV(q, initvu))
+                    elseif fl(StepV(q, initvl)) > 0
                         push!(vvals, StepV(q, initvl))
                     else
+                        # find root
                         push!(
                             vvals,
                             try
@@ -914,11 +919,14 @@ function TighterBounds(
                     end
                 else
                     ## check values at upper and lower end of interval
-                    if fl(StepV(q, initvu)) < 0 ||
-                       fl(maximum([
-                        StepV(bid.cumqb[bidstep], vl),
-                        StepV(bid.cumqb[bidstep] + 1, vl),
-                        ])) > 0
+                    ## note: taking the maximum below is slightly different than step 12 in Algorithm 2 of the 
+                    ## manuscript. doing so does not give a different result, it merely saves a bit of computation, 
+                    ## because it reduces the interval in which the root is sought 
+                    if fl(StepV(q, initvu)) < 0 
+                        push!(vvals,StepV(q, initvu))
+                    elseif fl(maximum([StepV(bid.cumqb[bidstep], vl), 
+                            StepV(bid.cumqb[bidstep] + 1, vl),
+                            ])) > 0
                         push!(
                             vvals,
                             maximum([
@@ -927,6 +935,7 @@ function TighterBounds(
                             ]),
                         )
                     else
+                        # find root
                         push!(
                             vvals,
                             try

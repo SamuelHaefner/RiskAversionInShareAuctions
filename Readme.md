@@ -4,7 +4,7 @@ This file contains the required information for the replication of the results i
 
 Author: [Samuel Häfner](https://samuelhaefner.github.io), Web3 Foundation, Zug, Switzerland, [samuel@web3.foundation](mailto:samuel@web3.foundation).
 
-Current version: Dec 25, 2021.
+Current version: August, 2022.
 
 # Table of Contents
 
@@ -79,7 +79,7 @@ Below, I describe the basic procedure to do so. Further down, I give an example 
 4. After the scripts completed, download the *.dat files with the estimates.
 5. Run the scripts described under Point 4 in Section [Overview](#Overview) above.
 
-*Comment 3:* The estimates that I obtained and reported in the manuscript can be downloaded [here](https://drive.google.com/file/d/1SCfj8dPIYREuEzHvy70rzSfKE5MA6ksS/view?usp=sharing). This file contains the .dat files, so that the interested reader may directly jump to Point 5 above.
+*Comment 3:* The estimates that I obtained and reported in the manuscript can be downloaded [here](https://drive.google.com/file/d/1PlKXkPn4GbM3ImMSvveuznnPRTeeURGe/view?usp=sharing). This file contains the .dat files, so that the interested reader may directly jump to Point 5 above.
 
 # Example
 
