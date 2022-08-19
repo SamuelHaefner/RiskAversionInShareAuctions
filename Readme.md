@@ -2,7 +2,7 @@ This file contains the required information for the replication of the results i
 
 # **[Risk Aversion in Share Auctions: Estimating Rents from TRQs in Switzerland](https://dx.doi.org/10.2139/ssrn.3397027)**
 
-Author: [Samuel Häfner](https://samuelhaefner.github.io), Web3 Foundation, Zug, Switzerland, [samuel@web3.foundation](mailto:samuel@web3.foundation).
+Author: [Samuel Häfner](https://samuelhaefner.github.io), Web3 Foundation, Zug, and University of St. Gallen, [samuel.haefner@gmail.com](mailto:samuel.haefner@gmail.com).
 
 Current version: August, 2022.
 
