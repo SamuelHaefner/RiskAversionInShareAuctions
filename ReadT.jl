@@ -740,7 +740,7 @@ p3=groupedbar(
     bar_position=:stack,
     group = ctg, 
     bar_width=0.5,
-    title = "Bidder Group a=3",
+    title = "Auction Group a=3",
     legend = :topleft
 )
 p=plot(p1,p2,p3,layout=(1,3),size = [1600, 400])

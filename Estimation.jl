@@ -597,7 +597,7 @@ end
 # ```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
 # ```m``` -- number of bootstrap rounds to be estimated
 #### Return value
-#A list of objects returned by ```SimpleBound()```, one entry per bidder.
+# A list of objects returned by ```SimpleBound()```, one entry per bidder.
 #############################################################
 
 function EstimateSimpleBounds(auction, W, bidderassignment, prices, rhovec, m)
@@ -634,7 +634,7 @@ end
 # ```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
 # ```m``` -- number of bootstrap rounds to be estimated
 #### Return value
-#A list of objects returned by ```SimpleBoundRobust()```, one entry per bidder.
+# A list of objects returned by ```SimpleBoundRobust()```, one entry per bidder.
 #############################################################
 
 function EstimateSimpleBoundsRobust(auction, W, bidderassignment, prices, rhovec, m)
@@ -674,10 +674,10 @@ end
 # ```m``` -- number of bootstrap rounds  
 #### Return value
 # A list of three matrices, with the columns corresponding to bootstrap rounds 
-# and rows corresponding to bidder groups. The first matrix counts the number 
-# of violations of the first inequality in Prop. 4, the second matrix
-# counts the number of violations of the second inequality in Prop. 4, 
-# and the third matrix counts the total number of submitted steps.  
+# and rows corresponding to bidder groups. The first matrix counts the number of 
+# violations of the inequalities (15) in Prop. 4, the second matrix counts the 
+# number of violations of the inequalities (16) in Prop. 4, and the third matrix 
+# counts the total number of submitted price-quantity pairs.  
 ###############################################################
 
 function EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
@@ -994,7 +994,7 @@ end
 # ```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```  
 # ```bidderassignment``` -- bidder assignment vector  
 # ```prices``` -- vector of prices used for the estimation of ```W```  
-# ```bounds``` -- estimated simple bounds from ```EstimateSimpleBounds()```  
+# ```bounds``` -- estimated simple bounds from ```EstimateSimpleBoundsRobust()```  
 # ```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
 # ```m``` -- number of boostratp runs  
 # ```maxiter``` -- maximum number of fixed point iterations  

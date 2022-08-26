@@ -41,10 +41,10 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
    - ```Auxiliary.jl``` - Reads in the required packages, the data set and defines the required auxiliary functions and  global variables.  
    - ```Grouping.jl``` - Determines the bidder groups and auction groups used for the estimation.  
    - ```Estimation.jl``` - Contains the main functions for the estimation of W, $\Theta$, and the bounds.  
-   - ```TestMon.jl``` - Contains the main functions to test for the monotonicity of $F^j$ in v.   
+   - ```TestMon.jl``` - Contains the main functions to test for the monotonicity of $F^j_i$ in v.   
 2. The *scripts to conduct the estimation*. In particular, the following files contain the scripts to produce the .jl and .sh files that can then be run on a SLURM workload manager.  
-   - ```EstimateWandTSLURM.jl``` - Produces the required .jl and .sh files to compute and save estimates of W and Theta.  
-   - ```EstimateWandTRobustSLURM.jl``` - Produces the required files to compute and save the robustness checks for Theta, using a log-normal distribution rather than a gamma distribution when estimating W.
+   - ```EstimateWandTSLURM.jl``` - Produces the required .jl and .sh files to compute and save estimates of W and $\Theta$.  
+   - ```EstimateWandTRobustSLURM.jl``` - Produces the required files to compute and save the robustness checks for $\Theta$, using a log-normal distribution rather than a gamma distribution when estimating W.
    - ```EstimateBoundsSLURM.jl``` - Produces the required files to compute standard and tighter bounds, using the estimates of W(p,q) obtained with EstimateWandTSLURM.jl.
    - ```TestMonSLURM.jl``` - Produces the required files to test for monotonicity of F.   
 3. *Templates* used by the scripts above. Essentially, the scripts above split up the jobs into a manageable number of bootstrap rounds. To do so, they require the following generic .jl and .sh templates. For further information, see the files themselves.
@@ -56,7 +56,7 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
    - ```EstimateWandTRobustGeneric.sh```
    - ```EstimateBoundsGeneric.sh```
    - ```TestMonGeneric.sh```
-3. The scripts to *read and further process the estimates* produced with above *Slurm.jl scripts. Once the estimates are saved in the respective .dat files, these scripts can be run as they are.
+3. The scripts to *read and further process the estimates* produced with above *SLURM.jl scripts. Once the estimates are saved in the respective .dat files, these scripts can be run as they are.
    - ```ReadEstimates.jl``` - Scripts and functions to read in the estimates of the bounds and produce the respective tables.
    - ```ReadT.jl``` - Scripts to read in estimates of T and produce the plots and tables. 
    - ```ReadTRobust.jl``` - Same as above, but using the alternative estimates (robustness check).
@@ -66,13 +66,13 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
 
 *Comment 1:* The script ```TestMonWandBounds.jl``` produces the required files containing the estimates of W(p,q) and the bounds for the monotonicity check. This script needs to be run before the TestMon*.jl scripts, using the bash script ```TestMonWandBounds.sh```.
 
-*Comment 2:* Computation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. The Julia version used was 1.5. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 48 − 72 hours (EstimateBoundsGeneric.jl).
+*Comment 2:* Computation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. The Julia version used was 1.6. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 24 hours (EstimateBoundsGeneric.jl).
 
 
 # Estimation Procedure on a SLURM Workload Manager
 The estimation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. This allows to run several bootstrap rounds in parallel. 
 
-Below, I describe the basic procedure to do so. Further down, I give an example of how the programs can be run locally.
+Below, I describe the basic procedure to do so. (Further down, in the Example section, I explain how the programs can be run locally.)
 1. Upload the data file (see below) and the *main code* files (Point 1 above) to the relevant folder.
 2. Run the scripts under Point 2 in Section [Overview](#Overview) above locally. This produces a host of *.jl and *.sh files.
 3. Upload these files together with ```TestMonWandBounds.sh``` and ```TestMonWandBounds.jl``` to the relevant folder and run the following main .sh files: (1) ```EstimateWandT.sh```, (2) ```EstimateWandTRobust.sh```, (3) ```EstimateBounds.sh```, (4) ```TestMonWandBounds.sh```, (5) ```TestMon.sh```. Scripts (1) and (2) can be run in parallel, but they need to be completed before running (3). Script (4) needs to be run before script (5) (see Comment 1 above).
@@ -391,7 +391,7 @@ Determines violations of the inequalities in Proposition 4 for a given auction.
   ```rho``` -- positive real number, the risk preference   
   ```m``` -- number of bootstrap rounds  
 #### Return value
-A list of two matrices, with the columns corresponding to bootstrap rounds and rows corresponding to bidder groups. The first matrix counts the number of violations, the second matrix counts the total number of test inequalities.  
+A list of three matrices, with the columns corresponding to bootstrap rounds and rows corresponding to bidder groups. The first matrix counts the number of violations of the inequalities (15) in Prop. 4, the second matrix counts the number of violations of the inequalities (16) in Prop. 4, and the third matrix counts the total number of submitted price-quantity pairs.  
 
 -----
 ```
@@ -425,7 +425,7 @@ Runs ```TighterBounds()``` for all bidders in an ```auction``` and for ```m``` b
  ```W``` -- estimate of W, as returned from ```Wgamma()``` or  ```Wlnorm()```  
  ```bidderassignment``` -- bidder assignment vector  
  ```prices``` -- vector of prices used for the estimation of ```W```  
- ```bounds``` -- estimated simple bounds from ```EstimateSimpleBounds()```  
+ ```bounds``` -- estimated simple bounds from ```EstimateSimpleBoundsRobust()```  
 ```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
 ```m``` -- number of boostratp runs  
 ```maxiter``` -- maximum number of fixed point iterations  
