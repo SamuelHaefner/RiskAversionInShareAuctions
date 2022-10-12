@@ -1,4 +1,5 @@
 ## This file contains the script to read in estimates of T and produce the plots and tables.
+## For more information, see Readme.md
 
 include("Auxiliary.jl")
 include("Estimation.jl")
@@ -18,10 +19,16 @@ m = 5
 # rhovector used
 rhovec = sort!(append!([exp(x) for x in [-10:0.5:0;]], 0))
 
+# load data in Theta*.dat files
 for runno in [1:1:runs;]
     eval(Meta.parse(string("@load \"Theta", runno, ".dat\" Theta", runno)))
 end
 
+# construct two-dimensional Lists[y][x], keeping track for every element of the rhovector
+# (x is the x-th element) and every bootstrap run y, the number of tested price-quantity pairs 
+# (Tested), the number of price-quantity pairs that violated necessary condition (15) in 
+# Proposition 4 (ViolatedQAll), and the number of price-quantity pairs that violated
+# condition (16) in Proposition 4 (ViolatedPAll)  
 Tested = []
 ViolatedPAll = []
 ViolatedQAll = []
@@ -87,6 +94,8 @@ for runno in [1:1:runs;]
     end
 end
 
+# For every rho-value in rhovec, compute average share of violations of the necessary 
+# condition (15) in Proposition 4 across bootstrap rounds and the standard deviation (TDataQ)
 TDataQ = DataFrame(
     [rhovec mean([
         [
@@ -105,6 +114,8 @@ TDataQ = hcat(TDataQ, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataQ, (:x1 => :std))
 TDataQ = hcat(TDataQ, TDataAdd)
 
+# For every rho-value in rhovec, compute average share of violations of the necessary 
+# condition (16) in Proposition 4 across bootstrap rounds and the standard deviation (TDataP)
 TDataP = DataFrame(
     [rhovec mean([
         [
@@ -123,6 +134,7 @@ TDataP = hcat(TDataP, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataP, (:x1 => :std))
 TDataP = hcat(TDataP, TDataAdd)
 
+# Same as above, but now for the sum of violations
 TDataSum= DataFrame(
     [rhovec mean([
         [
@@ -141,6 +153,7 @@ TDataSum = hcat(TDataSum, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataSum, (:x1 => :std))
 TDataSum = hcat(TDataSum, TDataAdd)
 
+# Construct the left panel in Figure 2 of the Supplementary Appendix
 DataMeanest=vcat(TDataQ.meanest',TDataP.meanest')'
 ctg = repeat([L"\Theta_{Q}", L"\Theta_{P}"], inner = 22)
 nam = repeat(pushfirst!(log.(TDataP.rho[2:end]), -11),outer=2)
@@ -158,6 +171,7 @@ p=plot(p,size = [500, 400])
 plot(p)
 savefig(p,"BRViolationsGamma.pdf")
 
+# Construct the data for the left table in Table 2 of the Supplementary Appendix
 data = hcat(
     TDataQ[:, [:rho, :meanest]],
     TDataP[:, [:meanest]],
@@ -173,8 +187,9 @@ t=latexify(
 write("BRViolationsGamma.txt",t)
 
 
-
 #### Thetas by Bidder Assignment
+# The code below repeats the construction above, but now does it for every bidder 
+# group separately.
 
 TDataQG1 = DataFrame(
     [rhovec mean([
@@ -284,6 +299,7 @@ TDataSumG3 = hcat(TDataSumG3, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);
 rename!(TDataSumG3, (:x1 => :std))
 TDataSumG3 = hcat(TDataSumG3, TDataAdd)
 
+# Construct Figure 4 in the Main Text
 DataMeanest1=vcat(TDataQG1.meanest',TDataPG1.meanest')'
 DataMeanest2=vcat(TDataQG2.meanest',TDataPG2.meanest')'
 DataMeanest3=vcat(TDataQG3.meanest',TDataPG3.meanest')'
@@ -323,6 +339,7 @@ p=plot(p1,p2,p3,layout=(1,3),size = [1600, 400])
 plot(p)
 savefig(p,"BRViolationsBidderGroups.pdf")
 
+# Construct Table 2 in the Main Text
 data = hcat(
     TDataQG1[:, [:rho, :meanest]],
     TDataPG1[:, [:meanest]],
@@ -344,7 +361,10 @@ t=latexify(
 write("BRViolationsBidderGroups.txt",t)
 
 
-## By Auction Group
+#### By Auction Group
+# The code below again repeats the construction above, but now does it for every auction 
+# group separately.
+
 # compute for group 1
 Tested = []
 ViolatedPAll = []
@@ -708,6 +728,7 @@ TDataSum = hcat(TDataSum, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataSum, (:x1 => :std))
 TDataSumG3 = hcat(TDataSum, TDataAdd)
 
+# Construct Figure 1 in the Supplementary Appendix
 DataMeanest1=vcat(TDataQG1.meanest',TDataPG1.meanest')'
 DataMeanest2=vcat(TDataQG2.meanest',TDataPG2.meanest')'
 DataMeanest3=vcat(TDataQG3.meanest',TDataPG3.meanest')'
@@ -747,6 +768,7 @@ p=plot(p1,p2,p3,layout=(1,3),size = [1600, 400])
 plot(p)
 savefig(p,"BRViolationsAuctionGroups.pdf")
 
+# Construct data for Table 1 in the Supplementary APpendix
 data = hcat(
     TDataQG1[:, [:rho, :meanest]],
     TDataPG1[:, [:meanest]],

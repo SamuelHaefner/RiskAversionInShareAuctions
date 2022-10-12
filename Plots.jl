@@ -6,7 +6,7 @@ using Plots
 using LaTeXStrings
 using Latexify
 
-## construct bidderassignments plot
+## Construct bidderassignments plot (left panel in Figure 3 in the Main Text)
 ###########################################################################
 bidderassignment = []
 for i in [1:1:123;]
@@ -33,7 +33,7 @@ bidderplot = plot(
 )
 savefig("ResamplingPlot2a.pdf")
 
-# construct auctiongroups plot
+# Construct auctiongroups plot (left panel in Figure 6 in the Main Text)
 ############################################################################
 auctiongroup = []
 for i in [1:1:39;]
@@ -60,7 +60,9 @@ auctionplot = plot(
 savefig("ResamplingPlot2b.pdf")
 
 
-# get summary statistics for the groups
+# Get summary statistics for the groups (used for right panels in Figure 6 and 3, respectively)
+# Note: this does not automatically produce an *.txt output; rather
+# the latexify()-output below needs to be copied by hand.
 ###########################################################################
 group_a = [1:1:length(unique(auctiongroup));]
 group_me = [length(quotas[findall(auctiongroup .== x)]) for x in group_a]
@@ -83,7 +85,7 @@ rename!(groupdescr, Symbol.(["Group","Size","Min","Mean","Max"]))
 latexify(groupdescr,env = :tabular,fmt = x->round(x, sigdigits = 5))
 
 
-# plot resampling algorithm
+# Plot resampling algorithm (right panel in Figure 7 in the Main Text)
 ############################################################################
 
 auction = 20
@@ -149,7 +151,8 @@ plot(resamplingplot)
 savefig("ResamplingPlot1.pdf")
 
 
-## plot a bunch of bid functions
+## Plot a bunch of bid functions (left panel in Figure 7 in the Main Text)
+#####################################################################################
 auction = 36
 bid = qpBid(activebidderindeces[auction][1], auction)
 bidfctplot = plot(
@@ -271,7 +274,8 @@ function PlotTighterBounds(bidder, auction, f, m, runs)
     savefig(f)
 end
 
-## Produce figures in manuscript
+## Produce figure for Figure 5 in the Main Text
+########################################################################################
 PlotTighterBounds(1,20,"BoundsBidder1Auction20.pdf",5,40)
 PlotTighterBounds(8,25,"BoundsBidder8Auction25.pdf",5,40)
 
@@ -280,7 +284,7 @@ PlotTighterBounds(8,25,"BoundsBidder8Auction25.pdf",5,40)
 ###############################################################
 #### Description
 # Computes tighter upper and lower bounds from initial conditions ```initvl``` 
-# and ```initivu``` by runing Algorithm 2.
+# and ```initivu``` by runing Algorithm 2. To be used below.
 #### Arguments
 # ```bid``` -- bid function  
 # ```initvl``` -- marginal profit function, the initial condition for the lower bound  
@@ -538,8 +542,8 @@ function TighterBoundsIterations(
     return [vliterations, vuiterations]
 end
 
-## construct plot showing the iterations of the fixed point algorithm
-##########################################################################
+## Construct plot showing the iterations of the fixed point algorithm
+## (Figure 8 in the Main Text)
 ##########################################################################
 
 auction=25

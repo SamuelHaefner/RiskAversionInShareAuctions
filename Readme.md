@@ -56,7 +56,7 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
    - ```EstimateWandTRobustGeneric.sh```
    - ```EstimateBoundsGeneric.sh```
    - ```TestMonGeneric.sh```
-3. The scripts to *read and further process the estimates* produced with above *SLURM.jl scripts. Once the estimates are saved in the respective .dat files, these scripts can be run as they are.
+3. The scripts to *read and further process the estimates* produced with above *SLURM.jl scripts. Once the estimates are saved in the respective .dat files, these scripts can be run as they are; they will produce the required figures and data for the tables.
    - ```ReadEstimates.jl``` - Scripts and functions to read in the estimates of the bounds and produce the respective tables.
    - ```ReadT.jl``` - Scripts to read in estimates of T and produce the plots and tables. 
    - ```ReadTRobust.jl``` - Same as above, but using the alternative estimates (robustness check).
@@ -230,13 +230,13 @@ The following table explains which scripts are used to produce the tables and pl
 |Figure 1 | none | tikz-scripts in separate .tex files (available upon request) |
 |Figure 2 | none | tikz-script in separate .tex file (available upon request) |
 |Figure 3 | ```Plots.jl```| Lines 9-34 (left panel). Lines 63-83 (right panel). |
-|Figure 4 | ```ReadT.jl``` | Lines 1-88; 177-324.|
+|Figure 4 | ```ReadT.jl``` | Lines 1-95; 190-340.|
 |Figure 5 | ```Plots.jl```| Function ```PlotTighterBounds()```; see the file for further information. |
-|Figure 6  | ```Plots.jl```| Lines 36-60 (left panel). Lines 63-83 (right panel). |
-|Figure 7  |  ```Plots.jl``` | Lines 152-177 (left panel). Lines 37-46; 88-149 (right panel).|
-|Figure 8 | ```Plots.jl``` | Lines 278-604. |
+|Figure 6  | ```Plots.jl```| Lines 36-60 (left panel). Lines 63-85 (right panel). |
+|Figure 7  |  ```Plots.jl``` | Lines 154-180 (left panel). Lines 88-151 (right panel).|
+|Figure 8 | ```Plots.jl``` | Lines 282-618. |
 |Table 1 | ```Auxilary.jl``` | Various functions in ```Auxiliary.jl``` are used. For a comprehensive overview see the corresponding [section](#Scripts) below. |
-|Table 2 | ```ReadT.jl``` | Lines 326-344. |
+|Table 2 | ```ReadT.jl``` | Lines 342-361. |
 |Table 3 | ```ReadEstimates.jl``` | See file for more information. |
 |Table 4 | ```ReadTestMon.jl``` | See file for more information. |
 |Table 5 | ```ReadEstimates.jl``` | See file for more information. |
@@ -245,9 +245,9 @@ The following table explains which scripts are used to produce the tables and pl
 
 | Figure/Table | Script | Line Number |
 |---|---|---|
-| Figure 1 |```ReadT.jl``` | Lines 1-88; 347-768.|
+| Figure 1 |```ReadT.jl``` | Lines 1-95; 364-789.|
 | Figure 2 | ```ReatT.jl``` (right figure) and ```ReadTRobust.jl``` (left figure) | See files for more information. |
-| Table 1 | ```ReadT.jl``` | Lines 1-88; 347-768. |
+| Table 1 | ```ReadT.jl``` | Lines 1-95; 364-789. |
 | Table 2 | ```ReatT.jl``` (right table) and ```ReadTRobust.jl``` (left table) | See files for more information. |
 | Tables in Section D | ```ReadEstimates.jl``` | See files for more information. |
 

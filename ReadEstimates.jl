@@ -326,11 +326,11 @@ end
 # read the actual estimates and construct the tables
 ######################################################################################
 
-# across all bidders, subg=1 
+# Compute bound estimates and std across all bidders (subg=1) 
 Bds=0
 Bds = ComputeBoundsMeanStd([1:1:40;],1)
 
-# table with means
+# Construct data for the first table in Appendix D of the Supplementary Appendix (Estimates)
 alldata_means=latexify(
     Bds[1],
     env = :tabular,
@@ -338,7 +338,7 @@ alldata_means=latexify(
     )
 write("AllEstMean.txt",alldata_means)
 
-# table with se
+# Construct data for the second table in Appendix D of the Supplementary Appendix (std's)
 alldata_se = latexify(
     Bds[2],
     env = :tabular,
@@ -346,7 +346,7 @@ alldata_se = latexify(
     )
 write("AllEstSE.txt",alldata_se)
 
-# table with estimate overview
+# Construct data for Table 3 in the Main Text
 alldata_summary=latexify(
     describe(Bds[1])[:,1:5],
     env = :tabular,
@@ -354,8 +354,10 @@ alldata_summary=latexify(
     )
 write("AllEstSummary.txt",alldata_summary)
 
-# across all bidders of group 1, subg=2
-Bds=0
+# Compute bound estimates and std across the different bidder groups
+# (The different *.txt files below are used to construct Table 5 in the Main Text) 
+
+# Compute bound estimates and std across all bidders of bidder group 1 (subg=2)
 Bds = ComputeBoundsMeanStd([1:1:40;],2)
 
 # table with means
@@ -380,7 +382,7 @@ summary1 = latexify(
     )
 write("Group1Summary.txt",summary1)
 
-# across all bidders of group 2, subg=3
+# Compute bound estimates and std across all bidders of bidder group 2 (subg=3)
 Bds=0
 Bds = ComputeBoundsMeanStd([1:1:40;],3)
 
@@ -406,7 +408,7 @@ summary2=latexify(
     )
 write("Group2Summary.txt",summary2)
 
-# across all bidders of group 3, subg=4
+# Compute bound estimates and std across all bidders of bidder group 3 (subg=4)
 Bds=0
 Bds = ComputeBoundsMeanStd([1:1:40;],4)
 

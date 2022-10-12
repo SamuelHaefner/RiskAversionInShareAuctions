@@ -18,10 +18,16 @@ m = 5
 # rhovector used
 rhovec = sort!(append!([exp(x) for x in [-10:0.5:0;]], 0))
 
+# load data in ThetaRobust*.dat files
 for runno in [1:1:runs;]
     eval(Meta.parse(string("@load \"ThetaRobust", runno, ".dat\" Theta", runno)))
 end
 
+# construct two-dimensional Lists[y][x], keeping track for every element of the rhovector
+# (x is the x-th element) and every bootstrap run y, the number of tested price-quantity pairs 
+# (Tested), the number of price-quantity pairs that violated necessary condition (15) in 
+# Proposition 4 (ViolatedQAll), and the number of price-quantity pairs that violated
+# condition (16) in Proposition 4 (ViolatedPAll)  
 Tested = []
 ViolatedPAll = []
 ViolatedQAll = []
@@ -87,6 +93,8 @@ for runno in [1:1:runs;]
     end
 end
 
+# For every rho-value in rhovec, compute average share of violations of the necessary 
+# condition (15) in Proposition 4 across bootstrap rounds and the standard deviation (TDataQ)
 TDataQ = DataFrame(
     [rhovec mean([
         [
@@ -105,6 +113,8 @@ TDataQ = hcat(TDataQ, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataQ, (:x1 => :std))
 TDataQ = hcat(TDataQ, TDataAdd)
 
+# For every rho-value in rhovec, compute average share of violations of the necessary 
+# condition (16) in Proposition 4 across bootstrap rounds and the standard deviation (TDataP)
 TDataP = DataFrame(
     [rhovec mean([
         [
@@ -123,6 +133,7 @@ TDataP = hcat(TDataP, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataP, (:x1 => :std))
 TDataP = hcat(TDataP, TDataAdd)
 
+# Same as above, but now for the sum of violations
 TDataSum= DataFrame(
     [rhovec mean([
         [
@@ -141,6 +152,7 @@ TDataSum = hcat(TDataSum, [std(TDataAdd[x, :]) for x in [1:1:length(rhovec);]])
 rename!(TDataSum, (:x1 => :std))
 TDataSum = hcat(TDataSum, TDataAdd)
 
+# Construct the right panel in Figure 2 of the Supplementary Appendix
 DataMeanest=vcat(TDataQ.meanest',TDataP.meanest')'
 ctg = repeat([L"\Theta_{Q}", L"\Theta_{P}"], inner = 22)
 nam = repeat(pushfirst!(log.(TDataP.rho[2:end]), -11),outer=2)
@@ -158,6 +170,7 @@ p=plot(p,size = [500, 400])
 plot(p)
 savefig(p,"BRViolationsLogNorm.pdf")
 
+# Construct the data for the right table in Table 2 of the Supplementary Appendix
 data = hcat(
     TDataQ[:, [:rho, :meanest]],
     TDataP[:, [:meanest]],

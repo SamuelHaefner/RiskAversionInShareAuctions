@@ -9,6 +9,7 @@ include("Auxiliary.jl")
 
 rhovec = [exp(x) for x in [-10:0.5:0;]]
 
+## loads and returns the data in the file TestMonA[auction]R[R]rho[rhodinex].dat
 function TestData(auction, R, rhoindex)
     eval(Meta.parse(string(
         "@load \"TestMonA",
@@ -22,6 +23,7 @@ function TestData(auction, R, rhoindex)
     return T
 end
 
+# Returns Monotonicity Violations for R=50,100,200
 function MonTestRead()
     rhovec = [exp(x) for x in [-10:0.5:0;]]
     MonTest = []
@@ -38,24 +40,26 @@ function MonTestRead()
     return MonTest
 end
 
+## Construct the data for the three tables (R=50,100,200) in Table 4 of the Main Text 
 T = MonTestRead()
 T50 = DataFrame(
     rho = rhovec[1:20],
     av = [mean(T[1][:, x] ./ (72 * 4.4)) for x in [1:1:20;]],
     se = [std(T[1][:, x] ./ (72 * 4.4)) for x in [1:1:20;]],
-    )
+)
 T100 = DataFrame(
     rho = rhovec[1:20],
     av = [mean(T[2][:, x] ./ (72 * 4.4)) for x in [1:1:20;]],
     se = [std(T[2][:, x] ./ (72 * 4.4)) for x in [1:1:20;]],
-    )
+)
 T200 = DataFrame(
     rho = rhovec[1:20],
     av = [mean(T[3][:, x] ./ (72 * 4.4)) for x in [1:1:20;]],
     se = [std(T[3][:, x] ./ (72 * 4.4)) for x in [1:1:20;]],
-    )
+)
 
 
+## Return the data for the three tables (R=50,100,200) in Table 4 of the Main Text 
 t1=latexify(
     T50[:, [:rho, :av, :se]],
     env = :tabular,
