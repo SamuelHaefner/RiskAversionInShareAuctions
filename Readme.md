@@ -4,7 +4,7 @@ This file contains the required information for the replication of the results i
 
 Author: [Samuel Häfner](https://samuelhaefner.github.io), Web3 Foundation, Zug, and University of St. Gallen, [samuel.haefner@gmail.com](mailto:samuel.haefner@gmail.com).
 
-Current version: August, 2022.
+Current version: October, 2022.
 
 # Table of Contents
 
