@@ -189,10 +189,10 @@ end
 # define the two vectors of values for rho within the three groups
 rhovec = [[0,0,0],[exp(-5),exp(-7),exp(-8)]]
 
-# take the second auction in the first auction group, g=1
-g = 1
+# take the third auction in the first auction group, g=2
+g = 2
 prices = PriceBids(group[g])
-auction = group[g][2]
+auction = group[g][3]
 BoundsAuction = []
 for i in [1:1:length(rhovec);]
   simplebounds = EstimateSimpleBoundsRobust(
