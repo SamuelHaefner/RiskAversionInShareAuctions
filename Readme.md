@@ -63,7 +63,8 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
    - ```ReadT.jl``` - Scripts to read in estimates of T and produce the plots and tables. 
    - ```ReadTRobust.jl``` - Same as above, but using the alternative estimates (robustness check).
    - ```ReadTestMon.jl``` - Contains the script to read in the monotonicity violations obtained and saved with TestMonGeneric.jl and produces the respective tables.
-5. Script to produce additional plots.
+5. Scripts to produce additional tables and plots.
+   - ```DataOverviewTable.jl``` - Script to generate the overview table of the data (Table 1).
    - ```Plots.jl``` - Script to generate the group plots, the resampling plots, and the plot showing the estimated bounds (which is done with function ```PlotTighterBounds()```; cf. the file for more information).  
 6. A file called [Estimate Data.zip](https://drive.google.com/file/d/1PlKXkPn4GbM3ImMSvveuznnPRTeeURGe/view?usp=sharing) also belongs to the replication files (externally hosted). It contains the estimates reported in the manuscript as described in Comment 3 below. 
 
@@ -238,7 +239,7 @@ The following table explains which scripts are used to produce the tables and pl
 |Figure 6  | ```Plots.jl```| Lines 36-60 (left panel). Lines 63-85 (right panel). |
 |Figure 7  |  ```Plots.jl``` | Lines 154-180 (left panel). Lines 88-151 (right panel).|
 |Figure 8 | ```Plots.jl``` | Lines 282-618. |
-|Table 1 | ```Auxilary.jl``` | Various functions in ```Auxiliary.jl``` are used. For a comprehensive overview see the corresponding [section](#Scripts) below. |
+|Table 1 | ```DataOverviewTable.jl``` | See file for more information. |
 |Table 2 | ```ReadT.jl``` | Lines 342-361. |
 |Table 3 | ```ReadEstimates.jl``` | See file for more information. |
 |Table 4 | ```ReadTestMon.jl``` | See file for more information. |
