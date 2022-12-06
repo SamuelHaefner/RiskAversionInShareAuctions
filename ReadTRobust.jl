@@ -163,7 +163,7 @@ p=groupedbar(
     bar_position=:stack,
     group = ctg, 
     bar_width=0.5,
-    title="Gamma distribution",
+    title="Log-Normal distribution",
     legend = :topleft
 )
 p=plot(p,size = [500, 400])

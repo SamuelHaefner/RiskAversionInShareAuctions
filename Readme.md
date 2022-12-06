@@ -4,34 +4,36 @@ This file contains the required information for the replication of the results i
 
 Author: [Samuel Häfner](https://samuelhaefner.github.io), Web3 Foundation, Zug, and University of St. Gallen, [samuel.haefner@gmail.com](mailto:samuel.haefner@gmail.com).
 
-Current version: August, 2022.
+Current version: October, 2022.
 
 # Table of Contents
 
-1. [Data](#Data)
-2. [Overview of Replication Files](#Overview)  
-3. [Estimation Procedure on a SLURM Workload Manager](#Estimation)
-4. [Example](#Example) 
-5. [Tables and Plots](#Tables)
-6. [Scripts in More Details](#Scripts)  
-  a. [Estimation.jl](##Estimation.jl)  
-  b. [TestMon.jl](##Testmon.jl)  
-  c. [Auxiliary.jl](##Auxiliary.jl) 
+- [Data](#data)
+- [Overview of the replication files](#overview-of-the-replication-files)
+- [Estimation Procedure on a SLURM Workload Manager](#estimation-procedure-on-a-slurm-workload-manager)
+- [Example](#example)
+- [Tables and Plots](#tables-and-plots)
+- [Scripts in More Detail](#scripts-in-more-detail)
+  - [The main global variables](#the-main-global-variables)
+  - [Estimation.jl](#estimationjl)
+  - [TestMon.jl](#testmonjl)
+  - [Auxiliary.jl](#auxiliaryjl)
+      
 
 # Data  
 The auction data is contained in the file ```setofbids.csv```. Each row corresponds to a submitted price-quantity pair. The columns are the following:
 
-| Variable | Description |
-|--- | --- |
-|```auction```| auction id |    
-|```quotatot``` | quota (in kg) | 
-|```bid_id``` | bid id |  
-|```bidder``` | bidder id | 
-|```qb```| quantity point (not cumulative, in kg) |  
-|```pb```| price point (in Swiss cents) | 
-|```qr```| resulting quantity (from that price-quantity pair)|  
-|```pr```| resulting payment | 
-|```qperc```| percentage of total quota |   
+| Variable       | Description                                        |
+| -------------- | -------------------------------------------------- |
+| ```auction```  | auction id                                         |
+| ```quotatot``` | quota (in kg)                                      |
+| ```bid_id```   | bid id                                             |
+| ```bidder```   | bidder id                                          |
+| ```qb```       | quantity point (not cumulative, in kg)             |
+| ```pb```       | price point (in Swiss cents)                       |
+| ```qr```       | resulting quantity (from that price-quantity pair) |
+| ```pr```       | resulting payment                                  |
+| ```qperc```    | percentage of total quota                          |
 
 
 # Overview of the replication files
@@ -56,21 +58,21 @@ This [repository](https://github.com/SamuelHaefner/RiskAversionInShareAuctions) 
    - ```EstimateWandTRobustGeneric.sh```
    - ```EstimateBoundsGeneric.sh```
    - ```TestMonGeneric.sh```
-3. The scripts to *read and further process the estimates* produced with above *SLURM.jl scripts. Once the estimates are saved in the respective .dat files, these scripts can be run as they are; they will produce the required figures and data for the tables.
+4. The scripts to *read and further process the estimates* produced with above *SLURM.jl scripts. Once the estimates are saved in the respective .dat files, these scripts can be run as they are; they will produce the required figures and data for the tables.
    - ```ReadEstimates.jl``` - Scripts and functions to read in the estimates of the bounds and produce the respective tables.
    - ```ReadT.jl``` - Scripts to read in estimates of T and produce the plots and tables. 
    - ```ReadTRobust.jl``` - Same as above, but using the alternative estimates (robustness check).
    - ```ReadTestMon.jl``` - Contains the script to read in the monotonicity violations obtained and saved with TestMonGeneric.jl and produces the respective tables.
-4. Scripts to produce additional tables and plots.
-   - ```DataOverviewTable.jl``` - Script to generate the overview table of the data (Table 1).
+5. Script to produce additional plots.
    - ```Plots.jl``` - Script to generate the group plots, the resampling plots, and the plot showing the estimated bounds (which is done with function ```PlotTighterBounds()```; cf. the file for more information).  
+6. A file called [Estimate Data.zip](https://drive.google.com/file/d/1PlKXkPn4GbM3ImMSvveuznnPRTeeURGe/view?usp=sharing) also belongs to the replication files (externally hosted). It contains the estimates reported in the manuscript as described in Comment 3 below. 
 
 *Comment 1:* The script ```TestMonWandBounds.jl``` produces the required files containing the estimates of W(p,q) and the bounds for the monotonicity check. This script needs to be run before the TestMon*.jl scripts, using the bash script ```TestMonWandBounds.sh```.
 
 *Comment 2:* Computation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. The Julia version used was 1.6. Computation time depended on the script, ranging from 2-3 hours (WandTGeneric.jl and TestMonGeneric.jl) up to 24 hours (EstimateBoundsGeneric.jl).
 
 
-# Estimation Procedure on a SLURM Workload Manager
+# Estimation Procedure (on a SLURM Workload Manager)
 The estimation was conducted at [sciCORE](http://scicore.unibas.ch/) (scientific computing core) facility at the University of Basel, using a SLURM workload manager. This allows to run several bootstrap rounds in parallel. 
 
 Below, I describe the basic procedure to do so. (Further down, in the Example section, I explain how the programs can be run locally.)
@@ -80,7 +82,7 @@ Below, I describe the basic procedure to do so. (Further down, in the Example se
 4. After the scripts completed, download the *.dat files with the estimates.
 5. Run the scripts described under Point 4 in Section [Overview](#Overview) above.
 
-*Comment 3:* The estimates that I obtained and reported in the manuscript can be downloaded [here](https://drive.google.com/file/d/1PlKXkPn4GbM3ImMSvveuznnPRTeeURGe/view?usp=sharing). This file contains the .dat files, so that the interested reader may directly jump to Point 5 above.
+*Comment 3:* The estimates that I obtained and reported in the manuscript (```Estimate Data.zip```) can be downloaded [here](https://drive.google.com/file/d/1PlKXkPn4GbM3ImMSvveuznnPRTeeURGe/view?usp=sharing). This file contains the .dat files, so that the interested reader may directly jump to Point 5 above.
 
 # Example
 
@@ -187,10 +189,10 @@ end
 # define the two vectors of values for rho within the three groups
 rhovec = [[0,0,0],[exp(-5),exp(-7),exp(-8)]]
 
-# take the second auction in the first auction group, g=1
-g = 1
+# take the third auction in the first auction group, g=2
+g = 2
 prices = PriceBids(group[g])
-auction = group[g][2]
+auction = group[g][3]
 BoundsAuction = []
 for i in [1:1:length(rhovec);]
   simplebounds = EstimateSimpleBoundsRobust(
@@ -236,7 +238,7 @@ The following table explains which scripts are used to produce the tables and pl
 |Figure 6  | ```Plots.jl```| Lines 36-60 (left panel). Lines 63-85 (right panel). |
 |Figure 7  |  ```Plots.jl``` | Lines 154-180 (left panel). Lines 88-151 (right panel).|
 |Figure 8 | ```Plots.jl``` | Lines 282-618. |
-|Table 1 | ```DataOverviewTable.jl``` | See file for more information. |
+|Table 1 | ```Auxilary.jl``` | Various functions in ```Auxiliary.jl``` are used. For a comprehensive overview see the corresponding [section](#Scripts) below. |
 |Table 2 | ```ReadT.jl``` | Lines 342-361. |
 |Table 3 | ```ReadEstimates.jl``` | See file for more information. |
 |Table 4 | ```ReadTestMon.jl``` | See file for more information. |
@@ -244,13 +246,13 @@ The following table explains which scripts are used to produce the tables and pl
 
 The following table explains which scripts are used to produce the tables and plots in the [supplementary appendix](https://samuelhaefner.github.io/SupplementaryAppendix.pdf) of the paper.
 
-| Figure/Table | Script | Line Number |
-|---|---|---|
-| Figure 1 |```ReadT.jl``` | Lines 1-95; 364-789.|
-| Figure 2 | ```ReatT.jl``` (right figure) and ```ReadTRobust.jl``` (left figure) | See files for more information. |
-| Table 1 | ```ReadT.jl``` | Lines 1-95; 364-789. |
-| Table 2 | ```ReatT.jl``` (right table) and ```ReadTRobust.jl``` (left table) | See files for more information. |
-| Tables in Section D | ```ReadEstimates.jl``` | See files for more information. |
+| Figure/Table        | Script                                                               | Line Number                     |
+| ------------------- | -------------------------------------------------------------------- | ------------------------------- |
+| Figure 1            | ```ReadT.jl```                                                       | Lines 1-95; 364-789.            |
+| Figure 2            | ```ReatT.jl``` (right figure) and ```ReadTRobust.jl``` (left figure) | See files for more information. |
+| Table 1             | ```ReadT.jl```                                                       | Lines 1-95; 364-789.            |
+| Table 2             | ```ReatT.jl``` (right table) and ```ReadTRobust.jl``` (left table)   | See files for more information. |
+| Tables in Section D | ```ReadEstimates.jl```                                               | See files for more information. |
 
 
 # Scripts in More Detail
@@ -259,25 +261,25 @@ This section provides the details about the functions and global variables defin
 ## The main global variables
 The **main global variables** used throughout the replication files are defined in the file ```Auxiliary.jl``` and are the followoing.
 
-| Variable | Description |
-|---|---|
-|```bids```| a data frame containing the bidding data | 
-|```K```| max number of price-quantity pairs|  
-|```un```| unit of account (100 corresponds to CHF/kg)|  
-|```vupperbar``` | upper bound on type space (in CHF)|  
-|```auctionindeces```| vector containing the auctionindeces corresponding to those in the data| 
-|```bidderindeces```| vector containing the bidderindeces corresponding to those in the data | 
-|```quotas```| vector with the quotas|  
-|```clearingprices```| vector with the market clearing prices | 
-|```activebidders```| vector with the number of active bidders | 
-|```activebidderindeces```| list of vectors with the indeces of the active bidders | 
+| Variable                  | Description                                                             |
+| ------------------------- | ----------------------------------------------------------------------- |
+| ```bids```                | a data frame containing the bidding data                                |
+| ```K```                   | max number of price-quantity pairs                                      |
+| ```un```                  | unit of account (100 corresponds to CHF/kg)                             |
+| ```vupperbar```           | upper bound on type space (in CHF)                                      |
+| ```auctionindeces```      | vector containing the auctionindeces corresponding to those in the data |
+| ```bidderindeces```       | vector containing the bidderindeces corresponding to those in the data  |
+| ```quotas```              | vector with the quotas                                                  |
+| ```clearingprices```      | vector with the market clearing prices                                  |
+| ```activebidders```       | vector with the number of active bidders                                |
+| ```activebidderindeces``` | list of vectors with the indeces of the active bidders                  |
 
 In the file ```Grouping.jl``` the following, **additional global variables** used for the estimation of W are defined:
 
-| Variable | Description |
-|---|---|
-|```group```| list containing, for each auction group, a vector of the respective auction indeces | 
-|```bidderassignment```| a vector determining for every bidder the bidder group assignment {1,2,3}|
+| Variable               | Description                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------- |
+| ```group```            | list containing, for each auction group, a vector of the respective auction indeces |
+| ```bidderassignment``` | a vector determining for every bidder the bidder group assignment {1,2,3}           |
 
 In the following subsections, I discuss the functions defined in the respective files ```Estimation.jl```, ```TestMon.jl```, and ```Auxiliary.jl```.
 
@@ -286,16 +288,16 @@ In the following subsections, I discuss the functions defined in the respective 
 Wgamma(prices, auctionset, bidderassignment, n, m, P) 
 ```
 #### Description
-Estimates W(p,q) using a gamma distribution. 
+Estimates $W(p,q)$ using a gamma distribution. 
 #### Arguments
-```prices``` -- vector of submitted prices to be used for the estimation of W.  
-```auctionset``` -- vector with indeces of auctions to be used for the estimation of W.  
+```prices``` -- vector of submitted prices to be used for the estimation of $W$.  
+```auctionset``` -- vector with indeces of auctions to be used for the estimation of $W$.  
 ```bidderassignment``` -- bidder assignment vector  
 ```n``` -- vector, each entry corresponding to the (average) number of active bidders from a given group  
 ```m``` -- number of bootstrap rounds to be estimated  
 ```P``` -- number of rounds of resampling used for estimation
 #### Return value
-A list of parameter estimates for the distribution of W(p,q). For each group in ```bidderassignment```, each bootstrap round, and each price in the vector ```prices```.
+A list of parameter estimates for the distribution of $W(p,q)$. For each group in ```bidderassignment```, each bootstrap round, and each price in the vector ```prices```.
 
 -----
 ```
@@ -330,10 +332,10 @@ SimpleBoundRobust(bid, WPar, rho, Q)
 Computes upper and lower bounds on the rationalizable profit 
 functions as described in Proposition 3.
 If the bounds violated the inequalities (15) in Proposition 4,
-return upper bound = vupperbar and lower bound = bid.
+return ```upper bound = vupperbar``` and ```lower bound = bid```.
 #### Arguments
 ```bid``` -- bid function  
-```WPar``` -- array, containing the estimated parameters of W(p,q) at (p_i^j) for steps j=1,...,k  
+```WPar``` -- array, containing the estimated parameters of $W(p,q)$ at $p_i^j$ for steps j=1,...,k  
 ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
 ```Q``` -- positive real number, corresponding to the quota $Q$
 #### Return value
@@ -350,9 +352,9 @@ EstimateSimpleBounds(auction, W, bidderassignment,  prices, rhovec, m)
 Computes ```SimpleBounds()``` for all bidders in ```auction```.
 #### Arguments
 ```auction``` -- auction index  
-```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```  
+```W``` -- estimate of $W$, as returned from ```Wgamma()``` or ```Wlnorm()```  
 ```bidderassignment``` -- bidder assignment vector  
-```prices``` -- vector of submitted prices used for the estimation of W  
+```prices``` -- vector of submitted prices used for the estimation of $W$  
 ```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
 ```m``` -- number of bootstrap rounds to be estimated
 #### Return value
@@ -368,9 +370,9 @@ EstimateSimpleBoundsRobust(auction, W, bidderassignment,  prices, rhovec, m)
 Computes ```SimpleBoundsRobust()``` for all bidders in ```auction```.
 #### Arguments
 ```auction``` -- auction index  
-```W``` -- estimate of W, as returned from ```Wgamma()``` or ```Wlnorm()```  
+```W``` -- estimate of $W$, as returned from ```Wgamma()``` or ```Wlnorm()```  
 ```bidderassignment``` -- bidder assignment vector  
-```prices``` -- vector of submitted prices used for the estimation of W  
+```prices``` -- vector of submitted prices used for the estimation of $W$  
 ```rhovec``` -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$  
 ```m``` -- number of bootstrap rounds to be estimated
 #### Return value
@@ -695,7 +697,7 @@ IntV(a, b, v)
 #### Description
 Returns the value of $\int_a^b v(q)dq$.
 #### Arguments
-  ```a```, ```b``` -- positive real numbers
+  ```a```, ```b``` -- positive real numbers  
   ```v``` -- marginal profit function
 #### Return value
 Real number; value of $\int_a^b v(q)dq$.
@@ -707,10 +709,10 @@ PiOverline(bidstep, bid, v, WPar, rho, Q, n)
 #### Description
 Returns the value of $\overline{\Pi}_i^j(b,v)$ (cf. the manuscript for a definition).
 #### Arguments
-  ```bidstep``` -- positive natural number, corresponding to the number of the step under consideration, j  
+  ```bidstep``` -- positive natural number, corresponding to the number of the step under consideration, $j$  
   ```bid``` -- bid function  
   ```v``` -- marginal profit function  
-  ```WPar``` -- array, containing the estimated parameters of the distribution of D(p_i^j) for steps j=1,...,k  
+  ```WPar``` -- array, containing the estimated parameters of the distribution of $D(p_i^j)$ for steps $j=1,...,k$  
   ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
   ```Q``` -- positive real number, corresponding to the quota $Q$  
   ```n``` -- positive natural number, indicating the number of support points used for integration  
@@ -725,7 +727,7 @@ w(q, WPar, dp)
 Computes $w_i(p,q)$.
 #### Arguments
   ```q``` -- positive real number  
-  ```WPar``` -- array, containing two sets of estimated parameters of the distribution of D(p); one for p_i^j and one for p_i^j + dp.   
+  ```WPar``` -- array, containing two sets of estimated parameters of the distribution of $D(p)$; one for $p_i^j$ and one for $p_i^j + dp$.   
   ```dp``` -- positive real number  
 #### Return value
 Real number; value of $w_i(p,q)$.
@@ -753,7 +755,7 @@ FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
   ```v``` -- marginal profit function  
   ```W``` -- estimates of W as returned from ```Wgamma()``` or ```Wlnorm()```  
   ```group``` -- natural number, indicating the group number of the auction  
-  ```prices``` -- vector of submitted prices used for the estimation of W  
+  ```prices``` -- vector of submitted prices used for the estimation of $W$  
   ```rho``` -- positive real number, corresponding to the risk preference $\rho$  
   ```Q``` -- positive real number, corresponding to the quota $Q$  
   ```bootstraprun``` -- natural number, indicating the boostrap run number   

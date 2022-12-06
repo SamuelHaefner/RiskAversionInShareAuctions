@@ -1,5 +1,5 @@
-# Contains the script to read in the estimated monotonicity violations 
-# obtained and saved with TestMonGeneric.jl and produces the respective tables.
+# Contains the script to read in the estimated monotonicity violations obtained and saved
+# with TestMonGeneric.jl and produces *.txt files to be used for the respective tables.
 
 using LaTeXStrings
 using Latexify
