@@ -9,38 +9,27 @@ using Latexify
 #quotas: quotas (from Auxiliary.jl)
 
 #bid-to-cover ratio
-btcratio = []
-for i in [1:length(auctionindeces);]
-    push!(btcratio,BidToCover(i))
-end
+btcratio = [BidToCover(x) for x in [1:length(auctionindeces);]]
 
 #number of bidders: activebidders (from Auxiliary.jl)
 
 #market clearing price: clearingprices (from Auxiliary.jl)
 
 #revenue
-revenue = []
-for i in [1:length(auctionindeces);]
-    push!(revenue,Revenue(i))
-end
+revenue = [Revenue(x) for x in [1:length(auctionindeces);]]
+
 
 #average total quanitity bid per bidder
-avbidperbidder = []
-for i in bidderindeces
-    push!(avbidperbidder,AvgBid(i))
-end
+avbidperbidder = [AvgBid(x) for x in bidderindeces]
+
 
 #share of successful bidders
-succbidders = []
-for i in [1:length(auctionindeces);]
-    push!(succbidders,ShareSuccBidders(i))
-end
+succbidders = [ShareSuccBidders(x) for x in [1:length(auctionindeces);]]
+
 
 #success rate per bidder
-succrate = []
-for i in bidderindeces
-    push!(succrate,SuccessRate(i))
-end
+succrate = [SuccessRate(x) for x in bidderindeces]
+
 
 #success rate per bidder*
 succratestar = []
@@ -60,7 +49,7 @@ end
 sharealloc = sharealloc[sharealloc.>0]
 
 # construct rows of table
-quotas_row = [mean(quotas),minimum(quotas),quantile(quotas,0.25),quantile(quotas,0.75),maximum(quotas)]
+quotas_row = [mean(quotas),minimum(quotas),quantile(quotas,0.25),quantile(quotas,0.75),maximum(quotas)]./1000
 btcratio_row = [mean(btcratio),minimum(btcratio),quantile(btcratio,0.25),quantile(btcratio,0.75),maximum(btcratio)]
 activebidders_row = [mean(activebidders),minimum(activebidders),quantile(activebidders,0.25),quantile(activebidders,0.75),maximum(activebidders)]
 clearingprices_row = [mean(clearingprices),minimum(clearingprices),quantile(clearingprices,0.25),quantile(clearingprices,0.75),maximum(clearingprices)]./100
