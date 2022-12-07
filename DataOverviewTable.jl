@@ -1,3 +1,5 @@
+## this script produces the data overview table (Table 1)
+
 include("Auxiliary.jl")
 include("Estimation.jl")
 include("Grouping.jl")
