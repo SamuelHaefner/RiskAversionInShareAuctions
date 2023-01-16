@@ -1,82 +1,371 @@
 <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>&ast;&ast;&lbrack;Risk Aversion in Share Auctions&colon; Estimating Rents from TRQs in Switzerland&rbrack;&lpar;https&colon;&sol;&sol;dx&period;doi&period;org&sol;10&period;2139&sol;ssrn&period;3397027&rpar;&ast;&ast;</title>
-        <style>
-/* From extension vscode.github */
+<html>
+<head>
+<title>Readme.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-.vscode-dark img[src$=\#gh-light-mode-only],
-.vscode-light img[src$=\#gh-dark-mode-only] {
-	display: none;
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
 }
 
-/* From extension ms-toolsai.jupyter */
-/* These classnames are inherited from bootstrap, but are present in most notebook renderers */
-
-.alert {
-    width: auto;
-    padding: 1em;
-    margin-top: 1em;
-    margin-bottom: 1em;
-}
-.alert > *:last-child {
-    margin-bottom: 0;
-}
-#preview > .alert:last-child {
-    /* Prevent this being set to zero by the default notebook stylesheet */
-    padding-bottom: 1em;
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
 }
 
-.alert-success {
-    /* Note there is no suitable color available, so we just copy "info" */
-    background-color: var(--theme-info-background);
-    color: var(--theme-info-foreground);
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
 }
-.alert-info {
-    background-color: var(--theme-info-background);
-    color: var(--theme-info-foreground);
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
 }
-.alert-warning {
-    background-color: var(--theme-warning-background);
-    color: var(--theme-warning-foreground);
+
+body.showEditorSelection .code-line {
+	position: relative;
 }
-.alert-danger {
-    background-color: var(--theme-error-background);
-    color: var(--theme-error-foreground);
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
 }
 
 </style>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+
 <style>
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
-                font-size: 14px;
-                line-height: 1.6;
-            }
-        </style>
-        <style>
-.task-list-item {
-    list-style-type: none;
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
 }
 
-.task-list-item-checkbox {
-    margin-left: -20px;
-    vertical-align: middle;
-    pointer-events: none;
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
 }
 </style>
-        
-    </head>
-    <body class="vscode-body vscode-light">
-        <p>This file contains the required information for the replication of the results in:</p>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p>This file contains the required information for the replication of the results in:</p>
 <h1 id="risk-aversion-in-share-auctions-estimating-rents-from-trqs-in-switzerland"><strong><a href="https://dx.doi.org/10.2139/ssrn.3397027">Risk Aversion in Share Auctions: Estimating Rents from TRQs in Switzerland</a></strong></h1>
 <p>Author: <a href="https://samuelhaefner.github.io">Samuel Häfner</a>, Web3 Foundation, Zug, and University of St. Gallen, <a href="mailto:samuel.haefner@gmail.com">samuel.haefner@gmail.com</a>.</p>
 <p>Current version: October, 2022.</p>
@@ -151,14 +440,14 @@
 <ul>
 <li><code>Auxiliary.jl</code> - Reads in the required packages, the data set and defines the required auxiliary functions and  global variables.</li>
 <li><code>Grouping.jl</code> - Determines the bidder groups and auction groups used for the estimation.</li>
-<li><code>Estimation.jl</code> - Contains the main functions for the estimation of W, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Θ</mi></mrow><annotation encoding="application/x-tex">\Theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">Θ</span></span></span></span>, and the bounds.</li>
-<li><code>TestMon.jl</code> - Contains the main functions to test for the monotonicity of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>F</mi><mi>i</mi><mi>j</mi></msubsup></mrow><annotation encoding="application/x-tex">F^j_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2194em;vertical-align:-0.2769em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9426em;"><span style="top:-2.4231em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.1809em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2769em;"><span></span></span></span></span></span></span></span></span></span> in v.</li>
+<li><code>Estimation.jl</code> - Contains the main functions for the estimation of W, $\Theta$, and the bounds.</li>
+<li><code>TestMon.jl</code> - Contains the main functions to test for the monotonicity of $F^j_i$ in v.</li>
 </ul>
 </li>
 <li>The <em>scripts to conduct the estimation</em>. In particular, the following files contain the scripts to produce the .jl and .sh files that can then be run on a SLURM workload manager.
 <ul>
-<li><code>EstimateWandTSLURM.jl</code> - Produces the required .jl and .sh files to compute and save estimates of W and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Θ</mi></mrow><annotation encoding="application/x-tex">\Theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">Θ</span></span></span></span>.</li>
-<li><code>EstimateWandTRobustSLURM.jl</code> - Produces the required files to compute and save the robustness checks for <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Θ</mi></mrow><annotation encoding="application/x-tex">\Theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">Θ</span></span></span></span>, using a log-normal distribution rather than a gamma distribution when estimating W.</li>
+<li><code>EstimateWandTSLURM.jl</code> - Produces the required .jl and .sh files to compute and save estimates of W and $\Theta$.</li>
+<li><code>EstimateWandTRobustSLURM.jl</code> - Produces the required files to compute and save the robustness checks for $\Theta$, using a log-normal distribution rather than a gamma distribution when estimating W.</li>
 <li><code>EstimateBoundsSLURM.jl</code> - Produces the required files to compute standard and tighter bounds, using the estimates of W(p,q) obtained with EstimateWandTSLURM.jl.</li>
 <li><code>TestMonSLURM.jl</code> - Produces the required files to test for monotonicity of F.</li>
 </ul>
@@ -205,18 +494,18 @@
 </ol>
 <p><em>Comment 3:</em> The estimates that I obtained and reported in the manuscript (<code>Estimate Data.zip</code>) can be downloaded <a href="https://drive.google.com/file/d/1PlKXkPn4GbM3ImMSvveuznnPRTeeURGe/view?usp=sharing">here</a>. This file contains the .dat files, so that the interested reader may directly jump to Point 5 above.</p>
 <h1 id="example">Example</h1>
-<p>The following code, which can be run locally, goes through the basic computations. Doing one bootstrap round, the code first estimates W(p,q), then computes <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Θ</mi><mo stretchy="false">(</mo><mi>ρ</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\Theta(\rho)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">Θ</span><span class="mopen">(</span><span class="mord mathnormal">ρ</span><span class="mclose">)</span></span></span></span>, and last determines the bounds for <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\rho=0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><msup><mi>ρ</mi><mo>∗</mo></msup></mrow><annotation encoding="application/x-tex">\rho=\rho^*</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8831em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6887em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span></span></span></span></span></span></span></span>.</p>
-<pre><code class="language-julia"><span class="hljs-comment">#######################################################################</span>
+<p>The following code, which can be run locally, goes through the basic computations. Doing one bootstrap round, the code first estimates W(p,q), then computes $\Theta(\rho)$, and last determines the bounds for $\rho=0$ and $\rho=\rho^*$.</p>
+<pre class="hljs"><code><div><span class="hljs-comment">#######################################################################</span>
 <span class="hljs-comment">## load the data set. </span>
 <span class="hljs-comment">## define global variables and relevant functions</span>
 <span class="hljs-comment">##</span>
 <span class="hljs-comment">## required packages: CSV; DataFrames; Distributions; </span>
 <span class="hljs-comment">##                    BSON: @save, @load;  Roots</span>
 <span class="hljs-comment">#######################################################################</span>
-include(<span class="hljs-string">&quot;Auxiliary.jl&quot;</span>)
-include(<span class="hljs-string">&quot;Estimation.jl&quot;</span>)
-include(<span class="hljs-string">&quot;Grouping.jl&quot;</span>)
-include(<span class="hljs-string">&quot;TestMon.jl&quot;</span>)
+include(<span class="hljs-string">"Auxiliary.jl"</span>)
+include(<span class="hljs-string">"Estimation.jl"</span>)
+include(<span class="hljs-string">"Grouping.jl"</span>)
+include(<span class="hljs-string">"TestMon.jl"</span>)
 
 <span class="hljs-comment">#######################################################################</span>
 <span class="hljs-comment">## the following lines compute the estimates of W(p,q).  </span>
@@ -339,7 +628,7 @@ BoundsAuction = []
     )
   <span class="hljs-keyword">end</span>
 <span class="hljs-keyword">end</span>
-</code></pre>
+</div></code></pre>
 <h1 id="tables-and-plots">Tables and Plots</h1>
 <p>The following table explains which scripts are used to produce the tables and plots in the <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3397027">main paper</a>.</p>
 <table>
@@ -377,17 +666,17 @@ BoundsAuction = []
 <td>Function <code>PlotTighterBounds()</code>; see the file for further information.</td>
 </tr>
 <tr>
-<td>Figure 6</td>
+<td>Figure B.1</td>
 <td><code>Plots.jl</code></td>
 <td>Lines 36-60 (left panel). Lines 63-85 (right panel).</td>
 </tr>
 <tr>
-<td>Figure 7</td>
+<td>Figure B.2</td>
 <td><code>Plots.jl</code></td>
 <td>Lines 154-180 (left panel). Lines 88-151 (right panel).</td>
 </tr>
 <tr>
-<td>Figure 8</td>
+<td>Figure D.1</td>
 <td><code>Plots.jl</code></td>
 <td>Lines 282-618.</td>
 </tr>
@@ -407,12 +696,12 @@ BoundsAuction = []
 <td>See file for more information.</td>
 </tr>
 <tr>
-<td>Table 4</td>
+<td>Table C.1</td>
 <td><code>ReadTestMon.jl</code></td>
 <td>See file for more information.</td>
 </tr>
 <tr>
-<td>Table 5</td>
+<td>Table E.1</td>
 <td><code>ReadEstimates.jl</code></td>
 <td>See file for more information.</td>
 </tr>
@@ -429,22 +718,22 @@ BoundsAuction = []
 </thead>
 <tbody>
 <tr>
-<td>Figure 1</td>
+<td>Figure B.1</td>
 <td><code>ReadT.jl</code></td>
 <td>Lines 1-95; 364-789.</td>
 </tr>
 <tr>
-<td>Figure 2</td>
-<td><code>ReatT.jl</code> (right figure) and <code>ReadTRobust.jl</code> (left figure)</td>
+<td>Figure C.1</td>
+<td><code>ReatT.jl</code> (left figure) and <code>ReadTRobust.jl</code> (right figure)</td>
 <td>See files for more information.</td>
 </tr>
 <tr>
-<td>Table 1</td>
+<td>Table B.1</td>
 <td><code>ReadT.jl</code></td>
 <td>Lines 1-95; 364-789.</td>
 </tr>
 <tr>
-<td>Table 2</td>
+<td>Table C.1</td>
 <td><code>ReatT.jl</code> (right table) and <code>ReadTRobust.jl</code> (left table)</td>
 <td>See files for more information.</td>
 </tr>
@@ -530,39 +819,39 @@ BoundsAuction = []
 </table>
 <p>In the following subsections, I discuss the functions defined in the respective files <code>Estimation.jl</code>, <code>TestMon.jl</code>, and <code>Auxiliary.jl</code>.</p>
 <h2 id="estimationjl">Estimation.jl</h2>
-<pre><code>Wgamma(prices, auctionset, bidderassignment, n, m, P) 
-</code></pre>
+<pre class="hljs"><code><div>Wgamma(prices, auctionset, bidderassignment, n, m, P) 
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Estimates <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">W(p,q)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span></span></span></span> using a gamma distribution.</p>
+<p>Estimates $W(p,q)$ using a gamma distribution.</p>
 <h4 id="arguments">Arguments</h4>
-<p><code>prices</code> -- vector of submitted prices to be used for the estimation of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span>.<br>
-<code>auctionset</code> -- vector with indeces of auctions to be used for the estimation of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span>.<br>
+<p><code>prices</code> -- vector of submitted prices to be used for the estimation of $W$.<br>
+<code>auctionset</code> -- vector with indeces of auctions to be used for the estimation of $W$.<br>
 <code>bidderassignment</code> -- bidder assignment vector<br>
 <code>n</code> -- vector, each entry corresponding to the (average) number of active bidders from a given group<br>
 <code>m</code> -- number of bootstrap rounds to be estimated<br>
 <code>P</code> -- number of rounds of resampling used for estimation</p>
 <h4 id="return-value">Return value</h4>
-<p>A list of parameter estimates for the distribution of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">W(p,q)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span></span></span></span>. For each group in <code>bidderassignment</code>, each bootstrap round, and each price in the vector <code>prices</code>.</p>
+<p>A list of parameter estimates for the distribution of $W(p,q)$. For each group in <code>bidderassignment</code>, each bootstrap round, and each price in the vector <code>prices</code>.</p>
 <hr>
-<pre><code>Wlnorm(prices, auctionset, bidderassignment, n, m, P)
-</code></pre>
+<pre class="hljs"><code><div>Wlnorm(prices, auctionset, bidderassignment, n, m, P)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Same as <code>Wgamma()</code>, yet using a log normal distribution.</p>
 <hr>
-<pre><code>SimpleBound(bid, WPar, rho, Q)
-</code></pre>
+<pre class="hljs"><code><div>SimpleBound(bid, WPar, rho, Q)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Computes upper and lower bounds on the rationalizable profit functions as described in Proposition 3 and equations (9)-(10).</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>bid</code> -- bid function<br>
 <code>WPar</code> -- array, containing the estimated parameters of W(p,q) at (p_i^j) for steps j=1,...,k<br>
-<code>rho</code> -- positive real number, corresponding to the risk preference <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span></span></span></span><br>
-<code>Q</code> -- positive real number, corresponding to the quota <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi></mrow><annotation encoding="application/x-tex">Q</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span></p>
+<code>rho</code> -- positive real number, corresponding to the risk preference $\rho$<br>
+<code>Q</code> -- positive real number, corresponding to the quota $Q$</p>
 <h4 id="return-value">Return value</h4>
 <p>A list of dataframes, [vlb,vub], where vub is the data frame containing the upper bound and vlb is the data frame containing lower bound.</p>
 <hr>
-<pre><code>SimpleBoundRobust(bid, WPar, rho, Q)
-</code></pre>
+<pre class="hljs"><code><div>SimpleBoundRobust(bid, WPar, rho, Q)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Computes upper and lower bounds on the rationalizable profit
 functions as described in Proposition 3.
@@ -570,44 +859,44 @@ If the bounds violated the inequalities (15) in Proposition 4,
 return <code>upper bound = vupperbar</code> and <code>lower bound = bid</code>.</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>bid</code> -- bid function<br>
-<code>WPar</code> -- array, containing the estimated parameters of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">W(p,q)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span></span></span></span> at <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>p</mi><mi>i</mi><mi>j</mi></msubsup></mrow><annotation encoding="application/x-tex">p_i^j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2194em;vertical-align:-0.2769em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9426em;"><span style="top:-2.4231em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.1809em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2769em;"><span></span></span></span></span></span></span></span></span></span> for steps j=1,...,k<br>
-<code>rho</code> -- positive real number, corresponding to the risk preference <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span></span></span></span><br>
-<code>Q</code> -- positive real number, corresponding to the quota <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi></mrow><annotation encoding="application/x-tex">Q</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span></p>
+<code>WPar</code> -- array, containing the estimated parameters of $W(p,q)$ at $p_i^j$ for steps j=1,...,k<br>
+<code>rho</code> -- positive real number, corresponding to the risk preference $\rho$<br>
+<code>Q</code> -- positive real number, corresponding to the quota $Q$</p>
 <h4 id="return-value">Return value</h4>
 <p>Return a list of dataframes, [vlb,vub],
 where vub is the data frame containing the upper bound
 and vlb is the data frame containing lower bound.</p>
 <hr>
-<pre><code>EstimateSimpleBounds(auction, W, bidderassignment,  prices, rhovec, m)
-</code></pre>
+<pre class="hljs"><code><div>EstimateSimpleBounds(auction, W, bidderassignment,  prices, rhovec, m)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Computes <code>SimpleBounds()</code> for all bidders in <code>auction</code>.</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>auction</code> -- auction index<br>
-<code>W</code> -- estimate of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span>, as returned from <code>Wgamma()</code> or <code>Wlnorm()</code><br>
+<code>W</code> -- estimate of $W$, as returned from <code>Wgamma()</code> or <code>Wlnorm()</code><br>
 <code>bidderassignment</code> -- bidder assignment vector<br>
-<code>prices</code> -- vector of submitted prices used for the estimation of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span><br>
-<code>rhovec</code> -- vector of positive real number, each number corresponding to the risk preference <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mi>g</mi></msub></mrow><annotation encoding="application/x-tex">\rho_g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> in bidder group <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span></span></span></span><br>
+<code>prices</code> -- vector of submitted prices used for the estimation of $W$<br>
+<code>rhovec</code> -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$<br>
 <code>m</code> -- number of bootstrap rounds to be estimated</p>
 <h4 id="return-value">Return value</h4>
 <p>A list of objects returned by <code>SimpleBounds()</code>, one entry per bidder.</p>
 <hr>
-<pre><code>EstimateSimpleBoundsRobust(auction, W, bidderassignment,  prices, rhovec, m)
-</code></pre>
+<pre class="hljs"><code><div>EstimateSimpleBoundsRobust(auction, W, bidderassignment,  prices, rhovec, m)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Computes <code>SimpleBoundsRobust()</code> for all bidders in <code>auction</code>.</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>auction</code> -- auction index<br>
-<code>W</code> -- estimate of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span>, as returned from <code>Wgamma()</code> or <code>Wlnorm()</code><br>
+<code>W</code> -- estimate of $W$, as returned from <code>Wgamma()</code> or <code>Wlnorm()</code><br>
 <code>bidderassignment</code> -- bidder assignment vector<br>
-<code>prices</code> -- vector of submitted prices used for the estimation of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span><br>
-<code>rhovec</code> -- vector of positive real number, each number corresponding to the risk preference <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mi>g</mi></msub></mrow><annotation encoding="application/x-tex">\rho_g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> in bidder group <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span></span></span></span><br>
+<code>prices</code> -- vector of submitted prices used for the estimation of $W$<br>
+<code>rhovec</code> -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$<br>
 <code>m</code> -- number of bootstrap rounds to be estimated</p>
 <h4 id="return-value">Return value</h4>
 <p>A list of objects returned by <code>SimpleBoundRobust()</code>, one entry per bidder.</p>
 <hr>
-<pre><code>EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
-</code></pre>
+<pre class="hljs"><code><div>EstTheta(auction, W, bidderassignment, prices, bounds, rho, m)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Determines violations of the inequalities in Proposition 4 for a given auction.</p>
 <h4 id="arguments">Arguments</h4>
@@ -621,8 +910,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>A list of three matrices, with the columns corresponding to bootstrap rounds and rows corresponding to bidder groups. The first matrix counts the number of violations of the inequalities (15) in Prop. 4, the second matrix counts the number of violations of the inequalities (16) in Prop. 4, and the third matrix counts the total number of submitted price-quantity pairs.</p>
 <hr>
-<pre><code>TighterBounds(bid, initvl, initvu, W, g, prices, rho, Q, bootstraprun, maxiter, tolerance)
-</code></pre>
+<pre class="hljs"><code><div>TighterBounds(bid, initvl, initvu, W, g, prices, rho, Q, bootstraprun, maxiter, tolerance)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Computes tighter upper and lower bounds from initial conditions <code>initvl</code> and <code>initivu</code> by runing Algorithm 2.</p>
 <h4 id="arguments">Arguments</h4>
@@ -639,8 +928,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>A list of dataframes, [vlb,vub], where vub is the data frame containing the upper bound and vlb is the data frame containing lower bound.</p>
 <hr>
-<pre><code>EstTighterBounds(auction, W, bidderassignment, prices, bounds, rhovec, m, maxiter, tolerance)
-</code></pre>
+<pre class="hljs"><code><div>EstTighterBounds(auction, W, bidderassignment, prices, bounds, rhovec, m, maxiter, tolerance)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Runs <code>TighterBounds()</code> for all bidders in an <code>auction</code> and for <code>m</code> bootstrap rounds.</p>
 <h4 id="arguments">Arguments</h4>
@@ -649,17 +938,17 @@ and vlb is the data frame containing lower bound.</p>
 <code>bidderassignment</code> -- bidder assignment vector<br>
 <code>prices</code> -- vector of prices used for the estimation of <code>W</code><br>
 <code>bounds</code> -- estimated simple bounds from <code>EstimateSimpleBoundsRobust()</code><br>
-<code>rhovec</code> -- vector of positive real number, each number corresponding to the risk preference <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mi>g</mi></msub></mrow><annotation encoding="application/x-tex">\rho_g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> in bidder group <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span></span></span></span><br>
+<code>rhovec</code> -- vector of positive real number, each number corresponding to the risk preference $\rho_g$ in bidder group $g$<br>
 <code>m</code> -- number of boostratp runs<br>
 <code>maxiter</code> -- maximum number of fixed point iterations<br>
 <code>tolerance</code> -- tolerance level (used in iteration)</p>
 <h4 id="return-value">Return value</h4>
 <p>List containing for each bidder and each bootstrap round a two dimensional list [<code>bounds</code>,<code>tighterbounds</code>], where <code>tighterbounds</code> is the object returned by <code>TighterBounds()</code>.</p>
 <h2 id="testmonjl">TestMon.jl</h2>
-<pre><code>TestIncreasingDiff(auction, bidderset, BoundsAuction, W, R, rhoindexset, rhovec)
-</code></pre>
+<pre class="hljs"><code><div>TestIncreasingDiff(auction, bidderset, BoundsAuction, W, R, rhoindexset, rhovec)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Determines the number of price-quantity pairs for which the monotonicity assumption on <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>F</mi><mi>j</mi></msup></mrow><annotation encoding="application/x-tex">F^j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span></span></span></span></span></span></span> is violated for a given auction.</p>
+<p>Determines the number of price-quantity pairs for which the monotonicity assumption on $F^j$ is violated for a given auction.</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>auction</code> -- auction index<br>
 <code>bidderset</code> -- bidder index set (set of bidders to be looked at)<br>
@@ -671,8 +960,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>A list of length of the <code>rhoindexset</code>, each entry is again a list of length of the <code>bidderset</code>, and each entry of that list consists of two numbers: (1) the total number of price-quantity pairs tested for that bidder (2) the total number of price-quantity pairs for which a violation of monotonicity was found.</p>
 <hr>
-<pre><code>GetQVals(g, bidstep)
-</code></pre>
+<pre class="hljs"><code><div>GetQVals(g, bidstep)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Draws a random number (uniformly between 1 and 20) of equidistant x-values that lie between the x-values of the <code>bidstep</code>-th price-quantity pair and the (<code>bidstep</code>-1)-th price-quantity pair in <code>g</code>.</p>
 <h4 id="arguments">Arguments</h4>
@@ -681,8 +970,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>List of x-values.</p>
 <hr>
-<pre><code>GetHigherF(g, h, qval)
-</code></pre>
+<pre class="hljs"><code><div>GetHigherF(g, h, qval)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Compute a random step function between <code>g</code> and <code>h</code> with x values given in <code>qval</code></p>
 <h4 id="arguments">Arguments</h4>
@@ -691,10 +980,10 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>Data frame containing the step function, [vval,qval].</p>
 <hr>
-<pre><code>CheckFOCMonotone(bidstep, bid, vub, vlb, W, g, prices, rho, Q, bootstraprun, R)
-</code></pre>
+<pre class="hljs"><code><div>CheckFOCMonotone(bidstep, bid, vub, vlb, W, g, prices, rho, Q, bootstraprun, R)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Evaluates <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>F</mi><mi>j</mi></msup></mrow><annotation encoding="application/x-tex">F^j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span></span></span></span></span></span></span> at the two different, ordered profit functions <code>R</code> times and reports the differences.</p>
+<p>Evaluates $F^j$ at the two different, ordered profit functions <code>R</code> times and reports the differences.</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>bidstep</code> -- natural number, the bid step to be looked at<br>
 <code>bid</code> -- bid function<br>
@@ -703,15 +992,15 @@ and vlb is the data frame containing lower bound.</p>
 <code>W</code> -- estimate of W as obtained by <code>Wgamma()</code> or <code>Wlnorm()</code>
 <code>g</code> -- natural number, indicating the group number of the auction<br>
 <code>prices</code> -- vector of prices used for the estimation of W<br>
-<code>rho</code> -- real number, risk preference <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span></span></span></span><br>
-<code>Q</code> -- real number, the quota <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi></mrow><annotation encoding="application/x-tex">Q</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span><br>
+<code>rho</code> -- real number, risk preference $\rho$<br>
+<code>Q</code> -- real number, the quota $Q$<br>
 <code>bootstraprun</code> -- the number of the bootrap round<br>
 <code>R</code> -- the number of tests per bid step</p>
 <h4 id="return-value">Return value</h4>
 <p>List of length <code>R</code>, containing the differences.</p>
 <hr>
-<pre><code>LoadWandBounds(auction)
-</code></pre>
+<pre class="hljs"><code><div>LoadWandBounds(auction)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Loads estimates of W and of simple bounds for <code>auction</code> from corresponding .dat files.</p>
 <h4 id="arguments">Arguments</h4>
@@ -719,22 +1008,22 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>List containing W and simple bounds for <code>auction</code></p>
 <hr>
-<pre><code>TestIncreasingDiffBidder(auction, bidder, Bounds, W, R, rho)
-</code></pre>
+<pre class="hljs"><code><div>TestIncreasingDiffBidder(auction, bidder, Bounds, W, R, rho)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Determines for a bidder in a given auction whether monotonicity of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>F</mi><mi>j</mi></msup></mrow><annotation encoding="application/x-tex">F^j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span></span></span></span></span></span></span> is violated for the submitted price-quantity pairs.</p>
+<p>Determines for a bidder in a given auction whether monotonicity of $F^j$ is violated for the submitted price-quantity pairs.</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>auction</code> -- auction index<br>
 <code>bidder</code> -- bidder index<br>
 <code>Bounds</code> -- first element in list returned by <code>LoadWandBounds(</code>)<br>
 <code>W</code> -- second element in list returned by <code>LoadWandBounds()</code><br>
 <code>R</code> -- number of tests per bid step<br>
-<code>rho</code> -- real number, risk preference <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span></span></span></span></p>
+<code>rho</code> -- real number, risk preference $\rho$</p>
 <h4 id="return-value">Return value</h4>
 <p>Two-dimensional list, [number of tests performed (corresponds to the number of bid steps), number of violations]</p>
 <h2 id="auxiliaryjl">Auxiliary.jl</h2>
-<pre><code>qpBid(bidder, auction)
-</code></pre>
+<pre class="hljs"><code><div>qpBid(bidder, auction)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Retrieve the bid function of a bidder in an auction.</p>
 <h4 id="arguments">Arguments</h4>
@@ -743,8 +1032,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>A data frame: [qb (quantity points), pb (price points), cumqb (cumulated quantity points)].</p>
 <hr>
-<pre><code>AvgNoBidders(bidderassignment)
-</code></pre>
+<pre class="hljs"><code><div>AvgNoBidders(bidderassignment)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Determine the average number of bidders in each bidder cluster</p>
 <h4 id="arguments">Arguments</h4>
@@ -752,8 +1041,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>A list of real numbers; one for each cluster number; returning the average no. of bidders.</p>
 <hr>
-<pre><code>BidToCover(auction)
-</code></pre>
+<pre class="hljs"><code><div>BidToCover(auction)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Determines the bid-to-cover ratio in an auction.</p>
 <h4 id="arguments">Arguments</h4>
@@ -761,8 +1050,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>Real number; corresponding to the bid-to-cover ratio.</p>
 <hr>
-<pre><code>Revenue(auction)
-</code></pre>
+<pre class="hljs"><code><div>Revenue(auction)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Determines the revenue from an auction.</p>
 <h4 id="arguments">Arguments</h4>
@@ -770,8 +1059,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>Real number; corresponding to the auction revenue.</p>
 <hr>
-<pre><code>qRec(bidder, auction)
-</code></pre>
+<pre class="hljs"><code><div>qRec(bidder, auction)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Determines the allocated quantity of a bidder in a given auction.</p>
 <h4 id="arguments">Arguments</h4>
@@ -780,8 +1069,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>Real number; corresponding to the allocated quantity.</p>
 <hr>
-<pre><code>qShareRec(bidder, auction)
-</code></pre>
+<pre class="hljs"><code><div>qShareRec(bidder, auction)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Determines the share of quota that is allocated to a bidder in a given auction.</p>
 <h4 id="arguments">Arguments</h4>
@@ -790,8 +1079,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>Real number; corresponding to the received share.</p>
 <hr>
-<pre><code>ActiveAuctions(bidder)
-</code></pre>
+<pre class="hljs"><code><div>ActiveAuctions(bidder)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Determines the indeces of the auctions in which a bidder is active.</p>
 <h4 id="arguments">Arguments</h4>
@@ -799,8 +1088,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>A list of integers; corresponding to the indices of the auctions in which the bidder was active.</p>
 <hr>
-<pre><code>AvgBid(bidder)
-</code></pre>
+<pre class="hljs"><code><div>AvgBid(bidder)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Determines the average bid of a bidder across the auctions in which that bidder was active.</p>
 <h4 id="arguments">Arguments</h4>
@@ -808,8 +1097,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>Real number; corresponding to the average bid of the bidder.</p>
 <hr>
-<pre><code>ShareSuccBidders(auction)
-</code></pre>
+<pre class="hljs"><code><div>ShareSuccBidders(auction)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Determines the  share of succesfull bidders (with non-zero allocated quantity) in an auction.</p>
 <h4 id="arguments">Arguments</h4>
@@ -817,8 +1106,8 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>Real number; corresponding to the share of successful bidders.</p>
 <hr>
-<pre><code>SuccessRate(bidder)
-</code></pre>
+<pre class="hljs"><code><div>SuccessRate(bidder)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Returns the success rate of a bidder (succesfull participation/total participation).</p>
 <h4 id="arguments">Arguments</h4>
@@ -826,28 +1115,28 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>Real number; corresponding to the bidder's success rate.</p>
 <hr>
-<pre><code>StepBid(q, bid)
-</code></pre>
+<pre class="hljs"><code><div>StepBid(q, bid)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Determines the value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>β</mi><mi>b</mi></msub><mo stretchy="false">(</mo><mi>q</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\beta_b(q)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0528em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span></span></span></span> (cf. the manuscript for a definition).</p>
+<p>Determines the value of $\beta_b(q)$ (cf. the manuscript for a definition).</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>q</code> -- positive real number
 <code>bid</code> -- bid function as returned from qpBid(bidder, auction)</p>
 <h4 id="return-value">Return value</h4>
-<p>Real number; value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>β</mi><mrow><mi>b</mi><mi>i</mi><mi>d</mi></mrow></msub><mo stretchy="false">(</mo><mi>q</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\beta_{bid}(q)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0528em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">bi</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span></span></span></span>.</p>
+<p>Real number; value of $\beta_{bid}(q)$.</p>
 <hr>
-<pre><code>NoStepBid(q, bid)
-</code></pre>
+<pre class="hljs"><code><div>NoStepBid(q, bid)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Determines the step of the step function <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>β</mi><mi>b</mi></msub></mrow><annotation encoding="application/x-tex">\beta_b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0528em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> at <code>q</code>. That is, returns the number of downward jumps that have occured strictly before <code>q</code>, plus one.</p>
+<p>Determines the step of the step function $\beta_b$ at <code>q</code>. That is, returns the number of downward jumps that have occured strictly before <code>q</code>, plus one.</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>q</code> positive real number
 <code>bid</code> bid function as returned from qpBid(bidder, auction)</p>
 <h4 id="return-value">Return value</h4>
 <p>Integer; see description.</p>
 <hr>
-<pre><code>StepV(q, v)
-</code></pre>
+<pre class="hljs"><code><div>StepV(q, v)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Returns the value of the profit function v(q).</p>
 <h4 id="arguments">Arguments</h4>
@@ -856,54 +1145,54 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>Real number; corresponding to the value of the profit function v(q).</p>
 <hr>
-<pre><code>IntBid(a, b, bid)
-</code></pre>
+<pre class="hljs"><code><div>IntBid(a, b, bid)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Returns the value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mi>a</mi><mi>b</mi></msubsup><msub><mi>β</mi><mrow><mi>b</mi><mi>i</mi><mi>d</mi></mrow></msub><mo stretchy="false">(</mo><mi>q</mi><mo stretchy="false">)</mo><mi>d</mi><mi>q</mi></mrow><annotation encoding="application/x-tex">\int_a^b\beta_{bid}(q)dq</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3998em;vertical-align:-0.3558em;"></span><span class="mop"><span class="mop op-symbol small-op" style="margin-right:0.19445em;position:relative;top:-0.0006em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.044em;"><span style="top:-2.3442em;margin-left:-0.1945em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span><span style="top:-3.2579em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3558em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0528em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">bi</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span></span></span></span>.</p>
+<p>Returns the value of $\int_a^b\beta_{bid}(q)dq$.</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>a</code>, <code>b</code> -- positive real numbers
 <code>bid</code> -- bid function as returned from qpBid(bidder, auction)</p>
 <h4 id="return-value">Return value</h4>
-<p>Real number; value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mi>a</mi><mi>b</mi></msubsup><msub><mi>β</mi><mrow><mi>b</mi><mi>i</mi><mi>d</mi></mrow></msub><mo stretchy="false">(</mo><mi>q</mi><mo stretchy="false">)</mo><mi>d</mi><mi>q</mi></mrow><annotation encoding="application/x-tex">\int_a^b\beta_{bid}(q)dq</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3998em;vertical-align:-0.3558em;"></span><span class="mop"><span class="mop op-symbol small-op" style="margin-right:0.19445em;position:relative;top:-0.0006em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.044em;"><span style="top:-2.3442em;margin-left:-0.1945em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span><span style="top:-3.2579em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3558em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0528em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">bi</span><span class="mord mathnormal mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span></span></span></span>.</p>
+<p>Real number; value of $\int_a^b\beta_{bid}(q)dq$.</p>
 <hr>
-<pre><code>IntV(a, b, v)
-</code></pre>
+<pre class="hljs"><code><div>IntV(a, b, v)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Returns the value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mi>a</mi><mi>b</mi></msubsup><mi>v</mi><mo stretchy="false">(</mo><mi>q</mi><mo stretchy="false">)</mo><mi>d</mi><mi>q</mi></mrow><annotation encoding="application/x-tex">\int_a^b v(q)dq</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3998em;vertical-align:-0.3558em;"></span><span class="mop"><span class="mop op-symbol small-op" style="margin-right:0.19445em;position:relative;top:-0.0006em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.044em;"><span style="top:-2.3442em;margin-left:-0.1945em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span><span style="top:-3.2579em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3558em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span></span></span></span>.</p>
+<p>Returns the value of $\int_a^b v(q)dq$.</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>a</code>, <code>b</code> -- positive real numbers<br>
 <code>v</code> -- marginal profit function</p>
 <h4 id="return-value">Return value</h4>
-<p>Real number; value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∫</mo><mi>a</mi><mi>b</mi></msubsup><mi>v</mi><mo stretchy="false">(</mo><mi>q</mi><mo stretchy="false">)</mo><mi>d</mi><mi>q</mi></mrow><annotation encoding="application/x-tex">\int_a^b v(q)dq</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3998em;vertical-align:-0.3558em;"></span><span class="mop"><span class="mop op-symbol small-op" style="margin-right:0.19445em;position:relative;top:-0.0006em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.044em;"><span style="top:-2.3442em;margin-left:-0.1945em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span><span style="top:-3.2579em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3558em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span></span></span></span>.</p>
+<p>Real number; value of $\int_a^b v(q)dq$.</p>
 <hr>
-<pre><code>PiOverline(bidstep, bid, v, WPar, rho, Q, n)
-</code></pre>
+<pre class="hljs"><code><div>PiOverline(bidstep, bid, v, WPar, rho, Q, n)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Returns the value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mover accent="true"><mi mathvariant="normal">Π</mi><mo stretchy="true">‾</mo></mover><mi>i</mi><mi>j</mi></msubsup><mo stretchy="false">(</mo><mi>b</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\overline{\Pi}_i^j(b,v)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3479em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">Π</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0979em;"><span style="top:-2.453em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.3362em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span></span></span></span> (cf. the manuscript for a definition).</p>
+<p>Returns the value of $\overline{\Pi}_i^j(b,v)$ (cf. the manuscript for a definition).</p>
 <h4 id="arguments">Arguments</h4>
-<p><code>bidstep</code> -- positive natural number, corresponding to the number of the step under consideration, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi></mrow><annotation encoding="application/x-tex">j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span></span></span></span><br>
+<p><code>bidstep</code> -- positive natural number, corresponding to the number of the step under consideration, $j$<br>
 <code>bid</code> -- bid function<br>
 <code>v</code> -- marginal profit function<br>
-<code>WPar</code> -- array, containing the estimated parameters of the distribution of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo stretchy="false">(</mo><msubsup><mi>p</mi><mi>i</mi><mi>j</mi></msubsup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">D(p_i^j)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2194em;vertical-align:-0.2769em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9426em;"><span style="top:-2.4231em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.1809em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2769em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> for steps <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo separator="true">,</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">j=1,...,k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">...</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span></span></span></span><br>
-<code>rho</code> -- positive real number, corresponding to the risk preference <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span></span></span></span><br>
-<code>Q</code> -- positive real number, corresponding to the quota <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi></mrow><annotation encoding="application/x-tex">Q</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span><br>
+<code>WPar</code> -- array, containing the estimated parameters of the distribution of $D(p_i^j)$ for steps $j=1,...,k$<br>
+<code>rho</code> -- positive real number, corresponding to the risk preference $\rho$<br>
+<code>Q</code> -- positive real number, corresponding to the quota $Q$<br>
 <code>n</code> -- positive natural number, indicating the number of support points used for integration</p>
 <h4 id="return-value">Return value</h4>
 <p>Real number.</p>
 <hr>
-<pre><code>w(q, WPar, dp)
-</code></pre>
+<pre class="hljs"><code><div>w(q, WPar, dp)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Computes <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">w_i(p,q)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span></span></span></span>.</p>
+<p>Computes $w_i(p,q)$.</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>q</code> -- positive real number<br>
-<code>WPar</code> -- array, containing two sets of estimated parameters of the distribution of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo stretchy="false">(</mo><mi>p</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">D(p)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mclose">)</span></span></span></span>; one for <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>p</mi><mi>i</mi><mi>j</mi></msubsup></mrow><annotation encoding="application/x-tex">p_i^j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2194em;vertical-align:-0.2769em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9426em;"><span style="top:-2.4231em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.1809em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2769em;"><span></span></span></span></span></span></span></span></span></span> and one for <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>p</mi><mi>i</mi><mi>j</mi></msubsup><mo>+</mo><mi>d</mi><mi>p</mi></mrow><annotation encoding="application/x-tex">p_i^j + dp</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2194em;vertical-align:-0.2769em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9426em;"><span style="top:-2.4231em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.1809em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2769em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">p</span></span></span></span>.<br>
+<code>WPar</code> -- array, containing two sets of estimated parameters of the distribution of $D(p)$; one for $p_i^j$ and one for $p_i^j + dp$.<br>
 <code>dp</code> -- positive real number</p>
 <h4 id="return-value">Return value</h4>
-<p>Real number; value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">w_i(p,q)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mclose">)</span></span></span></span>.</p>
+<p>Real number; value of $w_i(p,q)$.</p>
 <hr>
-<pre><code>PriceBids(auctionset)
-</code></pre>
+<pre class="hljs"><code><div>PriceBids(auctionset)
+</div></code></pre>
 <h4 id="description">Description</h4>
 <p>Returns all submitted prices in <code>auctionset</code> in ascending order.</p>
 <h4 id="arguments">Arguments</h4>
@@ -911,47 +1200,45 @@ and vlb is the data frame containing lower bound.</p>
 <h4 id="return-value">Return value</h4>
 <p>List of real numbers; prices submitted in the auctions in <code>auctionset</code>.</p>
 <hr>
-<pre><code>FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
-</code></pre>
+<pre class="hljs"><code><div>FOC(bidstep, bid, v, W, group, prices, rho, Q, bootstraprun, n)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p><code>FOC()</code> returns the value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>F</mi><mi>j</mi></msup></mrow><annotation encoding="application/x-tex">F^j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span></span></span></span></span></span></span> (cf. the manuscript).</p>
+<p><code>FOC()</code> returns the value of $F^j$ (cf. the manuscript).</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>bidstep</code> -- positive natural number, corresponding to the number of the step under consideration, j<br>
 <code>bid</code> -- bid function<br>
 <code>v</code> -- marginal profit function<br>
 <code>W</code> -- estimates of W as returned from <code>Wgamma()</code> or <code>Wlnorm()</code><br>
 <code>group</code> -- natural number, indicating the group number of the auction<br>
-<code>prices</code> -- vector of submitted prices used for the estimation of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span><br>
-<code>rho</code> -- positive real number, corresponding to the risk preference <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi></mrow><annotation encoding="application/x-tex">\rho</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ρ</span></span></span></span><br>
-<code>Q</code> -- positive real number, corresponding to the quota <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi></mrow><annotation encoding="application/x-tex">Q</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span><br>
+<code>prices</code> -- vector of submitted prices used for the estimation of $W$<br>
+<code>rho</code> -- positive real number, corresponding to the risk preference $\rho$<br>
+<code>Q</code> -- positive real number, corresponding to the quota $Q$<br>
 <code>bootstraprun</code> -- natural number, indicating the boostrap run number<br>
 <code>n</code> -- positive natural number, indicating the number of support points used for integration</p>
 <h4 id="return-value">Return value</h4>
-<p>Real number; value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>F</mi><mi>j</mi></msup></mrow><annotation encoding="application/x-tex">F^j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span></span></span></span></span></span></span>.</p>
+<p>Real number; value of $F^j$.</p>
 <hr>
-<pre><code>VarPhiU(q, v, vl)
-</code></pre>
+<pre class="hljs"><code><div>VarPhiU(q, v, vl)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Determines <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>φ</mi><mi>u</mi></msub><mo stretchy="false">(</mo><mi>q</mi><mo separator="true">,</mo><mi>v</mi><mo separator="true">,</mo><msub><mi>v</mi><mi>l</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\varphi_u(q,v,v_l)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> (cf. the manuscript).</p>
+<p>Determines $\varphi_u(q,v,v_l)$ (cf. the manuscript).</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>q</code> -- positive real number<br>
 <code>v</code> -- marginal profit function<br>
-<code>vl</code> -- positive real number, corresponding to <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>v</mi><mi>l</mi></msub></mrow><annotation encoding="application/x-tex">v_l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></p>
+<code>vl</code> -- positive real number, corresponding to $v_l$</p>
 <h4 id="return-value">Return value</h4>
-<p>Real number; value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>φ</mi><mi>u</mi></msub><mo stretchy="false">(</mo><mi>q</mi><mo separator="true">,</mo><mi>v</mi><mo separator="true">,</mo><msub><mi>v</mi><mi>l</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\varphi_u(q,v,v_l)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>.</p>
+<p>Real number; value of $\varphi_u(q,v,v_l)$.</p>
 <hr>
-<pre><code>VarPhiL(q, v, vu)
-</code></pre>
+<pre class="hljs"><code><div>VarPhiL(q, v, vu)
+</div></code></pre>
 <h4 id="description">Description</h4>
-<p>Determines <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>φ</mi><mi>l</mi></msub><mo stretchy="false">(</mo><mi>q</mi><mo separator="true">,</mo><mi>v</mi><mo separator="true">,</mo><msub><mi>v</mi><mi>u</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\varphi_l(q,v,v_u)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> (cf. the manuscript).</p>
+<p>Determines $\varphi_l(q,v,v_u)$ (cf. the manuscript).</p>
 <h4 id="arguments">Arguments</h4>
 <p><code>q</code> -- positive real number<br>
 <code>v</code> -- marginal profit function<br>
-<code>vu</code> -- positive real number, corresponding to <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>v</mi><mi>u</mi></msub></mrow><annotation encoding="application/x-tex">v_u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></p>
+<code>vu</code> -- positive real number, corresponding to $v_u$</p>
 <h4 id="return-value">Return value</h4>
-<p>Real number; value of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>φ</mi><mi>l</mi></msub><mo stretchy="false">(</mo><mi>q</mi><mo separator="true">,</mo><mi>v</mi><mo separator="true">,</mo><msub><mi>v</mi><mi>u</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\varphi_l(q,v,v_u)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>.</p>
+<p>Real number; value of $\varphi_l(q,v,v_u)$.</p>
 
-        <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
-        
-    </body>
-    </html>
+</body>
+</html>

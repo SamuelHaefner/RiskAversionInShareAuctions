@@ -23,16 +23,18 @@ bidderplot = plot(
     [1:1:123;],
     ab ./ 1000,
     seriestype = :bar,
-    linecolor = convert(Array{Int64,1}, bidderassignment),
-    fillcolor = convert(Array{Int64,1}, bidderassignment),
+    palette=:Blues_9,
+    linecolor = convert(Array{Int64,1}, bidderassignment*3),
+    fillcolor = convert(Array{Int64,1}, bidderassignment*3),
     legend = false,
     xlabel = "Bidder",
     ylabel = "Average Bid [t]",
     size = (600, 250),
     # title = "Bidder Groups",
 )
-savefig("ResamplingPlot2a.pdf")
+savefig("Figure3.pdf")
 
+    
 # Construct auctiongroups plot (left panel in Figure 6 in the Main Text)
 ############################################################################
 auctiongroup = []
@@ -49,15 +51,16 @@ auctionplot = plot(
     [1:1:39;],
     quotas ./ 1000,
     seriestype = :bar,
-    fillcolor = convert(Array{Int64,1}, auctiongroup),
-    linecolor = convert(Array{Int64,1}, auctiongroup),
+    palette=:Blues_9,
+    fillcolor = convert(Array{Int64,1}, auctiongroup*3),
+    linecolor = convert(Array{Int64,1}, auctiongroup*3),
     legend = false,
     xlabel = "Auction",
     ylabel = "Quota [t]",
     size = (600, 250),
     # title = "Auction Groups",
 )
-savefig("ResamplingPlot2b.pdf")
+savefig("FigureB1.pdf")
 
 
 # Get summary statistics for the groups (used for right panels in Figure 6 and 3, respectively)
@@ -148,7 +151,7 @@ plot!(
 
 vline!([0], linecolor = :black)
 plot(resamplingplot)
-savefig("ResamplingPlot1.pdf")
+savefig("FigureB2Right.pdf")
 
 
 ## Plot a bunch of bid functions (left panel in Figure 7 in the Main Text)
@@ -177,7 +180,7 @@ for i in activebidderindeces[auction]
     )
 end
 plot(bidfctplot)
-savefig("ResamplingPlot1b.pdf")
+savefig("FigureB2Left.pdf")
 
 
 ###########################################################################
@@ -274,10 +277,10 @@ function PlotTighterBounds(bidder, auction, f, m, runs)
     savefig(f)
 end
 
-## Produce figure for Figure 5 in the Main Text
+## Produce figures for Figure 5 in the Main Text
 ########################################################################################
-PlotTighterBounds(1,20,"BoundsBidder1Auction20.pdf",5,40)
-PlotTighterBounds(8,25,"BoundsBidder8Auction25.pdf",5,40)
+PlotTighterBounds(1,20,"Figure5Top.pdf",5,40)
+PlotTighterBounds(8,25,"Figure5Bottom.pdf",5,40)
 
 ###############################################################
 # TighterBoundsIterations(bid, initvl, initvu, W, g, prices, rho, Q, bootstraprun, maxiter, tolerance)
@@ -615,4 +618,4 @@ for i in [1:1:length(test[1]);]
     eval(Meta.parse(string("p=plot!(xpoints[",i,"],[ypointsl[",i,"],ypointsu[",i,"]],linetype = :steppre,color=RGBA(",1-i*d,",",1-i*d,",",1-i*d,", 1))")))
 end
 plot(p)
-savefig("BoundsAlgorithmConverge.pdf")
+savefig("FigureD1.pdf")

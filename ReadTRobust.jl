@@ -164,11 +164,12 @@ p=groupedbar(
     group = ctg, 
     bar_width=0.5,
     title="Log-Normal distribution",
+    palette=:Blues_3,
     legend = :topleft
 )
 p=plot(p,size = [500, 400])
 plot(p)
-savefig(p,"BRViolationsLogNorm.pdf")
+savefig(p,"AppFigure2Right.pdf")
 
 # Construct the data for the right table in Table 2 of the Supplementary Appendix
 data = hcat(

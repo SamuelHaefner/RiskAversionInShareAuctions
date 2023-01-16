@@ -236,23 +236,23 @@ The following table explains which scripts are used to produce the tables and pl
 |Figure 3 | ```Plots.jl```| Lines 9-34 (left panel). Lines 63-83 (right panel). |
 |Figure 4 | ```ReadT.jl``` | Lines 1-95; 190-340.|
 |Figure 5 | ```Plots.jl```| Function ```PlotTighterBounds()```; see the file for further information. |
-|Figure 6  | ```Plots.jl```| Lines 36-60 (left panel). Lines 63-85 (right panel). |
-|Figure 7  |  ```Plots.jl``` | Lines 154-180 (left panel). Lines 88-151 (right panel).|
-|Figure 8 | ```Plots.jl``` | Lines 282-618. |
+|Figure B.1  | ```Plots.jl```| Lines 36-60 (left panel). Lines 63-85 (right panel). |
+|Figure B.2  |  ```Plots.jl``` | Lines 154-180 (left panel). Lines 88-151 (right panel).|
+|Figure D.1 | ```Plots.jl``` | Lines 282-618. |
 |Table 1 | ```DataOverviewTable.jl``` | See file for more information. |
 |Table 2 | ```ReadT.jl``` | Lines 342-361. |
 |Table 3 | ```ReadEstimates.jl``` | See file for more information. |
-|Table 4 | ```ReadTestMon.jl``` | See file for more information. |
-|Table 5 | ```ReadEstimates.jl``` | See file for more information. |
+|Table C.1 | ```ReadTestMon.jl``` | See file for more information. |
+|Table E.1 | ```ReadEstimates.jl``` | See file for more information. |
 
 The following table explains which scripts are used to produce the tables and plots in the [supplementary appendix](https://samuelhaefner.github.io/SupplementaryAppendix.pdf) of the paper.
 
 | Figure/Table        | Script                                                               | Line Number                     |
 | ------------------- | -------------------------------------------------------------------- | ------------------------------- |
-| Figure 1            | ```ReadT.jl```                                                       | Lines 1-95; 364-789.            |
-| Figure 2            | ```ReatT.jl``` (right figure) and ```ReadTRobust.jl``` (left figure) | See files for more information. |
-| Table 1             | ```ReadT.jl```                                                       | Lines 1-95; 364-789.            |
-| Table 2             | ```ReatT.jl``` (right table) and ```ReadTRobust.jl``` (left table)   | See files for more information. |
+| Figure B.1            | ```ReadT.jl```                                                       | Lines 1-95; 364-789.            |
+| Figure C.1            | ```ReatT.jl``` (left figure) and ```ReadTRobust.jl``` (right figure) | See files for more information. |
+| Table B.1             | ```ReadT.jl```                                                       | Lines 1-95; 364-789.            |
+| Table C.1             | ```ReatT.jl``` (right table) and ```ReadTRobust.jl``` (left table)   | See files for more information. |
 | Tables in Section D | ```ReadEstimates.jl```                                               | See files for more information. |
 
 

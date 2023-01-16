@@ -165,11 +165,12 @@ p=groupedbar(
     group = ctg, 
     bar_width=0.5,
     title="Gamma distribution",
+    palette=:Blues_3,
     legend = :topleft
 )
 p=plot(p,size = [500, 400])
 plot(p)
-savefig(p,"BRViolationsGamma.pdf")
+savefig(p,"AppFigure2Left.pdf")
 
 # Construct the data for the left table in Table 2 of the Supplementary Appendix
 data = hcat(
@@ -313,6 +314,7 @@ p1=groupedbar(
     group = ctg, 
     bar_width=0.5,
     title = "Bidder Group g=1",
+    palette=:Blues_3,
     legend = :topleft
 )
 p2=groupedbar(
@@ -323,6 +325,7 @@ p2=groupedbar(
     group = ctg, 
     bar_width=0.5,
     title = "Bidder Group g=2",
+    palette=:Blues_3,
     legend = :topleft
 )
 p3=groupedbar(
@@ -333,11 +336,12 @@ p3=groupedbar(
     group = ctg, 
     bar_width=0.5,
     title = "Bidder Group g=3",
+    palette=:Blues_3,
     legend = :topleft
 )
 p=plot(p1,p2,p3,layout=(1,3),size = [1600, 400])
 plot(p)
-savefig(p,"BRViolationsBidderGroups.pdf")
+savefig(p,"Figure4.pdf")
 
 # Construct Table 2 in the Main Text
 data = hcat(
@@ -742,6 +746,7 @@ p1=groupedbar(
     group = ctg, 
     bar_width=0.5,
     title = "Auction Group a=1",
+    palette=:Blues_3,
     legend = :topleft
 )
 p2=groupedbar(
@@ -752,6 +757,7 @@ p2=groupedbar(
     group = ctg, 
     bar_width=0.5,
     title = "Auction Group a=2",
+    palette=:Blues_3,
     legend = :topleft
 )
 p3=groupedbar(
@@ -762,11 +768,12 @@ p3=groupedbar(
     group = ctg, 
     bar_width=0.5,
     title = "Auction Group a=3",
+    palette=:Blues_3,
     legend = :topleft
 )
 p=plot(p1,p2,p3,layout=(1,3),size = [1600, 400])
 plot(p)
-savefig(p,"BRViolationsAuctionGroups.pdf")
+savefig(p,"AppFigure1.pdf")
 
 # Construct data for Table 1 in the Supplementary APpendix
 data = hcat(
